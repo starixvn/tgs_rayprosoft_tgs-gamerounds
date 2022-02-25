@@ -17,5 +17,7 @@ namespace Tgs.DataBase.Round.Core
         ValueTask UpdateRoundAsync(UpdateRound round);
 
         ValueTask ReopenedRoundAsync(ReopenedRound round);
+
+        ValueTask TurnoverRoundAsync(TurnoverRound round);
     }
 }

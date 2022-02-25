@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Tgs.DataBase.Round.Core;
 using Tgs.DataBase.Round.Core.Models;
@@ -15,13 +16,12 @@ namespace Tgs.DataBase.Round.Repositories
 
         public RoundRepository(
             BetContext context,
-            ISerialNumberGenerator serialNumberGenerator,
-             ILogger<RoundRepository> logger
-            )
+            ILogger<RoundRepository> logger,
+            ISerialNumberGenerator serialNumberGenerator)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
         }
 
         public async ValueTask ClosedRoundAsync(ClosedRound round)
@@ -123,56 +123,63 @@ namespace Tgs.DataBase.Round.Repositories
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync();
 
-
         public async ValueTask<Guid?> NewRoundAsync(NewRound round)
         {
             Guid roundId = await _serialNumberGenerator
                 .GenerateAsync()
                 .ConfigureAwait(false);
-            using (var transaction = _context.Database.BeginTransaction())
+
+            var data = new Entities.Round()
             {
-                try
+                Id = roundId,
+                ExternalRoundId = round.ExternalRoundId,
+                GameProviderId = round.GameProviderId,
+                PlayerCode = round.PlayerCode,
+                GameId = round.GameId,
+                CurrencyCode = round.CurrencyCode,
+                Status = (short)RoundStatus.New,
+                GameProviderConfigurationId = round.GameProviderConfigurationId,
+                WalletId = round.WalletId,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow,
+                BrandId = round.BrandId,
+                ExternalCreatedOn = DateTime.SpecifyKind(round.ExternalCreatedOn.UtcDateTime, DateTimeKind.Utc),
+                ClientStatus = (short)RoundClientStatus.Open
+            };
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                _ = _context.Rounds.Add(data);
+
+                _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+
+                var getRound = await _context.Rounds.FirstAsync(x => x.Id == roundId).ConfigureAwait(false);
+
+                _ = _context.RoundDetails.Add(new()
                 {
-                    var data = new Entities.Round()
+                    RoundId = getRound.Id,
+                    AdditionalData = string.Empty
+                });
+                _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+
+                await transaction.CommitAsync().ConfigureAwait(false);
+                return roundId;
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(LogLevel.Error,
+                    new EventId(10000, nameof(RoundRepository)),
+                    data,
+                    ex,
+                    (state, ex) => JsonSerializer.Serialize(new
                     {
-                        Id = roundId,
-                        ExternalRoundId = round.ExternalRoundId,
-                        GameProviderId = round.GameProviderId,
-                        PlayerCode = round.PlayerCode,
-                        GameId = round.GameId,
-                        CurrencyCode = round.CurrencyCode,
-                        Status = (short)RoundStatus.New,
-                        GameProviderConfigurationId = round.GameProviderConfigurationId,
-                        WalletId = round.WalletId,
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow,
-                        BrandId = round.BrandId,
-                        ExternalCreatedOn = DateTime.SpecifyKind(round.ExternalCreatedOn.UtcDateTime, DateTimeKind.Utc),
-                        ClientStatus = (short)RoundClientStatus.Open
-                    };
-
-                    _ = _context.Rounds.Add(data);
-
-                    _ = await _context.SaveChangesAsync().ConfigureAwait(false);
-
-                    var getRound = await _context.Rounds.FirstAsync(x => x.Id == roundId).ConfigureAwait(false);
-
-                    _ = _context.RoundDetails.Add(new()
-                    {
-                        RoundId = getRound.Id,
-                        AdditionalData = string.Empty
-                    });
-                    _ = await _context.SaveChangesAsync().ConfigureAwait(false);
-
-                    await transaction.CommitAsync().ConfigureAwait(false);
-                    return roundId;
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync().ConfigureAwait(false);
-                    _logger.LogError($"An exception occurs when closing the game record.({roundId})", ex);
-                    return null;
-                }
+                        Data = data,
+                        Exception = ex!,
+                        Message = "添加新局出現例外",
+                        LogOn = DateTimeOffset.UtcNow.ToString("o")
+                    }));
+                await transaction.RollbackAsync().ConfigureAwait(false);
+                return null;
             }
         }
 
@@ -202,6 +209,15 @@ namespace Tgs.DataBase.Round.Repositories
             data.ClientStatus = (short)round.ClientStatus;
             data.ReopenedOn = DateTime.UtcNow;
             data.ReopenTurnoverAdjustment = data.Turnover;
+            _ = _context.Rounds.Update(data);
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask TurnoverRoundAsync(TurnoverRound round)
+        {
+            var data = await _context.Rounds.SingleAsync(x => x.Id == round.RoundId).ConfigureAwait(false);
+            data.UpdatedOn = DateTime.UtcNow;
+            data.Turnover = round.Turnover;
             _ = _context.Rounds.Update(data);
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }
