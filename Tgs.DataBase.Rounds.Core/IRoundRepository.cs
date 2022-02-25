@@ -14,10 +14,14 @@ namespace Tgs.DataBase.Rounds.Core
 
         ValueTask OpenRoundAsync(OpenRound round);
 
-        ValueTask ReopenedRoundAsync(ReopenedRound round);
+        ValueTask ReopenedBetRoundAsync(ReopenedBetRound round);
+
+        ValueTask ReopenedSettleRoundAsync(ReopenedSettleRound round);
 
         ValueTask TurnoverRoundAsync(TurnoverRound round);
 
         ValueTask UpdateRoundAsync(UpdateRound round);
+
+        ValueTask VoidRoundAsync(VoidRound round);
     }
 }

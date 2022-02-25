@@ -194,12 +194,23 @@ namespace Tgs.DataBase.Rounds.Repositories
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        public async ValueTask ReopenedRoundAsync(ReopenedRound round)
+        public async ValueTask ReopenedBetRoundAsync(ReopenedBetRound round)
         {
             var data = await _context.Rounds.SingleAsync(x => x.Id == round.RoundId).ConfigureAwait(false);
-            data.Status = (short)RoundStatus.Closed;
+            data.Status = (short)RoundStatus.Open;
             data.UpdatedOn = DateTime.UtcNow;
-            data.ClosedOn = DateTime.UtcNow;
+            data.BetAmount = round.BetAmount;
+            data.ValidBetAmount = round.ValidBetAmount;
+            data.ClientStatus = (short)RoundClientStatus.Open;
+            _ = _context.Rounds.Update(data);
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask ReopenedSettleRoundAsync(ReopenedSettleRound round)
+        {
+            var data = await _context.Rounds.SingleAsync(x => x.Id == round.RoundId).ConfigureAwait(false);
+            data.Status = (short)round.Status;
+            data.UpdatedOn = DateTime.UtcNow;
             data.BetAmount = round.BetAmount;
             data.ValidBetAmount = round.ValidBetAmount;
             data.SettleAmount = round.SettleAmount;
@@ -233,6 +244,16 @@ namespace Tgs.DataBase.Rounds.Repositories
             data.Commission = round.Commission;
             data.Turnover = round.Turnover;
             data.WinLoss = round.WinLoss;
+            _ = _context.Rounds.Update(data);
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask VoidRoundAsync(VoidRound round)
+        {
+            var data = await _context.Rounds.SingleAsync(x => x.Id == round.RoundId).ConfigureAwait(false);
+            data.Status = (short)RoundStatus.Closed;
+            data.UpdatedOn = DateTime.UtcNow;
+            data.ClientStatus = (short)RoundClientStatus.Void;
             _ = _context.Rounds.Update(data);
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }

@@ -63,6 +63,7 @@ namespace Tgs.DataBase.Rounds.Repositories.UnitTest
             var actual = await fakeRoundRepository.GetAsync(roundId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
+            Assert.AreEqual(RoundStatus.Open, actual.Status);
             Assert.AreEqual(data.BetAmount, actual.BetAmount);
             Assert.AreEqual(data.ValidBetAmount, actual.ValidBetAmount);
         }

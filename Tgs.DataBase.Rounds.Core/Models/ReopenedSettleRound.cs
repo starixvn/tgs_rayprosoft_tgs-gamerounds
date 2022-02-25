@@ -1,7 +1,8 @@
 ﻿namespace Tgs.DataBase.Rounds.Core.Models
 {
-    public record ReopenedRound(
+    public record ReopenedSettleRound(
           Guid RoundId,
+          RoundStatus Status,
           decimal BetAmount,
           decimal ValidBetAmount,
           decimal SettleAmount,
