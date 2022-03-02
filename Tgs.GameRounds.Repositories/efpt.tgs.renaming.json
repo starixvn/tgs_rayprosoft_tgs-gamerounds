@@ -1,0 +1,18 @@
+﻿[
+  {
+    "SchemaName": "dbo",
+    "Tables": [
+      {
+        "Columns": [
+          {
+            "Name": "game_provider_configuration_id",
+            "NewName": "GameProviderConfigurationId"
+          }
+        ],
+        "Name": "game_provider_configurations",
+        "NewName": "GameProviderConfig"
+      }
+    ],
+    "UseSchemaName": false
+  }
+]
