@@ -2,7 +2,7 @@
 {
     public record UpdateRound(
           Guid RoundId,
-          RoundStatus Status,
+          GameRoundStatus Status,
           DateTimeOffset? ClosedOn,
           DateTimeOffset? ExternalClosedOn,
           decimal? BetAmount,
@@ -12,7 +12,7 @@
           decimal? Turnover,
           decimal? WinLoss,
           decimal? TieBetAdjustment,
-          RoundClientStatus ClientStatus,
+          GameRoundClientStatus ClientStatus,
           decimal? ReopenTurnoverAdjustment,
           DateTimeOffset? ReopenedOn,
           string? AdditionalData);

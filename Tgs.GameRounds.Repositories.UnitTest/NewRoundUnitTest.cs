@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Tgs.DataBase.Rounds.Repositories.Entities;
 using Tgs.GameRounds.Core.Models;
+using Tgs.GameRounds.Repositories.Entities;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories.UnitTest
@@ -17,7 +17,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
         [TestMethod]
         public async Task Normal_Process()
         {
-            var fakeLogger = NullLogger<RoundRepository>.Instance;
+            var fakeLogger = NullLogger<GameRoundRepository>.Instance;
             var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
             var options = new DbContextOptionsBuilder<BetContext>()
                .UseInMemoryDatabase(databaseName: "bet")
@@ -42,7 +42,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
                 ExternalCreatedOn: DateTimeOffset.UtcNow);
 
-            var fakeRoundRepository = new RoundRepository(context, fakeLogger, fakeSerialNumberGenerator);
+            var fakeRoundRepository = new GameRoundRepository(context, fakeLogger, fakeSerialNumberGenerator);
 
             _ = fakeSerialNumberGenerator.GenerateAsync().Returns(ValueTask.FromResult(expected));
 

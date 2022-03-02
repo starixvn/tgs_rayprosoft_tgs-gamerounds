@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Tgs.DataBase.Round": {
+    "Tgs.GameRounds": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

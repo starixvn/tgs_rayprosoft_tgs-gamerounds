@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Tgs.DataBase.Rounds.Repositories.Entities;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
+using Tgs.GameRounds.Repositories.Entities;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories.UnitTest
@@ -18,7 +18,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
         [TestMethod]
         public async Task Normal_Process()
         {
-            var fakeLogger = NullLogger<RoundRepository>.Instance;
+            var fakeLogger = NullLogger<GameRoundRepository>.Instance;
             var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
             var options = new DbContextOptionsBuilder<BetContext>()
                .UseInMemoryDatabase(databaseName: "bet")
@@ -40,20 +40,20 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 PlayerCode = playerCode,
                 GameId = gameId,
                 CurrencyCode = "CNY",
-                Status = (short)RoundStatus.Open,
+                Status = (short)GameRoundStatus.Open,
                 GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
                 WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
                 BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
                 CreatedOn = DateTime.UtcNow,
                 ExternalCreatedOn = DateTime.UtcNow,
-                ClientStatus = (short)RoundClientStatus.Open
+                ClientStatus = (short)GameRoundClientStatus.Open
             };
             _ = await context.AddAsync(round).ConfigureAwait(false);
             _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
             var data = new UpdateRound(
                 RoundId: roundId,
-                Status: RoundStatus.Closed,
+                Status: GameRoundStatus.Closed,
                 ClosedOn: DateTimeOffset.UtcNow,
                 ExternalClosedOn: DateTimeOffset.UtcNow,
                 BetAmount: 20m,
@@ -63,20 +63,20 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 Turnover: 20m,
                 WinLoss: -20m,
                 TieBetAdjustment: null,
-                ClientStatus: RoundClientStatus.Win,
+                ClientStatus: GameRoundClientStatus.Win,
                 ReopenTurnoverAdjustment: null,
                 ReopenedOn: null,
                 AdditionalData: null
                 );
 
-            var fakeRoundRepository = new RoundRepository(context, fakeLogger, fakeSerialNumberGenerator);
+            var fakeRoundRepository = new GameRoundRepository(context, fakeLogger, fakeSerialNumberGenerator);
 
             await fakeRoundRepository.UpdateRoundAsync(data).ConfigureAwait(false);
 
             var actual = await fakeRoundRepository.GetAsync(roundId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(RoundStatus.Closed, actual.Status);
+            Assert.AreEqual(GameRoundStatus.Closed, actual.Status);
             Assert.AreEqual(data.BetAmount, actual.BetAmount);
             Assert.AreEqual(data.ValidBetAmount, actual.ValidBetAmount);
             Assert.AreEqual(data.SettleAmount, actual.SettleAmount);

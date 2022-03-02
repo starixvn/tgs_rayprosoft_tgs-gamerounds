@@ -2,12 +2,12 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore;
 using System;
-using Tgs.DataBase.Rounds.Repositories.Entities.Configurations;
+using Tgs.GameRounds.Repositories.Entities.Configurations;
 #nullable enable
 
 #nullable disable
 
-namespace Tgs.DataBase.Rounds.Repositories.Entities
+namespace Tgs.GameRounds.Repositories.Entities
 {
     public partial class BetContext : DbContext
     {

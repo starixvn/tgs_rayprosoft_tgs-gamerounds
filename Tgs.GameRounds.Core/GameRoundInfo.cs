@@ -1,13 +1,13 @@
 ﻿namespace Tgs.GameRounds.Core
 {
-    public record RoundInfo(
+    public record GameRoundInfo(
         Guid RoundId,
         string ExternalRoundId,
         Guid GameProviderId,
         string PlayerCode,
         int GameId,
         string CurrencyCode,
-        RoundStatus Status,
+        GameRoundStatus Status,
         Guid GameProviderConfigurationId,
         Guid WalletId,
         DateTime CreatedOn,
@@ -23,7 +23,7 @@
         decimal? Turnover,
         decimal? WinLoss,
         decimal? TieBetAdjustment,
-        RoundClientStatus ClientStatus,
+        GameRoundClientStatus ClientStatus,
         decimal? ReopenTurnoverAdjustment,
         DateTime? ReopenedOn,
         decimal? EffectiveBettingPercentage,

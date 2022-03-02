@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tgs.DataBase.Rounds.Repositories.Entities;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Repositories;
+using Tgs.GameRounds.Repositories.Entities;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -12,6 +12,6 @@ namespace Microsoft.Extensions.DependencyInjection
             Action<IServiceProvider, DbContextOptionsBuilder> configure)
             => services
                 .AddDbContext<BetContext>(configure)
-                .AddTransient<IRoundRepository, RoundRepository>();
+                .AddTransient<IGameRoundRepository, GameRoundRepository>();
     }
 }

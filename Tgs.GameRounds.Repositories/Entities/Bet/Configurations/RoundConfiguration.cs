@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore;
 using System;
-using Tgs.DataBase.Rounds.Repositories.Entities;
+using Tgs.GameRounds.Repositories.Entities;
 
 #nullable disable
 
-namespace Tgs.DataBase.Rounds.Repositories.Entities.Configurations
+namespace Tgs.GameRounds.Repositories.Entities.Configurations
 {
     public partial class RoundConfiguration : IEntityTypeConfiguration<Round>
     {

@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.DataBase.Rounds.Repositories.Entities
+namespace Tgs.GameRounds.Repositories.Entities
 {
     public partial class RoundDetail
     {

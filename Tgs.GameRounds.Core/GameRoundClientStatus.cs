@@ -1,6 +1,6 @@
 ﻿namespace Tgs.GameRounds.Core
 {
-    public enum RoundClientStatus
+    public enum GameRoundClientStatus
     {
         Open = 1,
         Void,

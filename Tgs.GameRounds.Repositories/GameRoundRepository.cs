@@ -1,22 +1,22 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Tgs.DataBase.Rounds.Repositories.Entities;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
+using Tgs.GameRounds.Repositories.Entities;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories
 {
-    internal class RoundRepository : IRoundRepository
+    internal class GameRoundRepository : IGameRoundRepository
     {
         private readonly BetContext _context;
-        private readonly ILogger<RoundRepository> _logger;
+        private readonly ILogger<GameRoundRepository> _logger;
         private readonly ISerialNumberGenerator _serialNumberGenerator;
 
-        public RoundRepository(
+        public GameRoundRepository(
             BetContext context,
-            ILogger<RoundRepository> logger,
+            ILogger<GameRoundRepository> logger,
             ISerialNumberGenerator serialNumberGenerator)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -24,21 +24,21 @@ namespace Tgs.GameRounds.Repositories
             _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
         }
 
-        public ValueTask<RoundInfo?> GetAsync(Guid roundId)
+        public ValueTask<GameRoundInfo?> GetAsync(Guid roundId)
             => (from round in _context.Rounds.AsQueryable()
                 join roundDetail in _context.RoundDetails.AsQueryable()
                 on round.Id equals roundDetail.RoundId
                 into roundDetailData
                 from data in roundDetailData.DefaultIfEmpty()
                 where round.Id == roundId
-                select new RoundInfo(
+                select new GameRoundInfo(
                     round.Id,
                     round.ExternalRoundId,
                     round.GameProviderId,
                     round.PlayerCode,
                     round.GameId,
                     round.CurrencyCode,
-                    (RoundStatus)round.Status,
+                    (GameRoundStatus)round.Status,
                     round.GameProviderConfigurationId,
                     round.WalletId,
                     round.CreatedOn,
@@ -54,7 +54,7 @@ namespace Tgs.GameRounds.Repositories
                     round.Turnover,
                     round.WinLoss,
                     round.TieBetAdjustment,
-                    (RoundClientStatus)round.ClientStatus,
+                    (GameRoundClientStatus)round.ClientStatus,
                     round.ReopenTurnoverAdjustment,
                     round.ReopenedOn,
                     round.EffectiveBettingPercentage,
@@ -63,7 +63,7 @@ namespace Tgs.GameRounds.Repositories
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync();
 
-        public ValueTask<RoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+        public ValueTask<GameRoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
             => (from round in _context.Rounds.AsQueryable()
                 join roundDetail in _context.RoundDetails.AsQueryable()
                 on round.Id equals roundDetail.RoundId
@@ -73,14 +73,14 @@ namespace Tgs.GameRounds.Repositories
                 && round.ExternalRoundId == externalRoundId
                 && round.GameId == gameId
                 && round.WalletId == walletId
-                select new RoundInfo(
+                select new GameRoundInfo(
                     round.Id,
                     round.ExternalRoundId,
                     round.GameProviderId,
                     round.PlayerCode,
                     round.GameId,
                     round.CurrencyCode,
-                    (RoundStatus)round.Status,
+                    (GameRoundStatus)round.Status,
                     round.GameProviderConfigurationId,
                     round.WalletId,
                     round.CreatedOn,
@@ -96,7 +96,7 @@ namespace Tgs.GameRounds.Repositories
                     round.Turnover,
                     round.WinLoss,
                     round.TieBetAdjustment,
-                    (RoundClientStatus)round.ClientStatus,
+                    (GameRoundClientStatus)round.ClientStatus,
                     round.ReopenTurnoverAdjustment,
                     round.ReopenedOn,
                     round.EffectiveBettingPercentage,
@@ -119,14 +119,14 @@ namespace Tgs.GameRounds.Repositories
                 PlayerCode = round.PlayerCode,
                 GameId = round.GameId,
                 CurrencyCode = round.CurrencyCode,
-                Status = (short)RoundStatus.New,
+                Status = (short)GameRoundStatus.New,
                 GameProviderConfigurationId = round.GameProviderConfigurationId,
                 WalletId = round.WalletId,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow,
                 BrandId = round.BrandId,
                 ExternalCreatedOn = DateTime.SpecifyKind(round.ExternalCreatedOn.UtcDateTime, DateTimeKind.Utc),
-                ClientStatus = (short)RoundClientStatus.Open
+                ClientStatus = (short)GameRoundClientStatus.Open
             };
             using var transaction = _context.Database.BeginTransaction();
             try
@@ -150,7 +150,7 @@ namespace Tgs.GameRounds.Repositories
             catch (Exception ex)
             {
                 _logger.Log(LogLevel.Error,
-                    new EventId(10000, nameof(RoundRepository)),
+                    new EventId(10000, nameof(GameRoundRepository)),
                     data,
                     ex,
                     (state, ex) => JsonSerializer.Serialize(new

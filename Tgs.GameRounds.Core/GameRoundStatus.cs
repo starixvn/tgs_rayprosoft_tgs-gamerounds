@@ -1,6 +1,6 @@
 ﻿namespace Tgs.GameRounds.Core
 {
-    public enum RoundStatus
+    public enum GameRoundStatus
     {
         New,
         Open,

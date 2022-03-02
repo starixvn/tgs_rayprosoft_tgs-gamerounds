@@ -8,7 +8,7 @@
    "ModelNamespace": "Entities",
    "OutputContextPath": "Entities\/Bet",
    "OutputPath": "Entities\/Bet\/Models",
-   "ProjectRootNamespace": "Tgs.DataBase.Rounds.Repositories",
+   "ProjectRootNamespace": "Tgs.GameRounds.Repositories",
    "Schemas": [
       {
          "Name": "bet"
