@@ -1,4 +1,4 @@
-﻿namespace Tgs.DataBase.Rounds.Core.Models
+﻿namespace Tgs.GameRounds.Core.Models
 {
     public record NewRound(
           string ExternalRoundId,

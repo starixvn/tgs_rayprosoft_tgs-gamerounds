@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tgs.DataBase.Rounds.Core\Tgs.DataBase.Rounds.Core.csproj" />
+    <ProjectReference Include="..\Tgs.GameRounds.Core\Tgs.GameRounds.Core.csproj" />
   </ItemGroup>
 
 </Project>

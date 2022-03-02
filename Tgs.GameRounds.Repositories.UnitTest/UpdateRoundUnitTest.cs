@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Tgs.DataBase.Rounds.Core;
-using Tgs.DataBase.Rounds.Core.Models;
 using Tgs.DataBase.Rounds.Repositories.Entities;
+using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Core.Models;
 using Tgs.SerialNumberGenerator;
 
-namespace Tgs.DataBase.Rounds.Repositories.UnitTest
+namespace Tgs.GameRounds.Repositories.UnitTest
 {
     [TestClass]
-    public class ReopenedSettleRoundUnitTest
+    public class UpdateRoundUnitTest
     {
         [TestMethod]
         public async Task Normal_Process()
@@ -40,38 +40,38 @@ namespace Tgs.DataBase.Rounds.Repositories.UnitTest
                 PlayerCode = playerCode,
                 GameId = gameId,
                 CurrencyCode = "CNY",
-                Status = (short)RoundStatus.Closed,
+                Status = (short)RoundStatus.Open,
                 GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
                 WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
                 BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
                 CreatedOn = DateTime.UtcNow,
                 ExternalCreatedOn = DateTime.UtcNow,
-                ExternalClosedOn = DateTime.UtcNow,
-                BetAmount = 20m,
-                ValidBetAmount = 20m,
-                SettleAmount = 40m,
-                Commission = 0m,
-                Turnover = 20m,
-                WinLoss = -20m,
-                ClientStatus = (short)RoundClientStatus.Win,
+                ClientStatus = (short)RoundClientStatus.Open
             };
             _ = await context.AddAsync(round).ConfigureAwait(false);
             _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
-            var data = new ReopenedSettleRound(
+            var data = new UpdateRound(
                 RoundId: roundId,
                 Status: RoundStatus.Closed,
+                ClosedOn: DateTimeOffset.UtcNow,
+                ExternalClosedOn: DateTimeOffset.UtcNow,
                 BetAmount: 20m,
                 ValidBetAmount: 20m,
-                SettleAmount: 0m,
+                SettleAmount: 40m,
                 Commission: 0m,
                 Turnover: 20m,
-                WinLoss: 20m,
-                ClientStatus: RoundClientStatus.Loss);
+                WinLoss: -20m,
+                TieBetAdjustment: null,
+                ClientStatus: RoundClientStatus.Win,
+                ReopenTurnoverAdjustment: null,
+                ReopenedOn: null,
+                AdditionalData: null
+                );
 
             var fakeRoundRepository = new RoundRepository(context, fakeLogger, fakeSerialNumberGenerator);
 
-            await fakeRoundRepository.ReopenedSettleRoundAsync(data).ConfigureAwait(false);
+            await fakeRoundRepository.UpdateRoundAsync(data).ConfigureAwait(false);
 
             var actual = await fakeRoundRepository.GetAsync(roundId).ConfigureAwait(false);
 
@@ -83,8 +83,6 @@ namespace Tgs.DataBase.Rounds.Repositories.UnitTest
             Assert.AreEqual(data.Commission, actual.Commission);
             Assert.AreEqual(data.Turnover, actual.Turnover);
             Assert.AreEqual(data.WinLoss, actual.WinLoss);
-            Assert.AreEqual(data.ClientStatus, actual.ClientStatus);
-            Assert.AreEqual(data.Turnover, actual.ReopenTurnoverAdjustment);
         }
     }
 }

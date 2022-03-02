@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tgs.DataBase.Rounds.Core;
-using Tgs.DataBase.Rounds.Repositories;
 using Tgs.DataBase.Rounds.Repositories.Entities;
+using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Repositories;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

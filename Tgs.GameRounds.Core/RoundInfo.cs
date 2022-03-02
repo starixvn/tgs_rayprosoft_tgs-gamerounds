@@ -1,4 +1,4 @@
-﻿namespace Tgs.DataBase.Rounds.Core
+﻿namespace Tgs.GameRounds.Core
 {
     public record RoundInfo(
         Guid RoundId,

@@ -20,8 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tgs.DataBase.Rounds.Core\Tgs.DataBase.Rounds.Core.csproj" />
-    <ProjectReference Include="..\Tgs.DataBase.Rounds.Repositories\Tgs.DataBase.Rounds.Repositories.csproj" />
+    <ProjectReference Include="..\Tgs.GameRounds.Repositories\Tgs.GameRounds.Repositories.csproj" />
   </ItemGroup>
 
 </Project>
