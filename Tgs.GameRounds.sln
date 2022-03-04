@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.Repositories
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.Repositories.UnitTest", "Tgs.GameRounds.Repositories.UnitTest\Tgs.GameRounds.Repositories.UnitTest.csproj", "{C2E496BD-AB37-40D6-9D72-0F1E51204EE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRounds.Common", "Tgs.GameRounds.Common\Tgs.GameRounds.Common.csproj", "{3D780F9A-FB9E-435F-A6FE-C3075A9DAAB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRounds.Core.UnitTest", "Tgs.GameRounds.Core.UnitTest\Tgs.GameRounds.Core.UnitTest.csproj", "{B118ED75-65F4-4703-9DA1-7D4F1FE6E34A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{C2E496BD-AB37-40D6-9D72-0F1E51204EE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2E496BD-AB37-40D6-9D72-0F1E51204EE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2E496BD-AB37-40D6-9D72-0F1E51204EE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D780F9A-FB9E-435F-A6FE-C3075A9DAAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D780F9A-FB9E-435F-A6FE-C3075A9DAAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D780F9A-FB9E-435F-A6FE-C3075A9DAAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D780F9A-FB9E-435F-A6FE-C3075A9DAAB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B118ED75-65F4-4703-9DA1-7D4F1FE6E34A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B118ED75-65F4-4703-9DA1-7D4F1FE6E34A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B118ED75-65F4-4703-9DA1-7D4F1FE6E34A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B118ED75-65F4-4703-9DA1-7D4F1FE6E34A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-﻿namespace Tgs.GameRounds.Core
+﻿namespace Tgs.GameRounds.Common
 {
     public enum GameRoundStatus
     {
