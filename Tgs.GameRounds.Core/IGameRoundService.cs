@@ -1,6 +1,6 @@
 ﻿namespace Tgs.GameRounds.Core
 {
-    public interface IGameRoundCacheService
+    public interface IGameRoundService
     {
         ValueTask<bool> ExistAsync(Guid roundId);
 

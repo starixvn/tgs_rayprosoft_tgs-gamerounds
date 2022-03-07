@@ -13,6 +13,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .RegisterAllServiceUtilityTypes(
                     Assembly.GetExecutingAssembly(),
                     ServiceLifetime.Transient)
-                .AddTransient<IGameRoundCacheService>(sp => ActivatorUtilities.CreateInstance<GameRoundCacheService>(sp, redisDatabaseResolver(sp), TimeSpan.FromMinutes(30)));
+                .AddTransient<IGameRoundService>(sp => ActivatorUtilities.CreateInstance<GameRoundService>(sp, redisDatabaseResolver(sp), TimeSpan.FromMinutes(30)));
     }
 }

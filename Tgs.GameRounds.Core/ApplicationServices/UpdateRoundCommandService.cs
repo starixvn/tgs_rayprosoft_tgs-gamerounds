@@ -5,12 +5,12 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 {
     internal class UpdateRoundCommandService : IGetService<UpdateRoundQuery, UpdateRoundResult>
     {
-        private readonly IGameRoundCacheService _gameRoundCacheService;
+        private readonly IGameRoundService _gameRoundCacheService;
         private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
         private readonly IGameRoundRepository _gameRoundRepository;
 
         public UpdateRoundCommandService(
-          IGameRoundCacheService gameRoundCacheService,
+          IGameRoundService gameRoundCacheService,
           IGameRoundRecordRepository gameRoundRecordRepository,
           IGameRoundRepository gameRoundRepository)
         {

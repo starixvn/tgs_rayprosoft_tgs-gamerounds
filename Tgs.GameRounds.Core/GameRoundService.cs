@@ -3,7 +3,7 @@ using StackExchange.Redis;
 
 namespace Tgs.GameRounds.Core
 {
-    internal class GameRoundCacheService : IGameRoundCacheService
+    internal class GameRoundService : IGameRoundService
     {
         private readonly IDatabase _database;
         private readonly string _existKey = "gameround:exist:{0}";
@@ -11,7 +11,7 @@ namespace Tgs.GameRounds.Core
         private readonly string _externalKey = "gameround:external:{0}:{1}:{2}:{3}";
         private readonly IGameRoundRepository _gameRoundRepository;
 
-        public GameRoundCacheService(IDatabase database, IGameRoundRepository gameRoundRepository, TimeSpan expiry)
+        public GameRoundService(IDatabase database, IGameRoundRepository gameRoundRepository, TimeSpan expiry)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
             _gameRoundRepository = gameRoundRepository ?? throw new ArgumentNullException(nameof(gameRoundRepository));

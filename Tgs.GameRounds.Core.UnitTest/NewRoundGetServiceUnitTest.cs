@@ -15,7 +15,7 @@ namespace Tgs.GameRounds.Core.UnitTest
         [TestMethod]
         public async Task ExternalRoundId_Exist()
         {
-            var fakeGameRoundCache = Substitute.For<IGameRoundCacheService>();
+            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
@@ -90,7 +90,7 @@ namespace Tgs.GameRounds.Core.UnitTest
         [TestMethod]
         public async Task Normal_Process()
         {
-            var fakeGameRoundCache = Substitute.For<IGameRoundCacheService>();
+            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRoundRepository>();
 

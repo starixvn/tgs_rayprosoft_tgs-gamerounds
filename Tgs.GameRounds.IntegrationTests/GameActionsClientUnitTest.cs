@@ -92,7 +92,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             await using var web = CreateTestSettingSite(services =>
             {
-                var fakeGameRoundCache = Substitute.For<IGameRoundCacheService>();
+                var fakeGameRoundCache = Substitute.For<IGameRoundService>();
                 _ = fakeGameRoundCache.GetRoundIdAsync(data.GameProviderId, data.ExternalRoundId, data.GameId, data.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
                 _ = services.AddSingleton(fakeGameRoundCache);
 
@@ -192,7 +192,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             await using var web = CreateTestSettingSite(services =>
             {
-                var fakeGameRoundCache = Substitute.For<IGameRoundCacheService>();
+                var fakeGameRoundCache = Substitute.For<IGameRoundService>();
                 _ = fakeGameRoundCache.ExistAsync(roundId).Returns(ValueTask.FromResult(true));
                 _ = services.AddSingleton(fakeGameRoundCache);
 
