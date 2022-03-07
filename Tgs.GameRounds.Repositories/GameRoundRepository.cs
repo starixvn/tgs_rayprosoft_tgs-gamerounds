@@ -164,7 +164,7 @@ namespace Tgs.GameRounds.Repositories
             }
         }
 
-        public async ValueTask UpdateRoundAsync(UpdateRoundCommand round)
+        public async ValueTask UpdateRoundAsync(UpdateRoundQuery round)
         {
             var data = await _context.Rounds.SingleAsync(x => x.Id == round.RoundId).ConfigureAwait(false);
             data.Status = (short)round.Status;

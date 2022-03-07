@@ -10,6 +10,6 @@ namespace Tgs.GameRounds.Core
 
         ValueTask<Guid?> NewRoundAsync(NewRoundQuery round);
 
-        ValueTask UpdateRoundAsync(UpdateRoundCommand round);
+        ValueTask UpdateRoundAsync(UpdateRoundQuery round);
     }
 }
