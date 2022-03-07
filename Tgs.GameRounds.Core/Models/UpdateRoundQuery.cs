@@ -1,6 +1,8 @@
-﻿namespace Tgs.GameRounds.Core.Models
+﻿using Tgs.GameRounds.Common;
+
+namespace Tgs.GameRounds.Core.Models
 {
-    public record UpdateRound(
+    public record UpdateRoundQuery(
           Guid RoundId,
           GameRoundStatus Status,
           DateTimeOffset? ClosedOn,

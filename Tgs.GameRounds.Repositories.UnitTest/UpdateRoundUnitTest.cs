@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.Repositories.Entities;
 using Tgs.SerialNumberGenerator;
@@ -51,7 +51,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             _ = await context.AddAsync(round).ConfigureAwait(false);
             _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
-            var data = new UpdateRound(
+            var data = new UpdateRoundQuery(
                 RoundId: roundId,
                 Status: GameRoundStatus.Closed,
                 ClosedOn: DateTimeOffset.UtcNow,

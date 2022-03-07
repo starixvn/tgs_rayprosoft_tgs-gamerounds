@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.Repositories.Entities;
@@ -24,7 +25,7 @@ namespace Tgs.GameRounds.Repositories
             _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
         }
 
-        public ValueTask<GameRoundInfo?> GetAsync(Guid roundId)
+        public ValueTask<GameRoundInfo> GetAsync(Guid roundId)
             => (from round in _context.Rounds.AsQueryable()
                 join roundDetail in _context.RoundDetails.AsQueryable()
                 on round.Id equals roundDetail.RoundId
@@ -61,7 +62,7 @@ namespace Tgs.GameRounds.Repositories
                     data.AdditionalData
                     ))
             .ToAsyncEnumerable()
-            .FirstOrDefaultAsync();
+            .FirstAsync();
 
         public ValueTask<GameRoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
             => (from round in _context.Rounds.AsQueryable()
@@ -105,11 +106,9 @@ namespace Tgs.GameRounds.Repositories
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync();
 
-        public async ValueTask<Guid?> NewRoundAsync(NewRound round)
+        public async ValueTask<Guid?> NewRoundAsync(NewRoundQuery round)
         {
-            Guid roundId = await _serialNumberGenerator
-                .GenerateAsync()
-                .ConfigureAwait(false);
+            var roundId = await _serialNumberGenerator.GenerateAsync().ConfigureAwait(false);
 
             var data = new Round()
             {
@@ -165,7 +164,7 @@ namespace Tgs.GameRounds.Repositories
             }
         }
 
-        public async ValueTask UpdateRoundAsync(UpdateRound round)
+        public async ValueTask UpdateRoundAsync(UpdateRoundQuery round)
         {
             var data = await _context.Rounds.SingleAsync(x => x.Id == round.RoundId).ConfigureAwait(false);
             data.Status = (short)round.Status;
@@ -202,6 +201,5 @@ namespace Tgs.GameRounds.Repositories
 
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }
-
     }
 }

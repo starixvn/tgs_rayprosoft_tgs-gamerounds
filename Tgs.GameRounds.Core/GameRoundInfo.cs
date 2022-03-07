@@ -1,4 +1,6 @@
-﻿namespace Tgs.GameRounds.Core
+﻿using Tgs.GameRounds.Common;
+
+namespace Tgs.GameRounds.Core
 {
     public record GameRoundInfo(
         Guid RoundId,
@@ -10,12 +12,12 @@
         GameRoundStatus Status,
         Guid GameProviderConfigurationId,
         Guid WalletId,
-        DateTime CreatedOn,
-        DateTime? ClosedOn,
-        DateTime UpdatedOn,
+        DateTimeOffset CreatedOn,
+        DateTimeOffset? ClosedOn,
+        DateTimeOffset UpdatedOn,
         Guid BrandId,
-        DateTime? ExternalCreatedOn,
-        DateTime? ExternalClosedOn,
+        DateTimeOffset? ExternalCreatedOn,
+        DateTimeOffset? ExternalClosedOn,
         decimal? BetAmount,
         decimal? ValidBetAmount,
         decimal? SettleAmount,
@@ -25,7 +27,7 @@
         decimal? TieBetAdjustment,
         GameRoundClientStatus ClientStatus,
         decimal? ReopenTurnoverAdjustment,
-        DateTime? ReopenedOn,
+        DateTimeOffset? ReopenedOn,
         decimal? EffectiveBettingPercentage,
         string AdditionalData
         );

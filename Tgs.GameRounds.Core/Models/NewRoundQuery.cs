@@ -1,6 +1,6 @@
 ﻿namespace Tgs.GameRounds.Core.Models
 {
-    public record NewRound(
+    public record NewRoundQuery(
           string ExternalRoundId,
           Guid GameProviderId,
           string PlayerCode,
