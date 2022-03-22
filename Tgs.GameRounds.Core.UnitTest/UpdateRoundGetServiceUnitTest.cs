@@ -9,7 +9,7 @@ using Tgs.GameRounds.Core.Models;
 namespace Tgs.GameRounds.Core.UnitTest
 {
     [TestClass]
-    public class UpdateRoundCommandServiceUnitTest
+    public class UpdateRoundGetServiceUnitTest
     {
         [TestMethod]
         public async Task ExternalRoundId_Not_Exist()
@@ -73,7 +73,7 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var expected = new UpdateRoundResult(false);
 
-            var repository = new UpdateRoundCommandService(
+            var repository = new UpdateRoundGetService(
                 fakeGameRoundCache,
                 fakeGameRoundRecord,
                 fakeGameRound);
@@ -150,21 +150,36 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var expected = new UpdateRoundResult(true);
 
-            var repository = new UpdateRoundCommandService(
+            var repository = new UpdateRoundGetService(
                 fakeGameRoundCache,
                 fakeGameRoundRecord,
                 fakeGameRound);
 
             _ = fakeGameRoundCache.ExistAsync(data.RoundId).Returns(ValueTask.FromResult<bool>(expected.Success));
 
-            _ = fakeGameRound.UpdateRoundAsync(data);
+            _ = fakeGameRound.UpdateRoundAsync(new(
+                data.RoundId,
+                data.Status,
+                data.ClosedOn,
+                data.ExternalClosedOn,
+                data.BetAmount,
+                data.ValidBetAmount,
+                data.SettleAmount,
+                data.Commission,
+                data.Turnover,
+                data.WinLoss,
+                data.TieBetAdjustment,
+                data.ClientStatus,
+                data.ReopenTurnoverAdjustment,
+                data.ReopenedOn,
+                data.AdditionalData));
 
             _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult(gameRound));
 
             var actual = await repository.GetAsync(data).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Equals(expected, actual);
+            _ = Equals(expected, actual);
             Assert.AreEqual(expected.Success, actual.Success);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Is(gameRound));

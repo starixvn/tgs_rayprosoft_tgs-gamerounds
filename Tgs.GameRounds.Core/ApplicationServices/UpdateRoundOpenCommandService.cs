@@ -1,15 +1,14 @@
-﻿using Tgs.GameRounds.Core.Models;
-using Tgs.ServiceUtility;
+﻿using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Core.ApplicationServices
 {
-    internal class UpdateRoundCommandService : IGetService<UpdateRoundQuery, UpdateRoundResult>
+    internal class UpdateRoundOpenCommandService : ICommandService<UpdateRoundOpenCommand>
     {
         private readonly IGameRoundService _gameRoundCacheService;
         private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
         private readonly IGameRoundRepository _gameRoundRepository;
 
-        public UpdateRoundCommandService(
+        public UpdateRoundOpenCommandService(
           IGameRoundService gameRoundCacheService,
           IGameRoundRecordRepository gameRoundRecordRepository,
           IGameRoundRepository gameRoundRepository)
@@ -19,16 +18,23 @@ namespace Tgs.GameRounds.Core.ApplicationServices
             _gameRoundRepository = gameRoundRepository ?? throw new ArgumentNullException(nameof(gameRoundRepository));
         }
 
-        public async ValueTask<UpdateRoundResult> GetAsync(UpdateRoundQuery query, CancellationToken cancellationToken = default)
+        public async ValueTask ExecuteAsync(UpdateRoundOpenCommand command, CancellationToken cancellationToken = default)
         {
-            if (!await _gameRoundCacheService.ExistAsync(query.RoundId).ConfigureAwait(false))
+            if (!await _gameRoundCacheService.ExistAsync(command.RoundId).ConfigureAwait(false))
             {
-                return new(Success: false);
+                return;
             }
 
-            await _gameRoundRepository.UpdateRoundAsync(query).ConfigureAwait(false);
+            await _gameRoundRepository.UpdateRoundOpenAsync(new(
+                command.RoundId,
+                command.UpdatedOn,
+                command.BetAmount,
+                command.ValidBetAmount,
+                command.Commission,
+                command.Turnover,
+                command.AdditionalData)).ConfigureAwait(false);
 
-            var round = await _gameRoundRepository.GetAsync(query.RoundId).ConfigureAwait(false);
+            var round = await _gameRoundRepository.GetAsync(command.RoundId).ConfigureAwait(false);
 
             await _gameRoundRecordRepository.AddAsync(new(
                 round.RoundId,
@@ -58,8 +64,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 round.ReopenedOn,
                 round.EffectiveBettingPercentage,
                 round.AdditionalData)).ConfigureAwait(false);
-
-            return new(Success: true);
         }
     }
 }

@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Tgs.GameRounds.IntegrationTests
 {
-    internal class GameActionsApplicationUnitTest : WebApplicationFactory<Program>
+    internal class GameRoundsApplicationUnitTest : WebApplicationFactory<Program>
     {
         private readonly Action<IWebHostBuilder>? _webHostConfigure;
 
-        public GameActionsApplicationUnitTest(Action<IWebHostBuilder>? webHostConfigure = null)
+        public GameRoundsApplicationUnitTest(Action<IWebHostBuilder>? webHostConfigure = null)
         {
             _webHostConfigure = webHostConfigure;
         }

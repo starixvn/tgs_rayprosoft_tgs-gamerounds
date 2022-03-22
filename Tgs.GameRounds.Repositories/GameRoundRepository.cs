@@ -25,6 +25,52 @@ namespace Tgs.GameRounds.Repositories
             _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
         }
 
+        public async ValueTask<Guid> AddRoundAsync(AddRound source)
+        {
+            var roundId = await _serialNumberGenerator.GenerateAsync().ConfigureAwait(false);
+            var round = new Round()
+            {
+                Id = roundId,
+                ExternalRoundId = source.ExternalRoundId,
+                GameProviderId = source.GameProviderId,
+                PlayerCode = source.PlayerCode,
+                GameId = source.GameId,
+                CurrencyCode = source.CurrencyCode,
+                Status = (short)source.Status,
+                GameProviderConfigurationId = source.GameProviderConfigurationId,
+                WalletId = source.WalletId,
+                CreatedOn = DateTime.SpecifyKind(source.CreatedOn.UtcDateTime, DateTimeKind.Utc),
+                ClosedOn = (source.Status is GameRoundStatus.New || source.Status is GameRoundStatus.Open) ? null : (source.ClosedOn.HasValue) ? DateTime.SpecifyKind(source.ClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null,
+                UpdatedOn = DateTime.SpecifyKind(source.UpdatedOn.UtcDateTime, DateTimeKind.Utc),
+                BrandId = source.BrandId,
+                ExternalCreatedOn = (source.ExternalCreatedOn.HasValue) ? DateTime.SpecifyKind(source.ExternalCreatedOn.Value.UtcDateTime, DateTimeKind.Utc) : (DateTime?)null,
+                ExternalClosedOn = (source.ExternalClosedOn.HasValue) ? DateTime.SpecifyKind(source.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : (DateTime?)null,
+                BetAmount = source.BetAmount ?? 0,
+                ValidBetAmount = source.ValidBetAmount ?? 0,
+                SettleAmount = source.SettleAmount ?? 0,
+                Commission = source.Commission ?? 0,
+                Turnover = source.Turnover ?? 0,
+                WinLoss = -(source.WinLoss ?? 0),
+                TieBetAdjustment = source.TieBetAdjustment ?? 0,
+                ClientStatus = (short)source.ClientStatus
+            };
+            round.Id = roundId;
+            _ = _context.Rounds.Add(round);
+
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            var getRound = await _context.Rounds.FirstAsync(x => x.Id == roundId).ConfigureAwait(false);
+
+            _ = _context.RoundDetails.Add(new()
+            {
+                RoundId = getRound.Id,
+                AdditionalData = source.AdditionalData ?? string.Empty
+            });
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            return roundId;
+        }
+
         public ValueTask<GameRoundInfo> GetAsync(Guid roundId)
             => (from round in _context.Rounds.AsQueryable()
                 join roundDetail in _context.RoundDetails.AsQueryable()
@@ -106,7 +152,7 @@ namespace Tgs.GameRounds.Repositories
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync();
 
-        public async ValueTask<Guid?> NewRoundAsync(NewRoundQuery round)
+        public async ValueTask<Guid?> NewRoundAsync(NewRound round)
         {
             var roundId = await _serialNumberGenerator.GenerateAsync().ConfigureAwait(false);
 
@@ -164,7 +210,7 @@ namespace Tgs.GameRounds.Repositories
             }
         }
 
-        public async ValueTask UpdateRoundAsync(UpdateRoundQuery round)
+        public async ValueTask UpdateRoundAsync(UpdateRound round)
         {
             var data = await _context.Rounds.SingleAsync(x => x.Id == round.RoundId).ConfigureAwait(false);
             data.Status = (short)round.Status;
@@ -198,6 +244,84 @@ namespace Tgs.GameRounds.Repositories
                 detail.AdditionalData = round.AdditionalData ?? string.Empty;
                 _ = _context.RoundDetails.Update(detail);
             }
+
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask UpdateRoundClosedAsync(UpdateRoundClosed source)
+        {
+            var round = await _context.Rounds.SingleAsync(x => x.Id == source.RoundId).ConfigureAwait(false);
+            round.Status = (short)GameRoundStatus.Closed;
+            round.ClosedOn = (round.ClosedOn.HasValue) ? round.ClosedOn : (source.ClosedOn.HasValue) ? DateTime.SpecifyKind(source.ClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null;
+            round.UpdatedOn = DateTime.SpecifyKind(source.UpdatedOn.UtcDateTime, DateTimeKind.Utc);
+            round.ExternalClosedOn = source.ExternalClosedOn.HasValue ? source.ExternalClosedOn.Value.UtcDateTime : null;
+            round.BetAmount = source.BetAmount ?? 0;
+            round.ValidBetAmount = source.ValidBetAmount ?? 0;
+            round.SettleAmount = source.SettleAmount ?? 0;
+            round.Commission = source.Commission ?? 0;
+            round.Turnover = source.Turnover ?? 0;
+            round.WinLoss = -(source.WinLoss ?? 0);
+            round.TieBetAdjustment = source.TieBetAdjustment ?? 0;
+            round.ClientStatus = (short)source.ClientStatus;
+            var roundDetail = await _context.RoundDetails.SingleAsync(x => x.RoundId == source.RoundId).ConfigureAwait(false);
+            roundDetail.AdditionalData = source.AdditionalData;
+            _ = _context.Rounds.Update(round);
+            _ = _context.RoundDetails.Update(roundDetail);
+
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask UpdateRoundDetailAsync(Guid roundId, string additionalData)
+        {
+            var roundDetail = await _context.RoundDetails.SingleAsync(x => x.RoundId == roundId).ConfigureAwait(false);
+            roundDetail.AdditionalData = additionalData;
+            _ = _context.RoundDetails.Update(roundDetail);
+
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask UpdateRoundOpenAsync(UpdateRoundOpen source)
+        {
+            var round = await _context.Rounds.SingleAsync(x => x.Id == source.RoundId).ConfigureAwait(false);
+            round.Status = (short)GameRoundStatus.Open;
+            round.UpdatedOn = DateTime.SpecifyKind(source.UpdatedOn.UtcDateTime, DateTimeKind.Utc);
+            round.BetAmount = source.BetAmount ?? 0;
+            round.ValidBetAmount = source.ValidBetAmount ?? 0;
+            round.Commission = source.Commission ?? 0;
+            round.Turnover = source.Turnover ?? 0;
+            round.SettleAmount = null;
+            round.WinLoss = null;
+            round.TieBetAdjustment = null;
+            round.ReopenTurnoverAdjustment = null;
+            round.ReopenedOn = null;
+            var roundDetail = await _context.RoundDetails.SingleAsync(x => x.RoundId == source.RoundId).ConfigureAwait(false);
+            roundDetail.AdditionalData = source.AdditionalData;
+            _ = _context.Rounds.Update(round);
+            _ = _context.RoundDetails.Update(roundDetail);
+
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask UpdateRoundReopenAsync(UpdateRoundReopen source)
+        {
+            var round = await _context.Rounds.SingleAsync(x => x.Id == source.RoundId).ConfigureAwait(false);
+            round.Status = (short)source.Status;
+            round.UpdatedOn = DateTime.SpecifyKind(source.UpdatedOn.UtcDateTime, DateTimeKind.Utc);
+            round.ExternalClosedOn = source.ExternalClosedOn.HasValue ? source.ExternalClosedOn.Value.UtcDateTime : null;
+            round.BetAmount = source.BetAmount ?? 0;
+            round.ValidBetAmount = source.ValidBetAmount ?? 0;
+            round.SettleAmount = source.SettleAmount ?? 0;
+            round.Commission = source.Commission ?? 0;
+            round.Turnover = source.Turnover ?? 0;
+            round.WinLoss = -(source.WinLoss ?? 0);
+            round.TieBetAdjustment = source.TieBetAdjustment ?? 0;
+            round.ClientStatus = (short)source.ClientStatus;
+            round.ReopenTurnoverAdjustment = round.Turnover ?? 0;
+            round.ReopenedOn = DateTime.UtcNow;
+            var roundDetail = await _context.RoundDetails.SingleAsync(x => x.RoundId == source.RoundId).ConfigureAwait(false);
+            roundDetail.AdditionalData = source.AdditionalData;
+            _ = _context.Rounds.Update(round);
+            _ = _context.RoundDetails.Update(roundDetail);
 
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }

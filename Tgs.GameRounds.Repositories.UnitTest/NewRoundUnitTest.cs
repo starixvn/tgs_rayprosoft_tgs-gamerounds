@@ -31,7 +31,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var expected = Guid.NewGuid();
-            var data = new NewRoundQuery(
+            var data = new NewRound(
                 ExternalRoundId: externalRoundId,
                 GameProviderId: gameProviderId,
                 PlayerCode: playerCode,

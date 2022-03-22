@@ -51,7 +51,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             _ = await context.AddAsync(round).ConfigureAwait(false);
             _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
-            var data = new UpdateRoundQuery(
+            var data = new UpdateRound(
                 RoundId: roundId,
                 Status: GameRoundStatus.Closed,
                 ClosedOn: DateTimeOffset.UtcNow,

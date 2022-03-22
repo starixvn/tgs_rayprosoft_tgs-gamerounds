@@ -2,7 +2,7 @@
 
 namespace Tgs.GameRounds.Core.Models
 {
-    public record UpdateRoundQuery(
+    public record UpdateRound(
           Guid RoundId,
           GameRoundStatus Status,
           DateTimeOffset? ClosedOn,

@@ -29,9 +29,9 @@ namespace Tgs.GameRounds.Core
                 {
                     return false;
                 }
-                await _database.StringSetAsync(key, JsonSerializer.Serialize(new
+                _ = await _database.StringSetAsync(key, JsonSerializer.Serialize(new
                 {
-                    RoundId = round.RoundId,
+                    round.RoundId,
                     LogOn = DateTimeOffset.UtcNow
                 }), _expiry).ConfigureAwait(false);
                 return true;
@@ -50,7 +50,7 @@ namespace Tgs.GameRounds.Core
                 {
                     return null;
                 }
-                await _database.StringSetAsync(key, round.RoundId.ToString(), _expiry).ConfigureAwait(false);
+                _ = await _database.StringSetAsync(key, round.RoundId.ToString(), _expiry).ConfigureAwait(false);
                 return round.RoundId;
             }
             return Guid.TryParse(await _database.StringGetAsync(key).ConfigureAwait(false), out Guid roundId) ? roundId : null;
