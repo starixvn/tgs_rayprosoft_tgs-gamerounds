@@ -56,6 +56,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult(data));
 
                 _ = services.AddSingleton(fakeRepository);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -119,6 +121,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeGameRound.GetAsync(gameProviderId, externalRoundId, gameId, walletId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
 
                 _ = services.AddSingleton(fakeGameRound);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -175,6 +179,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
 
                 _ = services.AddSingleton(fakeRepository);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -228,6 +234,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult(data));
 
                 _ = services.AddSingleton(fakeRepository);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -316,6 +324,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -422,6 +432,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -521,6 +533,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -604,6 +618,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -701,6 +717,8 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
+
+                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
