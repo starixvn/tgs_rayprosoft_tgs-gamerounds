@@ -5,7 +5,6 @@ using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
-using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest
 {
@@ -147,7 +146,16 @@ namespace Tgs.GameRounds.Core.UnitTest
                 fakeGameRoundRecord,
                 fakeGameRound);
 
-            _ = fakeGameRound.NewRoundAsync(data).Returns(ValueTask.FromResult<Guid?>(expected));
+            _ = fakeGameRound.NewRoundAsync(
+                new(data.ExternalRoundId,
+                data.GameProviderId,
+                data.PlayerCode,
+                data.GameId,
+                data.CurrencyCode,
+                data.GameProviderConfigurationId,
+                data.WalletId,
+                data.BrandId,
+                data.ExternalCreatedOn)).Returns(ValueTask.FromResult<Guid?>(expected));
             _ = fakeGameRound.GetAsync(expected).Returns(ValueTask.FromResult(gameRound));
 
             var actual = await repository.GetAsync(data).ConfigureAwait(false);

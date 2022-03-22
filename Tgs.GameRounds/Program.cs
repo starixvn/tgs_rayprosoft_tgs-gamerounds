@@ -44,7 +44,8 @@ builder.Services
         options.ConnectionString = configuration.GetConnectionString("RedisConfigurationString");
     })
     .AddGameRoundsCore((sp) => sp.GetRequiredService<RedisConnectionManager>().Database)
-    .AddGameRoundRepositories(
+    .AddGameRoundRepositories((sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database)
+    .AddGameRoundTgsRepositories(
     (sp, dbBuilder) =>
     {
         var config = sp.GetRequiredService<IConfiguration>();
@@ -54,8 +55,18 @@ builder.Services
                 serverOption.SetPostgresVersion(12, 5);
                 serverOption.CommandTimeout(180);
             });
-    },
-    (sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database);
+    })
+    .AddGameRoundBetRepositories(
+    (sp, dbBuilder) =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+        dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"),
+            serverOption =>
+            {
+                serverOption.SetPostgresVersion(12, 5);
+                serverOption.CommandTimeout(180);
+            });
+    });
 
 var app = builder.Build();
 

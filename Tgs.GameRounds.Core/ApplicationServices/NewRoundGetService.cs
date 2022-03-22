@@ -27,7 +27,18 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 return new(Success: true, RoundId: roundId.Value);
             }
 
-            var newRoundId = await _gameRoundRepository.NewRoundAsync(query).ConfigureAwait(false);
+            var newRoundId = await _gameRoundRepository.NewRoundAsync(
+                new NewRound(
+                    query.ExternalRoundId,
+                    query.GameProviderId,
+                    query.PlayerCode,
+                    query.GameId,
+                    query.CurrencyCode,
+                    query.GameProviderConfigurationId,
+                    query.WalletId,
+                    query.BrandId,
+                    query.ExternalCreatedOn)).ConfigureAwait(false);
+
             if (!newRoundId.HasValue)
             {
                 return new();

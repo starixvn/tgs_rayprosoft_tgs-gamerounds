@@ -5,10 +5,24 @@ namespace Tgs.GameRounds.Client
 {
     internal interface IGameRoundsClient
     {
-        ValueTask<GameRoundStatus?> GameRoundGetStatus(Guid rounid);
+        ValueTask AddRoundAsync(AddRoundViewModel model);
 
-        ValueTask<NewRoundResultViewModel?> GameRoundsNewRoundAsync(NewRoundQueryViewModel model);
+        ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid rounid);
 
-        ValueTask<UpdateRoundResultViewModel?> GameRoundsUpdateRoundAsync(Guid roundId, UpdateRoundQueryViewModel model);
+        ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, string externalGameId, Guid walletId);
+
+        ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
+
+        ValueTask<GameRoundStatus?> GetStatusAsync(Guid rounid);
+
+        ValueTask<NewRoundResultViewModel?> NewRoundAsync(NewRoundQueryViewModel model);
+
+        ValueTask<UpdateRoundResultViewModel?> UpdateRoundAsync(Guid roundId, UpdateRoundQueryViewModel model);
+
+        ValueTask UpdateRoundClosedAsync(Guid roundId, UpdateRoundClosedViewModel model);
+
+        ValueTask UpdateRoundOpenAsync(Guid roundId, UpdateRoundOpenViewModel model);
+
+        ValueTask UpdateRoundReopenAsync(Guid roundId, UpdateRoundReopenViewModel model);
     }
 }
