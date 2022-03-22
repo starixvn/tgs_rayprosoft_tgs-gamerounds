@@ -55,7 +55,7 @@ builder.Services
     .AddRouting(options => options.LowercaseUrls = true)
     .AddControllers(configure =>
     {
-        configure.Filters.Add<ExceptionFilter>();
+        _ = configure.Filters.Add<ExceptionFilter>();
     })
     .AddJsonOptions(options =>
     {
@@ -80,22 +80,22 @@ builder.Services
     (sp, dbBuilder) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
+        _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
             serverOption =>
             {
-                serverOption.SetPostgresVersion(12, 5);
-                serverOption.CommandTimeout(180);
+                _ = serverOption.SetPostgresVersion(12, 5);
+                _ = serverOption.CommandTimeout(180);
             });
     })
     .AddGameRoundBetRepositories(
     (sp, dbBuilder) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
+        _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
             serverOption =>
             {
-                serverOption.SetPostgresVersion(12, 5);
-                serverOption.CommandTimeout(180);
+                _ = serverOption.SetPostgresVersion(12, 5);
+                _ = serverOption.CommandTimeout(180);
             });
     });
 
@@ -103,7 +103,7 @@ builder.Services
     .AddMessageQueue()
     .AddNatsMessageQueue(natsConfig =>
     {
-        natsConfig
+        _ = natsConfig
             .ConfigQueueOptions((options, sp) =>
             {
                 var config = sp.GetRequiredService<IConfiguration>();
