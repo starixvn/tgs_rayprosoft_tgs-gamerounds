@@ -62,7 +62,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.GetGameRound(roundId).ConfigureAwait(false);
+            var actual = await sut.GetGameRoundAsync(roundId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
             _ = Equals(roundId, actual.RoundId);
@@ -125,7 +125,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.GetGameRound(gameProviderId, externalRoundId, externalGameId, walletId).ConfigureAwait(false);
+            var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, externalGameId, walletId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
             _ = Equals(roundId, actual.RoundId);
@@ -181,7 +181,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.GetGameRound(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
+            var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
             _ = Equals(roundId, actual.RoundId);
@@ -234,7 +234,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.GetStatus(roundId).ConfigureAwait(false);
+            var actual = await sut.GetStatusAsync(roundId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
             Assert.AreEqual(expected, actual);

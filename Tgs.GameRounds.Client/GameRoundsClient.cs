@@ -37,7 +37,7 @@ namespace Tgs.GameRounds.Client
             _ = response.EnsureSuccessStatusCode();
         }
 
-        public async ValueTask<GameRoundViewModel?> GetGameRound(Guid rounid)
+        public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid rounid)
         {
             var response = await _httpClient
                 .GetAsync($"gamerounds/{rounid}")
@@ -50,7 +50,7 @@ namespace Tgs.GameRounds.Client
             return (string.IsNullOrEmpty(contentJson)) ? null : JsonSerializer.Deserialize<GameRoundViewModel?>(contentJson, _SerializerOptions);
         }
 
-        public async ValueTask<GameRoundViewModel?> GetGameRound(Guid gameProviderId, string externalRoundId, string externalGameId, Guid walletId)
+        public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, string externalGameId, Guid walletId)
         {
             var response = await _httpClient
                 .GetAsync($"gamerounds/externalgame?gameProviderId={gameProviderId}&externalRoundId={externalRoundId}&externalGameId={externalGameId}&walletId={walletId}")
@@ -63,7 +63,7 @@ namespace Tgs.GameRounds.Client
             return (string.IsNullOrEmpty(contentJson)) ? null : JsonSerializer.Deserialize<GameRoundViewModel?>(contentJson, _SerializerOptions);
         }
 
-        public async ValueTask<GameRoundViewModel?> GetGameRound(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+        public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
         {
             var response = await _httpClient
                 .GetAsync($"gamerounds/game?gameProviderId={gameProviderId}&externalRoundId={externalRoundId}&gameId={gameId}&walletId={walletId}")
@@ -76,7 +76,7 @@ namespace Tgs.GameRounds.Client
             return (string.IsNullOrEmpty(contentJson)) ? null : JsonSerializer.Deserialize<GameRoundViewModel?>(contentJson, _SerializerOptions);
         }
 
-        public async ValueTask<GameRoundStatus?> GetStatus(Guid rounid)
+        public async ValueTask<GameRoundStatus?> GetStatusAsync(Guid rounid)
         {
             var response = await _httpClient
                 .GetAsync($"gamerounds/{rounid}/status")
