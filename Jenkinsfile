@@ -62,8 +62,8 @@ pipeline {
 
 		stage('Push packages') {
 			steps {
-				sh 'dotnet pack -c $BuildConfiguration "Tgs.GameRounds.Client/Tgs.GameRounds.Client.csproj" --no-build'
-				sh 'dotnet nuget push "Tgs.GameRounds.Client/bin/$BuildConfiguration/*.nupkg" -s raypro-baget -k admin --skip-duplicate'
+				sh 'dotnet pack -c $BuildConfiguration "Tgs.GameRounds.Client/Tgs.GameRounds.Client.csproj" --no-restore'
+				sh 'dotnet nuget push "Tgs.GameRounds.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro-baget" -k admin --skip-duplicate'
 			}
 		}
 
