@@ -3,7 +3,7 @@ using Tgs.GameRounds.Common.ViewModels;
 
 namespace Tgs.GameRounds.Client
 {
-    internal interface IGameRoundsClient
+    public interface IGameRoundsClient
     {
         ValueTask AddRoundAsync(AddRoundViewModel model);
 
