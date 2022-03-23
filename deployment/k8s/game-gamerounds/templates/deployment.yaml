@@ -65,7 +65,7 @@ spec:
               name: appsettings
               readOnly: true
               subPath: appsettings.json
-            {{- if eq .Values.namespace "prod" }}
+            {{- if eq .Release.Namespace "prod" }}
             - mountPath: /etc/ssl/certs/rds-combined-ca-bundle.pem
               name: rds-combined-ca-bundle
               readOnly: true
@@ -93,7 +93,7 @@ spec:
         - name: appsettings
           configMap:
             name: configmap-{{ include "game-gamerounds.fullname" . }}
-        {{- if eq .Values.namespace "prod" }}
+        {{- if eq .Release.Namespace "prod" }}
         - name: rds-combined-ca-bundle
           configMap:
             name: configmap-mongodb-pem
