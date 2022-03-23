@@ -21,6 +21,8 @@ namespace Tgs.GameRounds.Client
 
         ValueTask UpdateRoundClosedAsync(Guid roundId, UpdateRoundClosedViewModel model);
 
+        ValueTask UpdateRoundDetailAsync(Guid roundId, UpdateRoundDetailViewModel model);
+
         ValueTask UpdateRoundOpenAsync(Guid roundId, UpdateRoundOpenViewModel model);
 
         ValueTask UpdateRoundReopenAsync(Guid roundId, UpdateRoundReopenViewModel model);

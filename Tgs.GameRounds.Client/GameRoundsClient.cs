@@ -138,6 +138,20 @@ namespace Tgs.GameRounds.Client
             _ = response.EnsureSuccessStatusCode();
         }
 
+        public async ValueTask UpdateRoundDetailAsync(Guid roundId, UpdateRoundDetailViewModel model)
+        {
+            var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
+            requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+            var response = await _httpClient
+               .PutAsync(
+                   $"gamerounds/{roundId}/detail",
+                   requestContent)
+               .ConfigureAwait(false);
+
+            _ = response.EnsureSuccessStatusCode();
+        }
+
         public async ValueTask UpdateRoundOpenAsync(Guid roundId, UpdateRoundOpenViewModel model)
         {
             var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));

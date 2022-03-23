@@ -344,6 +344,22 @@ namespace Tgs.GameRounds.Controllers
                 model.AdditionalData)).ConfigureAwait(false);
 
         /// <summary>
+        /// Updates the round detail asynchronous.
+        /// </summary>
+        /// <param name="service">The service.</param>
+        /// <param name="roundid">The roundid.</param>
+        /// <param name="model">The model.</param>
+        /// <returns></returns>
+        [HttpPut("{roundid}/detail", Name = "GameRoundsUpdateRoundDetail")]
+        public async ValueTask UpdateRoundDetailAsync(
+                [FromServices] ICommandService<UpdateRoundDetailCommand> service,
+                Guid roundid,
+                UpdateRoundDetailViewModel model)
+            => await service.ExecuteAsync(new(
+                roundid,
+                model.AdditionalData)).ConfigureAwait(false);
+
+        /// <summary>
         /// Updates the round open asynchronous.
         /// </summary>
         /// <param name="service">The service.</param>
