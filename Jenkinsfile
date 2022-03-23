@@ -99,7 +99,7 @@ pipeline {
 			steps {
                 script {
                     withKubeConfig([credentialsId: env.k8s_config]) {
-                        def resources = getResources(env.k8s_config, env.kube_ns, "game-token")
+                        def resources = getResources(env.k8s_config, env.kube_ns, "game-gamerounds")
                         def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
                         def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
                         
