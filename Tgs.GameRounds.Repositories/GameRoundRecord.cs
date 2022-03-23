@@ -32,7 +32,7 @@ namespace Tgs.GameRounds.Repositories
         /// <summary>
         /// The external round identifier
         /// </summary>
-        [BsonElement("external_game_id")]
+        [BsonElement("external_round_id")]
         [BsonRepresentation(BsonType.String)]
         public string ExternalRoundId { get; set; } = default!;
 

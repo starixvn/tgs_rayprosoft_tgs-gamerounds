@@ -37,7 +37,6 @@ namespace Tgs.GameRounds.Repositories
                     PlayerCode = gameRound.PlayerCode,
                     WalletId = gameRound.WalletId,
                     GameId = gameRound.GameId,
-
                     CurrencyCode = gameRound.CurrencyCode,
                     Status = (int)gameRound.Status,
                     CreatedOn = gameRound.CreatedOn,
