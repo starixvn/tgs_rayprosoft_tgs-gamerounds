@@ -8,7 +8,7 @@
 
 	<PropertyGroup>
 		<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
-		<Version>0.0.4</Version>
+		<Version>0.0.5</Version>
 		<Authors>Raypro</Authors>
 		<Description>Tgs GameActions Client</Description>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-gamerounds</PackageProjectUrl>
