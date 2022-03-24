@@ -5,7 +5,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddGameActionsClient(
+    public static IServiceCollection AddGameRoundsClient(
         this IServiceCollection services,
         Action<GameRoundsClientOptions, IServiceProvider> configure)
         => services
