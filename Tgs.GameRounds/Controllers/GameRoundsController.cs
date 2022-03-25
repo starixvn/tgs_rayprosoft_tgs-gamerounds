@@ -50,22 +50,24 @@ namespace Tgs.GameRounds.Controllers
         /// <summary>
         /// Gets the game round asynchronous.
         /// </summary>
-        /// <param name="gameRoundRepository">The game round repository.</param>
+        /// <param name="service">The service.</param>
         /// <param name="roundid">The roundid.</param>
         /// <returns></returns>
         [HttpGet("{roundid}", Name = "GetGameRound")]
         public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(
-                [FromServices] IGameRoundRepository gameRoundRepository,
+                [FromServices] IGetService<GetGameRoundQuery, GameRoundResult> service,
                 Guid roundid)
         {
-            var result = await gameRoundRepository.GetAsync(roundid).ConfigureAwait(false);
+            var result = await service.GetAsync(new(roundid)).ConfigureAwait(false);
 
             return result != null ? new GameRoundViewModel(
                 result.RoundId,
                 result.ExternalRoundId,
                 result.GameProviderId,
+                result.GameProviderCode,
                 result.PlayerCode,
                 result.GameId,
+                result.ExternalGameId,
                 result.CurrencyCode,
                 result.Status,
                 result.GameProviderConfigurationId,
@@ -101,11 +103,11 @@ namespace Tgs.GameRounds.Controllers
         /// <returns></returns>
         [HttpGet("externalgame", Name = "GetGameRoundByExternalGame")]
         public async ValueTask<GameRoundViewModel?> GetGameRoundByExternalGameAsync(
-                 [FromServices] IGetService<GetGameRoundByExternalGameQuery, GetGameRoundByExternalGameResult> service,
-                Guid gameProviderId,
-                string externalRoundId,
-                string externalGameId,
-                Guid walletId)
+            [FromServices] IGetService<GetGameRoundByExternalGameQuery, GameRoundResult> service,
+            Guid gameProviderId,
+            string externalRoundId,
+            string externalGameId,
+            Guid walletId)
         {
             var result = await service.GetAsync(new(
                 gameProviderId,
@@ -117,8 +119,10 @@ namespace Tgs.GameRounds.Controllers
                 result.RoundId,
                 result.ExternalRoundId,
                 result.GameProviderId,
+                result.GameProviderCode,
                 result.PlayerCode,
                 result.GameId,
+                result.ExternalGameId,
                 result.CurrencyCode,
                 result.Status,
                 result.GameProviderConfigurationId,
@@ -146,7 +150,7 @@ namespace Tgs.GameRounds.Controllers
         /// <summary>
         /// Gets the game round by game asynchronous.
         /// </summary>
-        /// <param name="gameRoundRepository">The game round repository.</param>
+        /// <param name="service">The service.</param>
         /// <param name="gameProviderId">The game provider identifier.</param>
         /// <param name="externalRoundId">The external round identifier.</param>
         /// <param name="gameId">The game identifier.</param>
@@ -154,24 +158,26 @@ namespace Tgs.GameRounds.Controllers
         /// <returns></returns>
         [HttpGet("game", Name = "GetGameRoundByGame")]
         public async ValueTask<GameRoundViewModel?> GetGameRoundByGameAsync(
-                [FromServices] IGameRoundRepository gameRoundRepository,
+                [FromServices] IGetService<GetGameRoundByGameQuery, GameRoundResult> service,
                 Guid gameProviderId,
                 string externalRoundId,
                 int gameId,
                 Guid walletId)
         {
-            var result = await gameRoundRepository.GetAsync(
+            var result = await service.GetAsync(new(
                 gameProviderId,
                 externalRoundId,
                 gameId,
-                walletId).ConfigureAwait(false);
+                walletId)).ConfigureAwait(false);
 
             return result != null ? new GameRoundViewModel(
                 result.RoundId,
                 result.ExternalRoundId,
                 result.GameProviderId,
+                result.GameProviderCode,
                 result.PlayerCode,
                 result.GameId,
+                result.ExternalGameId,
                 result.CurrencyCode,
                 result.Status,
                 result.GameProviderConfigurationId,
