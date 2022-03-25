@@ -20,6 +20,8 @@ namespace Tgs.GameRounds.IntegrationTests
         {
             var roundId = Guid.NewGuid();
             var expected = GameRoundStatus.Open;
+            var externalGameId = "Bacc";
+            var gameProviderCode = "DG";
             var data = new GameRoundInfo(
                RoundId: roundId,
                ExternalRoundId: Guid.NewGuid().ToString("N"),
@@ -55,7 +57,21 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult(data));
 
+
                 _ = services.AddSingleton(fakeRepository);
+
+                var fakeGame = Substitute.For<IGame>();
+
+                _ = fakeGame.GetExternalGameIdAsync(data.GameId).Returns(ValueTask.FromResult(externalGameId));
+
+                _ = services.AddSingleton(fakeGame);
+
+
+                var fakeGameProvider = Substitute.For<IGameProvider>();
+
+                _ = fakeGameProvider.GetGameProviderCodeAsync(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
+
+                _ = services.AddSingleton(fakeGameProvider);
 
                 _ = services.AddFakeNatsMessageQueue();
             });
@@ -67,7 +83,9 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.GetGameRoundAsync(roundId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            _ = Equals(roundId, actual.RoundId);
+            Assert.AreEqual(roundId, actual.RoundId);
+            Assert.AreEqual(externalGameId, actual.ExternalGameId);
+            Assert.AreEqual(gameProviderCode, actual.GameProviderCode);
         }
 
         [TestMethod]
@@ -77,6 +95,7 @@ namespace Tgs.GameRounds.IntegrationTests
             Guid gameProviderId = Guid.NewGuid();
             string externalRoundId = Guid.NewGuid().ToString("N");
             string externalGameId = "bacc";
+            var gameProviderCode = "DG";
             int gameId = 1;
             Guid walletId = Guid.NewGuid();
             var data = new GameRoundInfo(
@@ -110,11 +129,19 @@ namespace Tgs.GameRounds.IntegrationTests
 
             await using var web = CreateTestSettingSite(services =>
             {
-                var fakeGame = Substitute.For<IGameRepository>();
+                var fakeGame = Substitute.For<IGame>();
 
-                _ = fakeGame.GetGameIdAsync(gameProviderId, externalGameId).Returns(ValueTask.FromResult<int?>(gameId));
+                _ = fakeGame.GetGameIdAsync(gameProviderId, externalGameId).Returns(ValueTask.FromResult<int>(gameId));
 
                 _ = services.AddSingleton(fakeGame);
+
+
+                var fakeGameProvider = Substitute.For<IGameProvider>();
+
+                _ = fakeGameProvider.GetGameProviderCodeAsync(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
+
+                _ = services.AddSingleton(fakeGameProvider);
+
 
                 var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
@@ -132,7 +159,9 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, externalGameId, walletId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            _ = Equals(roundId, actual.RoundId);
+            Assert.AreEqual(roundId, actual.RoundId);
+            Assert.AreEqual(externalGameId, actual.ExternalGameId);
+            Assert.AreEqual(gameProviderCode, actual.GameProviderCode);
         }
 
         [TestMethod]
@@ -141,6 +170,8 @@ namespace Tgs.GameRounds.IntegrationTests
             var roundId = Guid.NewGuid();
             Guid gameProviderId = Guid.NewGuid();
             string externalRoundId = Guid.NewGuid().ToString("N");
+            var externalGameId = "Bacc";
+            var gameProviderCode = "DG";
             int gameId = 1;
             Guid walletId = Guid.NewGuid();
             var data = new GameRoundInfo(
@@ -180,6 +211,20 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = services.AddSingleton(fakeRepository);
 
+
+                var fakeGame = Substitute.For<IGame>();
+
+                _ = fakeGame.GetExternalGameIdAsync(data.GameId).Returns(ValueTask.FromResult(externalGameId));
+
+                _ = services.AddSingleton(fakeGame);
+
+
+                var fakeGameProvider = Substitute.For<IGameProvider>();
+
+                _ = fakeGameProvider.GetGameProviderCodeAsync(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
+
+                _ = services.AddSingleton(fakeGameProvider);
+
                 _ = services.AddFakeNatsMessageQueue();
             });
 
@@ -190,7 +235,10 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            _ = Equals(roundId, actual.RoundId);
+            Assert.AreEqual(roundId, actual.RoundId);
+            Assert.AreEqual(externalGameId, actual.ExternalGameId);
+            Assert.AreEqual(gameProviderCode, actual.GameProviderCode);
+
         }
 
         [TestMethod]

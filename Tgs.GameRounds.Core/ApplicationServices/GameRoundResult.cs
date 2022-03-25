@@ -2,12 +2,14 @@
 
 namespace Tgs.GameRounds.Core.ApplicationServices
 {
-    public record GetGameRoundByExternalGameResult(
+    public record GameRoundResult(
         Guid RoundId,
         string ExternalRoundId,
         Guid GameProviderId,
+        string GameProviderCode,
         string PlayerCode,
         int GameId,
+        string ExternalGameId,
         string CurrencyCode,
         GameRoundStatus Status,
         Guid GameProviderConfigurationId,

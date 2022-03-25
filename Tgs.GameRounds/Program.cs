@@ -73,19 +73,24 @@ builder.Services
         var configuration = sp.GetRequiredService<IConfiguration>();
         options.ConnectionString = configuration.GetConnectionString("Redis");
     })
-    .AddGameRoundsCore((sp) => sp.GetRequiredService<RedisConnectionManager>().Database)
-    .AddGameRoundRepositories((sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database)
-    .AddGameRoundTgsRepositories(
-    (sp, dbBuilder) =>
+    .AddGameRoundsCore(
+    configuration =>
     {
-        var configuration = sp.GetRequiredService<IConfiguration>();
-        _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
-            serverOption =>
-            {
-                _ = serverOption.SetPostgresVersion(12, 5);
-                _ = serverOption.CommandTimeout(180);
-            });
-    })
+        _ = configuration
+           .AddGameRoundTgsRepositories((sp, dbBuilder) =>
+           {
+               var configuration = sp.GetRequiredService<IConfiguration>();
+               _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
+                   serverOption =>
+                   {
+                       _ = serverOption.SetPostgresVersion(12, 5);
+                       _ = serverOption.CommandTimeout(180);
+                   });
+           },
+           sp => sp.GetRequiredService<RedisConnectionManager>().Database);
+    },
+    (sp) => sp.GetRequiredService<RedisConnectionManager>().Database)
+    .AddGameRoundRepositories((sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database)
     .AddGameRoundBetRepositories(
     (sp, dbBuilder) =>
     {
@@ -143,6 +148,7 @@ builder.Services
                 || !httpContext.Request.Path.StartsWithSegments("/swagger")
                 && !httpContext.Request.Path.StartsWithSegments("/healthz")
                 && !httpContext.Request.Path.StartsWithSegments("/profiler/")
+                && !httpContext.Request.Path.StartsWithSegments("/metrics")
                 && !new[] { "html", "ico", "png", "jpg" }.Any(
                     ext => httpContext.Request.Path.Value.EndsWith($".{ext}"));
         };

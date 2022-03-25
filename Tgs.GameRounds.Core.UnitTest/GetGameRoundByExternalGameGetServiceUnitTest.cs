@@ -13,7 +13,8 @@ namespace Tgs.GameRounds.Core.UnitTest
         [TestMethod]
         public async Task Normal_Process()
         {
-            var fakeGame = Substitute.For<IGameRepository>();
+            var fakeGame = Substitute.For<IGame>();
+            var fakeGameProvider = Substitute.For<IGameProvider>();
             var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
             var roundId = Guid.NewGuid();
@@ -23,6 +24,7 @@ namespace Tgs.GameRounds.Core.UnitTest
             var externalGameId = "Bacc";
             var gameId = 500001;
             var walletId = Guid.NewGuid();
+            var gameProviderCode = "SG";
             var gameRound = new GameRoundInfo(
                 RoundId: roundId,
                 ExternalRoundId: externalRoundId,
@@ -56,9 +58,11 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var repository = new GetGameRoundByExternalGameGetService(
                 fakeGame,
+                fakeGameProvider,
                 fakeGameRound);
 
-            _ = fakeGame.GetGameIdAsync(query.GameProviderId, query.ExternalGameId).Returns(ValueTask.FromResult<int?>(gameId));
+            _ = fakeGame.GetGameIdAsync(query.GameProviderId, query.ExternalGameId).Returns(ValueTask.FromResult(gameId));
+            _ = fakeGameProvider.GetGameProviderCodeAsync(query.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
 
             _ = fakeGameRound.GetAsync(query.GameProviderId, query.ExternalRoundId, gameId, query.WalletId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
