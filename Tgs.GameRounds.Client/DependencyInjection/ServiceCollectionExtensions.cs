@@ -18,5 +18,6 @@ public static class ServiceCollectionExtensions
                 var options = sp.GetRequiredService<IOptions<GameRoundsClientOptions>>().Value;
                 httpClient.BaseAddress = options.BaseUrl;
             })
+            .AddHttpMessageHandler<LoggingHandler>()
             .Services;
 }
