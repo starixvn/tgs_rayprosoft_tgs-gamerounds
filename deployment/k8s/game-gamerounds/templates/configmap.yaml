@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-{{ include "game-gamerounds.fullname" . }}
+  labels:
+    {{- include "game-gamerounds.labels" . | nindent 4 }}
+data:
+  appsettings.json: |
+    {
+    }

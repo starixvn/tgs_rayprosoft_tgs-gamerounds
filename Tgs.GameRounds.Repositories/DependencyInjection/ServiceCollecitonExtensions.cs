@@ -1,0 +1,43 @@
+﻿using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using StackExchange.Redis;
+using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Core.Configuration;
+using Tgs.GameRounds.Repositories;
+using Tgs.GameRounds.Repositories.Entities;
+
+namespace Microsoft.Extensions.DependencyInjection
+{
+    public static class ServiceCollecitonExtensions
+    {
+        public static IServiceCollection AddGameRoundBetRepositories(
+            this IServiceCollection services,
+            Action<IServiceProvider, DbContextOptionsBuilder> configure)
+            => services
+            .AddSerialNumberGenerator()
+            .AddDbContext<BetContext>(configure)
+            .AddTransient<IGameRoundRepository, GameRoundRepository>();
+
+        public static IServiceCollection AddGameRoundRepositories(
+                    this IServiceCollection services,
+            Func<IServiceProvider, IMongoDatabase> mongoDatabaseResolver)
+            => services
+                .AddSerialNumberGenerator()
+                .AddTransient<IGameRoundRecordRepository>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)));
+
+        public static GameRoundConfiguration AddGameRoundTgsRepositories(
+            this GameRoundConfiguration configuration,
+             Action<IServiceProvider, DbContextOptionsBuilder> configure,
+             Func<IServiceProvider, IDatabase> redisDatabaseResolver)
+        {
+            _ = configuration.Services.AddSerialNumberGenerator();
+
+            _ = configuration.Services.AddDbContext<TgsContext>(configure);
+            return configuration
+                .SetGameProviders<GameProviderRepository>()
+                .SetGameProviders<GameProviderRedisRepository>(sp => new object[] { redisDatabaseResolver(sp), TimeSpan.FromHours(1) })
+                .SetGames<GameRepository>()
+                .SetGames<GameRedisRepository>(sp => new object[] { redisDatabaseResolver(sp), TimeSpan.FromHours(1) });
+        }
+    }
+}
