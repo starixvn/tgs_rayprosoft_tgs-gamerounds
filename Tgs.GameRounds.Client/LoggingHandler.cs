@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Tgs.GameRounds.Client
 {
@@ -17,22 +12,22 @@ namespace Tgs.GameRounds.Client
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Request: {request}", request);
+            _logger.LogInformation("LogOn:{DateTime.Now.ToString(\"o\")} Request: {request}", DateTime.Now.ToString("o"), request);
 
             if (request.Content != null)
             {
-                _logger.LogInformation("Request Body: {await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}", await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
+                _logger.LogInformation("LogOn:{DateTime.Now.ToString(\"o\")} Request Body: {await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}", DateTime.Now.ToString("o"), await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
             }
 
             var response = await base
                 .SendAsync(request, cancellationToken)
                 .ConfigureAwait(false);
 
-            _logger.LogInformation("Response: {response}", response);
+            _logger.LogInformation("LogOn:{DateTime.Now.ToString(\"o\")} Response: {response}", DateTime.Now.ToString("o"), response);
 
             if (response.Content != null)
             {
-                _logger.LogInformation("Response Body: {await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}", await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
+                _logger.LogInformation("LogOn:{DateTime.Now.ToString(\"o\")} Response Body: {await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}", DateTime.Now.ToString("o"), await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
             }
 
             return response;

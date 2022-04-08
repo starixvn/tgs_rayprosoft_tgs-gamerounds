@@ -27,6 +27,11 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 return;
             }
 
+            if (!await _gameRoundCacheService.LockAsync(command.GameProviderId, command.ExternalRoundId, command.GameId, command.WalletId).ConfigureAwait(false))
+            {
+                return;
+            }
+
             var newRoundId = await _gameRoundRepository.AddRoundAsync(
                 new AddRound(
                     command.ExternalRoundId,
@@ -83,6 +88,8 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 roundRecord.ReopenedOn,
                 roundRecord.EffectiveBettingPercentage,
                 roundRecord.AdditionalData)).ConfigureAwait(false);
+
+            await _gameRoundCacheService.UnLockAsync(command.GameProviderId, command.ExternalRoundId, command.GameId, command.WalletId).ConfigureAwait(false);
         }
     }
 }
