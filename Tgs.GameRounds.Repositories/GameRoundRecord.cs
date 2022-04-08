@@ -114,9 +114,8 @@ namespace Tgs.GameRounds.Repositories
         /// </summary>
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
-        [BsonElement("bet")]
-        [BsonRepresentation(BsonType.Decimal128)]
-        public decimal? Bet { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string Bet { get; set; } = default!;
 
         /// <summary>
         /// The valid bet
@@ -124,8 +123,8 @@ namespace Tgs.GameRounds.Repositories
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
         [BsonElement("valid_bet")]
-        [BsonRepresentation(BsonType.Decimal128)]
-        public decimal? ValidBet { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string ValidBet { get; set; } = default!;
 
         /// <summary>
         /// The settle
@@ -133,8 +132,8 @@ namespace Tgs.GameRounds.Repositories
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
         [BsonElement("settle")]
-        [BsonRepresentation(BsonType.Decimal128)]
-        public decimal? Settle { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string Settle { get; set; } = default!;
 
         /// <summary>
         /// The commission
@@ -142,8 +141,8 @@ namespace Tgs.GameRounds.Repositories
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
         [BsonElement("commission")]
-        [BsonRepresentation(BsonType.Decimal128)]
-        public decimal? Commission { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string Commission { get; set; } = default!;
 
         /// <summary>
         /// The turnover
@@ -151,8 +150,8 @@ namespace Tgs.GameRounds.Repositories
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
         [BsonElement("turnover")]
-        [BsonRepresentation(BsonType.Decimal128)]
-        public decimal? Turnover { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string Turnover { get; set; } = default!;
 
         /// <summary>
         /// The win loss
@@ -160,8 +159,8 @@ namespace Tgs.GameRounds.Repositories
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
         [BsonElement("winLoss")]
-        [BsonRepresentation(BsonType.Decimal128)]
-        public decimal? WinLoss { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string WinLoss { get; set; } = default!;
 
         /// <summary>
         /// The tie bet adjustment
@@ -169,8 +168,8 @@ namespace Tgs.GameRounds.Repositories
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
         [BsonElement("tie_bet_adjustment")]
-        [BsonRepresentation(BsonType.Decimal128)]
-        public decimal? TieBetAdjustment { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string TieBetAdjustment { get; set; } = default!;
 
         /// <summary>
         /// The client status
@@ -186,8 +185,8 @@ namespace Tgs.GameRounds.Repositories
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
         [BsonElement("reopen_turnover_adjustment")]
-        [BsonRepresentation(BsonType.Decimal128)]
-        public decimal? ReopenTurnoverAdjustment { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public string ReopenTurnoverAdjustment { get; set; } = default!;
 
         /// <summary>
         /// The reopened on
