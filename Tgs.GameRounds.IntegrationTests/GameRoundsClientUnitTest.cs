@@ -70,8 +70,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeGameProvider.GetGameProviderCodeAsync(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
 
                 _ = services.AddSingleton(fakeGameProvider);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -144,8 +142,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeGameRound.GetAsync(gameProviderId, externalRoundId, gameId, walletId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
 
                 _ = services.AddSingleton(fakeGameRound);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -218,8 +214,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeGameProvider.GetGameProviderCodeAsync(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
 
                 _ = services.AddSingleton(fakeGameProvider);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -275,8 +269,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult(data));
 
                 _ = services.AddSingleton(fakeRepository);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -316,6 +308,7 @@ namespace Tgs.GameRounds.IntegrationTests
             {
                 var fakeGameRoundCache = Substitute.For<IGameRoundService>();
                 _ = fakeGameRoundCache.GetRoundIdAsync(data.GameProviderId, data.ExternalRoundId, data.GameId, data.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
+                _ = fakeGameRoundCache.LockAsync(data.GameProviderId, data.ExternalRoundId, data.GameId, data.WalletId).Returns(true);
                 _ = services.AddSingleton(fakeGameRoundCache);
 
                 var fakeGameRound = Substitute.For<IGameRoundRepository>();
@@ -365,8 +358,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -473,8 +464,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -574,8 +563,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -649,8 +636,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -734,8 +719,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();
@@ -833,8 +816,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
-
-                _ = services.AddFakeNatsMessageQueue();
             });
 
             var httpClient = web.CreateClient();

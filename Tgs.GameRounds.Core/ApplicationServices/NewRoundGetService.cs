@@ -24,7 +24,12 @@ namespace Tgs.GameRounds.Core.ApplicationServices
             var roundId = await _gameRoundCacheService.GetRoundIdAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false);
             if (roundId.HasValue)
             {
-                return new(Success: true, RoundId: roundId.Value);
+                return new NewRoundResult(Success: true, RoundId: roundId.Value);
+            }
+
+            if (!await _gameRoundCacheService.LockAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false))
+            {
+                return new NewRoundResult();
             }
 
             var newRoundId = await _gameRoundRepository.NewRoundAsync(
@@ -41,7 +46,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 
             if (!newRoundId.HasValue)
             {
-                return new();
+                return new NewRoundResult();
             }
 
             var roundRecord = await _gameRoundRepository.GetAsync(newRoundId.Value).ConfigureAwait(false);
@@ -74,6 +79,8 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 roundRecord.ReopenedOn,
                 roundRecord.EffectiveBettingPercentage,
                 roundRecord.AdditionalData)).ConfigureAwait(false);
+
+            await _gameRoundCacheService.UnLockAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false);
 
             return new NewRoundResult(Success: true, RoundId: newRoundId);
         }

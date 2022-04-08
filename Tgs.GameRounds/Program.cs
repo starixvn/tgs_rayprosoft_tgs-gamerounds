@@ -104,20 +104,6 @@ builder.Services
     });
 
 builder.Services
-    .AddMessageQueue()
-    .AddNatsMessageQueue(natsConfig =>
-    {
-        _ = natsConfig
-            .ConfigQueueOptions((options, sp) =>
-            {
-                var config = sp.GetRequiredService<IConfiguration>();
-
-                options.Url = config.GetConnectionString("Nats");
-            });
-    })
-    .AddNatsGlobPatternExchange("*");
-
-builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
         sp => new ConfigureNamedOptions<OtlpExporterOptions>(
             Microsoft.Extensions.Options.Options.DefaultName,
