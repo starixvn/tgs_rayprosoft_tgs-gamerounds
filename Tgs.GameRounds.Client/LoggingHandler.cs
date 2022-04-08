@@ -16,7 +16,8 @@ namespace Tgs.GameRounds.Client
 
             if (request.Content != null)
             {
-                _logger.LogInformation("Request Body: {await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}", await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
+                var requestContent = await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                _logger.LogInformation("Request Body: {requestContent}", requestContent);
             }
 
             var response = await base
@@ -27,7 +28,8 @@ namespace Tgs.GameRounds.Client
 
             if (response.Content != null)
             {
-                _logger.LogInformation("Response Body: {await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}", await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
+                var responseContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                _logger.LogInformation("Response Body: {ResponseContent}", responseContent);
             }
 
             return response;
