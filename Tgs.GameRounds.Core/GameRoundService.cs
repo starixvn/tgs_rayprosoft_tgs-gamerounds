@@ -10,6 +10,7 @@ namespace Tgs.GameRounds.Core
         private readonly TimeSpan _expiry;
         private readonly string _externalKey = "gameround:external:{0}:{1}:{2}:{3}";
         private readonly IGameRoundRepository _gameRoundRepository;
+        private readonly string _lockKey = "gameround:lock:{0}:{1}:{2}:{3}";
 
         public GameRoundService(IDatabase database, IGameRoundRepository gameRoundRepository, TimeSpan expiry)
         {
@@ -54,6 +55,19 @@ namespace Tgs.GameRounds.Core
                 return round.RoundId;
             }
             return Guid.TryParse(await _database.StringGetAsync(key).ConfigureAwait(false), out Guid roundId) ? roundId : null;
+        }
+
+        public async ValueTask<bool> LockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+        {
+            string key = string.Format(_lockKey, gameProviderId, externalRoundId, gameId, walletId);
+            return !await _database.KeyExistsAsync(key).ConfigureAwait(false)
+                && await _database.StringSetAsync(key, Guid.Empty.ToString(), _expiry).ConfigureAwait(false);
+        }
+
+        public async ValueTask UnLockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+        {
+            string key = string.Format(_lockKey, gameProviderId, externalRoundId, gameId, walletId);
+            _ = await _database.KeyDeleteAsync(key).ConfigureAwait(false);
         }
     }
 }

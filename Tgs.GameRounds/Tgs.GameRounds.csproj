@@ -31,8 +31,6 @@
 		<PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
 		<PackageReference Include="prometheus-net.AspNetCore.HealthChecks" Version="6.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
-		<PackageReference Include="Tgs.MessageQueue" Version="2.1.0" />
-		<PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.1" />
 		<PackageReference Include="Tgs.Interceptors" Version="0.2.1" />
 	</ItemGroup>
 
