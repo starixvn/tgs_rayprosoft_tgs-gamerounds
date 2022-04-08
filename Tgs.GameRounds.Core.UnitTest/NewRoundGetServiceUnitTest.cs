@@ -98,7 +98,7 @@ namespace Tgs.GameRounds.Core.UnitTest
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
 
-            var data = new NewRoundQuery(
+            var query = new NewRoundQuery(
                 ExternalRoundId: externalRoundId,
                 GameProviderId: gameProviderId,
                 PlayerCode: playerCode,
@@ -113,19 +113,19 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var gameRound = new GameRoundInfo(
                 RoundId: expected,
-                ExternalRoundId: data.ExternalRoundId,
-                GameProviderId: data.GameProviderId,
-                PlayerCode: data.PlayerCode,
-                GameId: data.GameId,
-                CurrencyCode: data.CurrencyCode,
+                ExternalRoundId: query.ExternalRoundId,
+                GameProviderId: query.GameProviderId,
+                PlayerCode: query.PlayerCode,
+                GameId: query.GameId,
+                CurrencyCode: query.CurrencyCode,
                 Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: data.GameProviderConfigurationId,
-                WalletId: data.WalletId,
+                GameProviderConfigurationId: query.GameProviderConfigurationId,
+                WalletId: query.WalletId,
                 CreatedOn: DateTimeOffset.UtcNow,
                 ClosedOn: null,
                 UpdatedOn: DateTimeOffset.UtcNow,
-                BrandId: data.BrandId,
-                ExternalCreatedOn: data.ExternalCreatedOn,
+                BrandId: query.BrandId,
+                ExternalCreatedOn: query.ExternalCreatedOn,
                 ExternalClosedOn: null,
                 BetAmount: null,
                 ValidBetAmount: null,
@@ -146,25 +146,39 @@ namespace Tgs.GameRounds.Core.UnitTest
                 fakeGameRoundRecord,
                 fakeGameRound);
 
+            _ = fakeGameRoundCache.LockAsync(
+                query.GameProviderId,
+                query.ExternalRoundId,
+                query.GameId,
+                query.WalletId).Returns(true);
+
             _ = fakeGameRound.NewRoundAsync(
-                new(data.ExternalRoundId,
-                data.GameProviderId,
-                data.PlayerCode,
-                data.GameId,
-                data.CurrencyCode,
-                data.GameProviderConfigurationId,
-                data.WalletId,
-                data.BrandId,
-                data.ExternalCreatedOn)).Returns(ValueTask.FromResult<Guid?>(expected));
+                new(query.ExternalRoundId,
+                query.GameProviderId,
+                query.PlayerCode,
+                query.GameId,
+                query.CurrencyCode,
+                query.GameProviderConfigurationId,
+                query.WalletId,
+                query.BrandId,
+                query.ExternalCreatedOn)).Returns(ValueTask.FromResult<Guid?>(expected));
             _ = fakeGameRound.GetAsync(expected).Returns(ValueTask.FromResult(gameRound));
 
-            var actual = await repository.GetAsync(data).ConfigureAwait(false);
+            var actual = await repository.GetAsync(query).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
             Assert.AreEqual(true, actual.Success);
             Assert.AreEqual(expected, actual.RoundId);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Is(gameRound));
+
+            _ = fakeGameRoundCache
+                .Received(1)
+                .UnLockAsync(
+                    query.GameProviderId,
+                    query.ExternalRoundId,
+                    query.GameId,
+                    query.WalletId);
         }
     }
 }
