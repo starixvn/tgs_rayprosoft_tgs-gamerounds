@@ -54,23 +54,12 @@ namespace Tgs.GameRounds.Repositories
                     ClientStatus = (int)gameRound.ClientStatus,
                     ReopenTurnoverAdjustment = gameRound.ReopenTurnoverAdjustment,
                     ReopenedOn = gameRound.ReopenedOn,
-                    AdditionalData = gameRound.AdditionalData,
                     RecordOn = DateTimeOffset.UtcNow
                 }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _logger.Log(LogLevel.Error,
-                   new EventId(10000, nameof(GameRoundRepository)),
-                   gameRound,
-                   ex,
-                   (state, ex) => JsonSerializer.Serialize(new
-                   {
-                       Data = gameRound,
-                       Exception = ex!,
-                       Message = "添加紀錄出現例外",
-                       LogOn = DateTimeOffset.UtcNow.ToString("o")
-                   }));
+                _logger.LogError(exception: ex, "LogOn:{DateTime.Now.ToString(\"o\")} ErrorMessage: {ex.Message}", DateTime.Now.ToString("o"), ex.Message);
             }
         }
 

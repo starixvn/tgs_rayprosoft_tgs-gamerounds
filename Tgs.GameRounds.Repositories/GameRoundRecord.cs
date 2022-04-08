@@ -197,13 +197,6 @@ namespace Tgs.GameRounds.Repositories
         public DateTimeOffset? ReopenedOn { get; set; }
 
         /// <summary>
-        /// The additional data
-        /// </summary>
-        [BsonIgnoreIfNull]
-        [BsonElement("additional_data")]
-        public string? AdditionalData { get; set; } = default!;
-
-        /// <summary>
         /// The record on
         /// </summary>
         [BsonElement("record_on")]
