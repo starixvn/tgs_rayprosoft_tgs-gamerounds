@@ -57,7 +57,6 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult(data));
 
-
                 _ = services.AddSingleton(fakeRepository);
 
                 var fakeGame = Substitute.For<IGame>();
@@ -65,7 +64,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 _ = fakeGame.GetExternalGameIdAsync(data.GameId).Returns(ValueTask.FromResult(externalGameId));
 
                 _ = services.AddSingleton(fakeGame);
-
 
                 var fakeGameProvider = Substitute.For<IGameProvider>();
 
@@ -135,13 +133,11 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = services.AddSingleton(fakeGame);
 
-
                 var fakeGameProvider = Substitute.For<IGameProvider>();
 
                 _ = fakeGameProvider.GetGameProviderCodeAsync(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
 
                 _ = services.AddSingleton(fakeGameProvider);
-
 
                 var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
@@ -211,13 +207,11 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = services.AddSingleton(fakeRepository);
 
-
                 var fakeGame = Substitute.For<IGame>();
 
                 _ = fakeGame.GetExternalGameIdAsync(data.GameId).Returns(ValueTask.FromResult(externalGameId));
 
                 _ = services.AddSingleton(fakeGame);
-
 
                 var fakeGameProvider = Substitute.For<IGameProvider>();
 
@@ -238,7 +232,6 @@ namespace Tgs.GameRounds.IntegrationTests
             Assert.AreEqual(roundId, actual.RoundId);
             Assert.AreEqual(externalGameId, actual.ExternalGameId);
             Assert.AreEqual(gameProviderCode, actual.GameProviderCode);
-
         }
 
         [TestMethod]
