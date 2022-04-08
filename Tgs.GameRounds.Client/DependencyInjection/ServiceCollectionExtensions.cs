@@ -19,5 +19,6 @@ public static class ServiceCollectionExtensions
                 httpClient.BaseAddress = options.BaseUrl;
             })
             .AddHttpMessageHandler<LoggingHandler>()
-            .Services;
+            .Services
+            .AddTransient<LoggingHandler>();
 }
