@@ -35,7 +35,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: OTEL_SERVICE_NAME
-              value: Game-GameRounds-Api({{ .Release.Namespace }})
+              value: Game-GameRounds({{ .Release.Namespace }})
             - name: NODE_IP
               valueFrom:
                 fieldRef:
