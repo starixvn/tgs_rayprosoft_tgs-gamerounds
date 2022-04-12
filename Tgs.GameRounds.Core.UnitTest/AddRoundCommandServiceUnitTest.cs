@@ -80,16 +80,16 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: string.Empty
                 );
 
-            var service = new AddRoundCommandService(
-                fakeGameRoundCache,
-                fakeGameRoundRecord,
-                fakeGameRound);
-
             _ = fakeGameRoundCache.LockAsync(
                 command.GameProviderId,
                 command.ExternalRoundId,
                 command.GameId,
                 command.WalletId).Returns(false);
+
+            var service = new AddRoundCommandService(
+                fakeGameRoundCache,
+                fakeGameRoundRecord,
+                fakeGameRound);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
 
@@ -174,11 +174,6 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: string.Empty
                 );
 
-            var service = new AddRoundCommandService(
-                fakeGameRoundCache,
-                fakeGameRoundRecord,
-                fakeGameRound);
-
             _ = fakeGameRoundCache.LockAsync(
                 command.GameProviderId,
                 command.ExternalRoundId,
@@ -210,6 +205,11 @@ namespace Tgs.GameRounds.Core.UnitTest
                     command.ClientStatus,
                     command.AdditionalData)).Returns(ValueTask.FromResult(expected));
             _ = fakeGameRound.GetAsync(expected).Returns(ValueTask.FromResult(gameRound));
+
+            var service = new AddRoundCommandService(
+                fakeGameRoundCache,
+                fakeGameRoundRecord,
+                fakeGameRound);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
 

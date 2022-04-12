@@ -66,11 +66,6 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: string.Empty
                 );
 
-            var service = new UpdateRoundOpenCommandService(
-                fakeGameRoundCache,
-                fakeGameRoundRecord,
-                fakeGameRound);
-
             _ = fakeGameRoundCache.ExistAsync(data.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
             _ = fakeGameRound.UpdateRoundOpenAsync(
@@ -83,6 +78,11 @@ namespace Tgs.GameRounds.Core.UnitTest
                     data.AdditionalData));
 
             _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult(gameRound));
+
+            var service = new UpdateRoundOpenCommandService(
+                fakeGameRoundCache,
+                fakeGameRoundRecord,
+                fakeGameRound);
 
             await service.ExecuteAsync(data).ConfigureAwait(false);
 

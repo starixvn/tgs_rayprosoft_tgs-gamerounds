@@ -3,7 +3,6 @@ using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.ApplicationServices;
-using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Controllers
@@ -240,24 +239,19 @@ namespace Tgs.GameRounds.Controllers
         ///         }
         /// </remarks>
         [HttpPost("new", Name = "GameRoundsNewRound")]
-        public async ValueTask<NewRoundResultViewModel> NewRoundAsync(
-                [FromServices] IGetService<NewRoundQuery, NewRoundResult> service,
+        public ValueTask<Guid> NewRoundAsync(
+                [FromServices] IGetService<NewRoundQuery, Guid> service,
                 NewRoundQueryViewModel model)
-        {
-            var result = await service.GetAsync(new(
-                        model.ExternalRoundId,
-                        model.GameProviderId,
-                        model.PlayerCode,
-                        model.GameId,
-                        model.CurrencyCode,
-                        model.GameProviderConfigurationId,
-                        model.WalletId,
-                        model.BrandId,
-                        model.ExternalCreatedOn)).ConfigureAwait(false);
-            return new(
-                result.Success,
-                result.RoundId);
-        }
+            => service.GetAsync(new NewRoundQuery(
+                model.ExternalRoundId,
+                model.GameProviderId,
+                model.PlayerCode,
+                model.GameId,
+                model.CurrencyCode,
+                model.GameProviderConfigurationId,
+                model.WalletId,
+                model.BrandId,
+                model.ExternalCreatedOn));
 
         /// <summary>
         /// Games the rounds update round asynchronous.
@@ -288,39 +282,30 @@ namespace Tgs.GameRounds.Controllers
         ///         }
         /// </remarks>
         [HttpPut("{roundid}", Name = "GameRoundsUpdateRound")]
-        public async ValueTask<UpdateRoundResultViewModel> UpdateRoundAsync(
-                [FromServices] IGetService<UpdateRoundQuery, UpdateRoundResult> service,
+        public ValueTask UpdateRoundAsync(
+                [FromServices] ICommandService<UpdateRoundCommand> service,
                 Guid roundid,
                 UpdateRoundQueryViewModel model)
-        {
-            if (!Enum.IsDefined(model.ClientStatus))
-            {
-                return new(false);
-            }
-
-            if (!Enum.IsDefined(model.Status))
-            {
-                return new(false);
-            }
-
-            var result = await service.GetAsync(new(
-                roundid,
-                model.Status,
-                model.ClosedOn,
-                model.ExternalClosedOn,
-                model.BetAmount,
-                model.ValidBetAmount,
-                model.SettleAmount,
-                model.Commission,
-                model.Turnover,
-                model.WinLoss,
-                model.TieBetAdjustment,
-                model.ClientStatus,
-                model.ReopenTurnoverAdjustment,
-                model.ReopenedOn,
-                model.AdditionalData)).ConfigureAwait(false);
-            return new(result.Success);
-        }
+            => !Enum.IsDefined(model.ClientStatus)
+                ? throw new Exception("This ClientStatus is not in the specified item. ( Open: 1, Void: 2, Win: 3, Loss: 4, Draw: 5)")
+                : !Enum.IsDefined(model.Status)
+                ? throw new Exception("This Status is not a specified item. (New:0,Open:1, Closed:2)")
+                : service.ExecuteAsync(new UpdateRoundCommand(
+                    roundid,
+                    model.Status,
+                    model.ClosedOn,
+                    model.ExternalClosedOn,
+                    model.BetAmount,
+                    model.ValidBetAmount,
+                    model.SettleAmount,
+                    model.Commission,
+                    model.Turnover,
+                    model.WinLoss,
+                    model.TieBetAdjustment,
+                    model.ClientStatus,
+                    model.ReopenTurnoverAdjustment,
+                    model.ReopenedOn,
+                    model.AdditionalData));
 
         /// <summary>
         /// Updates the round closed asynchronous.
