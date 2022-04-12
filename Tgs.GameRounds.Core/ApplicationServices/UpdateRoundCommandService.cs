@@ -1,15 +1,14 @@
-﻿using Tgs.GameRounds.Core.Models;
-using Tgs.ServiceUtility;
+﻿using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Core.ApplicationServices
 {
-    internal class UpdateRoundGetService : IGetService<UpdateRoundQuery, UpdateRoundResult>
+    internal class UpdateRoundCommandService : ICommandService<UpdateRoundCommand>
     {
         private readonly IGameRoundService _gameRoundCacheService;
         private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
         private readonly IGameRoundRepository _gameRoundRepository;
 
-        public UpdateRoundGetService(
+        public UpdateRoundCommandService(
           IGameRoundService gameRoundCacheService,
           IGameRoundRecordRepository gameRoundRecordRepository,
           IGameRoundRepository gameRoundRepository)
@@ -19,31 +18,31 @@ namespace Tgs.GameRounds.Core.ApplicationServices
             _gameRoundRepository = gameRoundRepository ?? throw new ArgumentNullException(nameof(gameRoundRepository));
         }
 
-        public async ValueTask<UpdateRoundResult> GetAsync(UpdateRoundQuery query, CancellationToken cancellationToken = default)
+        public async ValueTask ExecuteAsync(UpdateRoundCommand command, CancellationToken cancellationToken = default)
         {
-            if (!await _gameRoundCacheService.ExistAsync(query.RoundId).ConfigureAwait(false))
+            if (!await _gameRoundCacheService.ExistAsync(command.RoundId).ConfigureAwait(false))
             {
-                return new(Success: false);
+                throw new Exception("This GameRound order does not exist.");
             }
 
             await _gameRoundRepository.UpdateRoundAsync(new(
-                query.RoundId,
-                query.Status,
-                query.ClosedOn,
-                query.ExternalClosedOn,
-                query.BetAmount,
-                query.ValidBetAmount,
-                query.SettleAmount,
-                query.Commission,
-                query.Turnover,
-                query.WinLoss,
-                query.TieBetAdjustment,
-                query.ClientStatus,
-                query.ReopenTurnoverAdjustment,
-                query.ReopenedOn,
-                query.AdditionalData)).ConfigureAwait(false);
+                command.RoundId,
+                command.Status,
+                command.ClosedOn,
+                command.ExternalClosedOn,
+                command.BetAmount,
+                command.ValidBetAmount,
+                command.SettleAmount,
+                command.Commission,
+                command.Turnover,
+                command.WinLoss,
+                command.TieBetAdjustment,
+                command.ClientStatus,
+                command.ReopenTurnoverAdjustment,
+                command.ReopenedOn,
+                command.AdditionalData)).ConfigureAwait(false);
 
-            var round = await _gameRoundRepository.GetAsync(query.RoundId).ConfigureAwait(false);
+            var round = await _gameRoundRepository.GetAsync(command.RoundId).ConfigureAwait(false);
 
             await _gameRoundRecordRepository.AddAsync(new(
                 round.RoundId,
@@ -73,8 +72,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 round.ReopenedOn,
                 round.EffectiveBettingPercentage,
                 round.AdditionalData)).ConfigureAwait(false);
-
-            return new(Success: true);
         }
     }
 }
