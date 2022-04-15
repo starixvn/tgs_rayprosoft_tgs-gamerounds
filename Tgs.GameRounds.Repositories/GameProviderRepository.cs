@@ -7,14 +7,14 @@ namespace Tgs.GameRounds.Repositories
     {
         private readonly TgsContext _context;
 #pragma warning disable IDE0052 // 刪除未讀取的私用成員
-        private readonly IGameProvider _game;
+        private readonly IGameProvider _gameProvider;
 #pragma warning restore IDE0052 // 刪除未讀取的私用成員
 
         public GameProviderRepository(
-            IGameProvider game,
+            IGameProvider gameProvider,
             TgsContext context)
         {
-            _game = game ?? throw new ArgumentNullException(nameof(game));
+            _gameProvider = gameProvider ?? throw new ArgumentNullException(nameof(gameProvider));
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 

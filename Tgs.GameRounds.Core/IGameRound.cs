@@ -2,15 +2,23 @@
 
 namespace Tgs.GameRounds.Core
 {
-    public interface IGameRoundRepository
+    public interface IGameRound
     {
         ValueTask<Guid> AddRoundAsync(AddRound source);
 
-        ValueTask<GameRoundInfo> GetAsync(Guid roundId);
+        ValueTask<bool> ExistAsync(Guid roundId);
+
+        ValueTask<GameRoundInfo?> GetAsync(Guid roundId);
 
         ValueTask<GameRoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
 
+        ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
+
+        ValueTask<bool> LockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
+
         ValueTask<Guid?> NewRoundAsync(NewRound round);
+
+        ValueTask UnLockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
 
         ValueTask UpdateRoundAsync(UpdateRound round);
 

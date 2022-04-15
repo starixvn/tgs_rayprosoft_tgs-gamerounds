@@ -3,8 +3,8 @@
     [Flags]
     public enum GameRoundStatus
     {
-        New,
-        Open,
-        Closed
+        New = 0,
+        Open = 1,
+        Closed = 2
     }
 }

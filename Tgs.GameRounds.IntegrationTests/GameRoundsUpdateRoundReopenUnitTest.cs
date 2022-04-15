@@ -39,13 +39,11 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
-                var fakeGameRoundCache = Substitute.For<IGameRoundService>();
-                _ = fakeGameRoundCache.ExistAsync(roundId).Returns(ValueTask.FromResult(true));
-                _ = services.AddSingleton(fakeGameRoundCache);
+                var fakeGameRound = Substitute.For<IGameRound>();
 
-                var fakeGameRound = Substitute.For<IGameRoundRepository>();
+                _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(true));
 
                 _ = fakeGameRound.UpdateRoundReopenAsync(new(
                     roundId,
@@ -92,7 +90,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     EffectiveBettingPercentage: null,
                     AdditionalData: viewModel.AdditionalData ?? string.Empty);
 
-                _ = fakeGameRound.GetAsync(roundId).Returns(ValueTask.FromResult(gameRound));
+                _ = fakeGameRound.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
                 _ = services.AddSingleton(fakeGameRound);
 

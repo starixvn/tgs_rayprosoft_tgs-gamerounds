@@ -33,15 +33,12 @@ namespace Tgs.GameRounds.IntegrationTests
                 ExternalCreatedOn = DateTimeOffset.UtcNow
             };
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
-                var fakeGameRoundCache = Substitute.For<IGameRoundService>();
+                var fakeGameRound = Substitute.For<IGameRound>();
 
-                _ = fakeGameRoundCache.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(expected));
+                _ = fakeGameRound.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(expected));
 
-                _ = services.AddSingleton(fakeGameRoundCache);
-
-                var fakeGameRound = Substitute.For<IGameRoundRepository>();
                 _ = services.AddSingleton(fakeGameRound);
 
                 var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
@@ -79,15 +76,13 @@ namespace Tgs.GameRounds.IntegrationTests
             };
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
-            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
-                _ = fakeGameRoundCache.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
-                _ = fakeGameRoundCache.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(true);
-                _ = services.AddSingleton(fakeGameRoundCache);
+                _ = fakeGameRound.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
 
-                var fakeGameRound = Substitute.For<IGameRoundRepository>();
+                _ = fakeGameRound.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(true);
 
                 _ = fakeGameRound.NewRoundAsync(new(
                     viewModel.ExternalRoundId,
@@ -115,7 +110,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
 
-            _ = fakeGameRoundCache.Received(1).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
+            _ = fakeGameRound.Received(1).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
         }
 
         [TestMethod]
@@ -139,13 +134,13 @@ namespace Tgs.GameRounds.IntegrationTests
             };
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
-            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
-                _ = fakeGameRoundCache.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
-                _ = fakeGameRoundCache.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(false);
-                _ = services.AddSingleton(fakeGameRoundCache);
+                _ = fakeGameRound.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
+                _ = fakeGameRound.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(false);
+                _ = services.AddSingleton(fakeGameRound);
             });
 
             var httpClient = web.CreateClient();
@@ -158,7 +153,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
 
-            _ = fakeGameRoundCache.Received(0).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
+            _ = fakeGameRound.Received(0).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
         }
 
         [TestMethod]
@@ -183,15 +178,13 @@ namespace Tgs.GameRounds.IntegrationTests
             };
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
-            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
-                _ = fakeGameRoundCache.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
-                _ = fakeGameRoundCache.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(true);
-                _ = services.AddSingleton(fakeGameRoundCache);
+                _ = fakeGameRound.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
 
-                var fakeGameRound = Substitute.For<IGameRoundRepository>();
+                _ = fakeGameRound.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(true);
 
                 _ = fakeGameRound.NewRoundAsync(new(
                     viewModel.ExternalRoundId,
@@ -233,7 +226,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     EffectiveBettingPercentage: null,
                     AdditionalData: string.Empty);
 
-                _ = fakeGameRound.GetAsync(expected).Returns(ValueTask.FromResult(gameRound));
+                _ = fakeGameRound.GetAsync(expected).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
                 _ = services.AddSingleton(fakeGameRound);
 
@@ -251,7 +244,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Any<GameRoundInfo>());
 
-            _ = fakeGameRoundCache.Received(1).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
+            _ = fakeGameRound.Received(1).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
         }
     }
 }

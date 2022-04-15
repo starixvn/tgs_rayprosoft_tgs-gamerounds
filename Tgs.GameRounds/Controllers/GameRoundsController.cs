@@ -209,7 +209,7 @@ namespace Tgs.GameRounds.Controllers
         /// <returns></returns>
         [HttpGet("{rounid}/status", Name = "GameRoundGetStatus")]
         public async ValueTask<GameRoundStatus?> GetStatusAsync(
-                   [FromServices] IGameRoundRepository repository,
+                   [FromServices] IGameRound repository,
                    Guid rounid)
         {
             var round = await repository.GetAsync(rounid).ConfigureAwait(false);

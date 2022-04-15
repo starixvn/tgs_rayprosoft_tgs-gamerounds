@@ -6,12 +6,12 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     {
         private readonly IGame _game;
         private readonly IGameProvider _gameProvider;
-        private readonly IGameRoundRepository _gameRoundRepository;
+        private readonly IGameRound _gameRoundRepository;
 
         public GetGameRoundByGameGetService(
             IGame game,
             IGameProvider gameProvider,
-            IGameRoundRepository gameRoundRepository)
+            IGameRound gameRoundRepository)
         {
             _game = game ?? throw new ArgumentNullException(nameof(game));
             _gameProvider = gameProvider ?? throw new ArgumentNullException(nameof(gameProvider));
@@ -22,45 +22,45 @@ namespace Tgs.GameRounds.Core.ApplicationServices
         {
             var gameRoundInfo = await _gameRoundRepository.GetAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false);
 
-            if (gameRoundInfo == null)
+            if (gameRoundInfo is not null)
             {
-                return null;
+                var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(query.GameProviderId).ConfigureAwait(false);
+
+                var externalGameId = await _game.GetExternalGameIdAsync(query.GameId).ConfigureAwait(false);
+
+                return new GameRoundResult(
+                    gameRoundInfo.RoundId,
+                    gameRoundInfo.ExternalRoundId,
+                    gameRoundInfo.GameProviderId,
+                    gameProviderCode,
+                    gameRoundInfo.PlayerCode,
+                    gameRoundInfo.GameId,
+                    externalGameId,
+                    gameRoundInfo.CurrencyCode,
+                    gameRoundInfo.Status,
+                    gameRoundInfo.GameProviderConfigurationId,
+                    gameRoundInfo.WalletId,
+                    gameRoundInfo.CreatedOn,
+                    gameRoundInfo.ClosedOn,
+                    gameRoundInfo.UpdatedOn,
+                    gameRoundInfo.BrandId,
+                    gameRoundInfo.ExternalCreatedOn,
+                    gameRoundInfo.ExternalClosedOn,
+                    gameRoundInfo.BetAmount,
+                    gameRoundInfo.ValidBetAmount,
+                    gameRoundInfo.SettleAmount,
+                    gameRoundInfo.Commission,
+                    gameRoundInfo.Turnover,
+                    gameRoundInfo.WinLoss,
+                    gameRoundInfo.TieBetAdjustment,
+                    gameRoundInfo.ClientStatus,
+                    gameRoundInfo.ReopenTurnoverAdjustment,
+                    gameRoundInfo.ReopenedOn,
+                    gameRoundInfo.EffectiveBettingPercentage,
+                    gameRoundInfo.AdditionalData);
             }
 
-            var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(query.GameProviderId).ConfigureAwait(false);
-
-            var externalGameId = await _game.GetExternalGameIdAsync(query.GameId).ConfigureAwait(false);
-
-            return new GameRoundResult(
-                gameRoundInfo.RoundId,
-                gameRoundInfo.ExternalRoundId,
-                gameRoundInfo.GameProviderId,
-                gameProviderCode,
-                gameRoundInfo.PlayerCode,
-                gameRoundInfo.GameId,
-                externalGameId,
-                gameRoundInfo.CurrencyCode,
-                gameRoundInfo.Status,
-                gameRoundInfo.GameProviderConfigurationId,
-                gameRoundInfo.WalletId,
-                gameRoundInfo.CreatedOn,
-                gameRoundInfo.ClosedOn,
-                gameRoundInfo.UpdatedOn,
-                gameRoundInfo.BrandId,
-                gameRoundInfo.ExternalCreatedOn,
-                gameRoundInfo.ExternalClosedOn,
-                gameRoundInfo.BetAmount,
-                gameRoundInfo.ValidBetAmount,
-                gameRoundInfo.SettleAmount,
-                gameRoundInfo.Commission,
-                gameRoundInfo.Turnover,
-                gameRoundInfo.WinLoss,
-                gameRoundInfo.TieBetAdjustment,
-                gameRoundInfo.ClientStatus,
-                gameRoundInfo.ReopenTurnoverAdjustment,
-                gameRoundInfo.ReopenedOn,
-                gameRoundInfo.EffectiveBettingPercentage,
-                gameRoundInfo.AdditionalData);
+            return default;
         }
     }
 }

@@ -6,11 +6,11 @@ namespace Tgs.GameRounds.Repositories
 {
     internal class GameRedisRepository : IGame
     {
+        private const string KeyExternalGameId = "gameround:game:externalgameid:{0}:{1}";
+        private const string KeyGameId = "gameround:game:gameid:{0}";
         private readonly IDatabase _database;
         private readonly TimeSpan _expiry;
         private readonly IGame _game;
-        private readonly string _keyExternalGameId = "gameround:game:externalgameid:{0}:{1}";
-        private readonly string _keyGameId = "gameround:game:gameid:{0}";
 
         public GameRedisRepository(IDatabase database, IGame game, TimeSpan expiry)
         {
@@ -21,7 +21,7 @@ namespace Tgs.GameRounds.Repositories
 
         public async ValueTask<string> GetExternalGameIdAsync(int gameId)
         {
-            var key = string.Format(_keyGameId, gameId);
+            var key = string.Format(KeyGameId, gameId);
             if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
             {
                 var externalGameId = await _game.GetExternalGameIdAsync(gameId).ConfigureAwait(false);
@@ -36,7 +36,7 @@ namespace Tgs.GameRounds.Repositories
 
         public async ValueTask<int> GetGameIdAsync(Guid gameProviderId, string externalGameId)
         {
-            var key = string.Format(_keyExternalGameId, gameProviderId, externalGameId);
+            var key = string.Format(KeyExternalGameId, gameProviderId, externalGameId);
             if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
             {
                 var gameId = await _game.GetGameIdAsync(gameProviderId, externalGameId).ConfigureAwait(false);
