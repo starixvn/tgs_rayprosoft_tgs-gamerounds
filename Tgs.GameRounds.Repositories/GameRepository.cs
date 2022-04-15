@@ -6,8 +6,8 @@ namespace Tgs.GameRounds.Repositories
 {
     internal class GameRepository : IGame
     {
-#pragma warning disable IDE0052 // 刪除未讀取的私用成員
         private readonly TgsContext _context;
+#pragma warning disable IDE0052 // 刪除未讀取的私用成員
         private readonly IGame _game;
 #pragma warning restore IDE0052 // 刪除未讀取的私用成員
 

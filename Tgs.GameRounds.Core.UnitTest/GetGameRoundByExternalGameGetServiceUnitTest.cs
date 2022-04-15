@@ -15,7 +15,7 @@ namespace Tgs.GameRounds.Core.UnitTest
         {
             var fakeGame = Substitute.For<IGame>();
             var fakeGameProvider = Substitute.For<IGameProvider>();
-            var fakeGameRound = Substitute.For<IGameRoundRepository>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
             var roundId = Guid.NewGuid();
 

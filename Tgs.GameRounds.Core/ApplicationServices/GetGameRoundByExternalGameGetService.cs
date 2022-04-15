@@ -6,12 +6,12 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     {
         private readonly IGame _game;
         private readonly IGameProvider _gameProvider;
-        private readonly IGameRoundRepository _gameRoundRepository;
+        private readonly IGameRound _gameRoundRepository;
 
         public GetGameRoundByExternalGameGetService(
             IGame game,
             IGameProvider gameProvider,
-            IGameRoundRepository gameRoundRepository)
+            IGameRound gameRoundRepository)
         {
             _game = game ?? throw new ArgumentNullException(nameof(game));
             _gameProvider = gameProvider ?? throw new ArgumentNullException(nameof(gameProvider));

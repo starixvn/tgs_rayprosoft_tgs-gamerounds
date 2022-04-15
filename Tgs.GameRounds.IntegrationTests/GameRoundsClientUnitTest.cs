@@ -49,13 +49,13 @@ namespace Tgs.GameRounds.IntegrationTests
                EffectiveBettingPercentage: null,
                AdditionalData: string.Empty);
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
-                var fakeRepository = Substitute.For<IGameRoundRepository>();
+                var fakeGameRound = Substitute.For<IGameRound>();
 
-                _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult(data));
+                _ = fakeGameRound.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
 
-                _ = services.AddSingleton(fakeRepository);
+                _ = services.AddSingleton(fakeGameRound);
 
                 var fakeGame = Substitute.For<IGame>();
 
@@ -121,7 +121,7 @@ namespace Tgs.GameRounds.IntegrationTests
               EffectiveBettingPercentage: null,
               AdditionalData: string.Empty);
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
                 var fakeGame = Substitute.For<IGame>();
 
@@ -135,7 +135,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = services.AddSingleton(fakeGameProvider);
 
-                var fakeGameRound = Substitute.For<IGameRoundRepository>();
+                var fakeGameRound = Substitute.For<IGameRound>();
 
                 _ = fakeGameRound.GetAsync(gameProviderId, externalRoundId, gameId, walletId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
 
@@ -193,9 +193,9 @@ namespace Tgs.GameRounds.IntegrationTests
               EffectiveBettingPercentage: null,
               AdditionalData: string.Empty);
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
-                var fakeRepository = Substitute.For<IGameRoundRepository>();
+                var fakeRepository = Substitute.For<IGameRound>();
 
                 _ = fakeRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
 
@@ -260,11 +260,11 @@ namespace Tgs.GameRounds.IntegrationTests
                EffectiveBettingPercentage: null,
                AdditionalData: string.Empty);
 
-            await using var web = CreateTestSettingSite(services =>
+            var web = CreateTestSettingSite(services =>
             {
-                var fakeRepository = Substitute.For<IGameRoundRepository>();
+                var fakeRepository = Substitute.For<IGameRound>();
 
-                _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult(data));
+                _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
 
                 _ = services.AddSingleton(fakeRepository);
             });

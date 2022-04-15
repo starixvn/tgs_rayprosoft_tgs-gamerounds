@@ -4,9 +4,9 @@
     public enum GameRoundClientStatus
     {
         Open = 1,
-        Void,
-        Win,
-        Loss,
-        Draw
+        Void = 2,
+        Win = 3,
+        Loss = 4,
+        Draw = 5
     }
 }
