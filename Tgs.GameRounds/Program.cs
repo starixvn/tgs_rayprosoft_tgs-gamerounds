@@ -88,20 +88,20 @@ builder.Services
                    });
            },
            sp => sp.GetRequiredService<RedisConnectionManager>().Database);
-    },
-    (sp) => sp.GetRequiredService<RedisConnectionManager>().Database)
-    .AddGameRoundRepositories((sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database)
-    .AddGameRoundBetRepositories(
-    (sp, dbBuilder) =>
-    {
-        var configuration = sp.GetRequiredService<IConfiguration>();
-        _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
-            serverOption =>
-            {
-                _ = serverOption.SetPostgresVersion(12, 5);
-                _ = serverOption.CommandTimeout(180);
-            });
-    });
+        _ = configuration
+           .AddGameRoundBetRepositories((sp, dbBuilder) =>
+           {
+               var configuration = sp.GetRequiredService<IConfiguration>();
+               _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
+                   serverOption =>
+                   {
+                       _ = serverOption.SetPostgresVersion(12, 5);
+                       _ = serverOption.CommandTimeout(180);
+                   });
+           },
+           sp => sp.GetRequiredService<RedisConnectionManager>().Database);
+    })
+    .AddGameRoundRepositories((sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database);
 
 builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(

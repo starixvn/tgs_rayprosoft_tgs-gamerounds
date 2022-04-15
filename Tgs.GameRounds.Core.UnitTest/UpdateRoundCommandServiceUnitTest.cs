@@ -13,9 +13,8 @@ namespace Tgs.GameRounds.Core.UnitTest
         [TestMethod]
         public async Task ExternalRoundId_Not_Exist()
         {
-            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
-            var fakeGameRound = Substitute.For<IGameRoundRepository>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
@@ -70,10 +69,9 @@ namespace Tgs.GameRounds.Core.UnitTest
                 EffectiveBettingPercentage: null,
                 AdditionalData: command.AdditionalData ?? string.Empty);
 
-            _ = fakeGameRoundCache.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
+            _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
 
             var service = new UpdateRoundCommandService(
-                fakeGameRoundCache,
                 fakeGameRoundRecord,
                 fakeGameRound);
 
@@ -85,9 +83,8 @@ namespace Tgs.GameRounds.Core.UnitTest
         [TestMethod]
         public async Task Normal_Process()
         {
-            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
-            var fakeGameRound = Substitute.For<IGameRoundRepository>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
@@ -144,7 +141,7 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var expected = true;
 
-            _ = fakeGameRoundCache.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(expected));
+            _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(expected));
 
             _ = fakeGameRound.UpdateRoundAsync(new(
                 command.RoundId,
@@ -163,10 +160,9 @@ namespace Tgs.GameRounds.Core.UnitTest
                 command.ReopenedOn,
                 command.AdditionalData));
 
-            _ = fakeGameRound.GetAsync(command.RoundId).Returns(ValueTask.FromResult(gameRound));
+            _ = fakeGameRound.GetAsync(command.RoundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
             var service = new UpdateRoundCommandService(
-                fakeGameRoundCache,
                 fakeGameRoundRecord,
                 fakeGameRound);
 

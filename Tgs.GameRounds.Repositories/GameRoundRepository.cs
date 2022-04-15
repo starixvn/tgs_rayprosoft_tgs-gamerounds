@@ -9,18 +9,21 @@ using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories
 {
-    internal class GameRoundRepository : IGameRoundRepository
+    internal class GameRoundRepository : IGameRound
     {
         private readonly BetContext _context;
+        private readonly IGameRound _gameRound;
         private readonly ILogger<GameRoundRepository> _logger;
         private readonly ISerialNumberGenerator _serialNumberGenerator;
 
         public GameRoundRepository(
             BetContext context,
+            IGameRound gameRound,
             ILogger<GameRoundRepository> logger,
             ISerialNumberGenerator serialNumberGenerator)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
         }
@@ -71,7 +74,10 @@ namespace Tgs.GameRounds.Repositories
             return roundId;
         }
 
-        public ValueTask<GameRoundInfo> GetAsync(Guid roundId)
+        public async ValueTask<bool> ExistAsync(Guid roundId)
+            => (await GetAsync(roundId).ConfigureAwait(false)) is not null;
+
+        public ValueTask<GameRoundInfo?> GetAsync(Guid roundId)
             => (from round in _context.Rounds.AsQueryable()
                 join roundDetail in _context.RoundDetails.AsQueryable()
                 on round.Id equals roundDetail.RoundId
@@ -108,7 +114,7 @@ namespace Tgs.GameRounds.Repositories
                     data.AdditionalData
                     ))
             .ToAsyncEnumerable()
-            .FirstAsync();
+            .FirstOrDefaultAsync();
 
         public ValueTask<GameRoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
             => (from round in _context.Rounds.AsQueryable()
@@ -151,6 +157,12 @@ namespace Tgs.GameRounds.Repositories
                     ))
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync();
+
+        public async ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+            => (await GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false))?.RoundId;
+
+        public ValueTask<bool> LockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+            => ValueTask.FromResult(true);
 
         public async ValueTask<Guid?> NewRoundAsync(NewRound round)
         {
@@ -209,6 +221,8 @@ namespace Tgs.GameRounds.Repositories
                 return null;
             }
         }
+
+        public ValueTask UnLockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId) => throw new NotSupportedException();
 
         public async ValueTask UpdateRoundAsync(UpdateRound round)
         {

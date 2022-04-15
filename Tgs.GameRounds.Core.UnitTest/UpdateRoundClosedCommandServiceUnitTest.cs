@@ -14,9 +14,8 @@ namespace Tgs.GameRounds.Core.UnitTest
         [TestMethod]
         public async Task Normal_Process()
         {
-            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
-            var fakeGameRound = Substitute.For<IGameRoundRepository>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
             var roundId = Guid.NewGuid();
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -72,7 +71,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: string.Empty
                 );
 
-            _ = fakeGameRoundCache.ExistAsync(data.RoundId).Returns(ValueTask.FromResult<bool>(true));
+            _ = fakeGameRound.ExistAsync(data.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
             _ = fakeGameRound.UpdateRoundClosedAsync(
                 new(data.RoundId,
@@ -89,10 +88,9 @@ namespace Tgs.GameRounds.Core.UnitTest
                     data.ClientStatus,
                     data.AdditionalData));
 
-            _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult(gameRound));
+            _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
             var service = new UpdateRoundClosedCommandService(
-                fakeGameRoundCache,
                 fakeGameRoundRecord,
                 fakeGameRound);
 

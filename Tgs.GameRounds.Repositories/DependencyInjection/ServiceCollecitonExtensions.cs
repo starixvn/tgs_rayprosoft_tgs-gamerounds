@@ -10,13 +10,19 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollecitonExtensions
     {
-        public static IServiceCollection AddGameRoundBetRepositories(
-            this IServiceCollection services,
-            Action<IServiceProvider, DbContextOptionsBuilder> configure)
-            => services
-            .AddSerialNumberGenerator()
-            .AddDbContext<BetContext>(configure)
-            .AddTransient<IGameRoundRepository, GameRoundRepository>();
+        public static GameRoundConfiguration AddGameRoundBetRepositories(
+            this GameRoundConfiguration configuration,
+            Action<IServiceProvider, DbContextOptionsBuilder> configure,
+            Func<IServiceProvider, IDatabase> redisDatabaseResolver)
+        {
+            _ = configuration.Services.AddSerialNumberGenerator();
+
+            _ = configuration.Services.AddDbContext<BetContext>(configure);
+
+            return configuration
+                .SetGameRounds<GameRoundRepository>()
+                .SetGameRounds<GameRoundRedisRepository>(sp => new object[] { redisDatabaseResolver(sp), TimeSpan.FromMinutes(30) });
+        }
 
         public static IServiceCollection AddGameRoundRepositories(
                     this IServiceCollection services,
@@ -33,6 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             _ = configuration.Services.AddSerialNumberGenerator();
 
             _ = configuration.Services.AddDbContext<TgsContext>(configure);
+
             return configuration
                 .SetGameProviders<GameProviderRepository>()
                 .SetGameProviders<GameProviderRedisRepository>(sp => new object[] { redisDatabaseResolver(sp), TimeSpan.FromHours(1) })

@@ -8,6 +8,8 @@ namespace Tgs.GameRounds.Core.Configuration
 
         internal Type SourceStoreGameProviderType { get; private set; } = typeof(NoopGameProvider);
 
+        internal Type SourceStoreGameRoundType { get; private set; } = typeof(NoopGameRound);
+
         internal Type SourceStoreGameType { get; private set; } = typeof(NoopGame);
 
         public GameRoundConfiguration(IServiceCollection services)
@@ -39,8 +41,32 @@ namespace Tgs.GameRounds.Core.Configuration
             return this;
         }
 
+        public GameRoundConfiguration SetGameRounds<TGameRound>(Func<IServiceProvider, object[]>? parametersFactory = null)
+            where TGameRound : class, IGameRound
+        {
+            var sourceType = SourceStoreGameRoundType;
+
+            _ = Services.AddTransient(sp =>
+            {
+                var parameters = new List<object>
+                  {
+                      sp.GetRequiredService(sourceType)
+                  };
+                if (parametersFactory is not null)
+                    parameters.AddRange(parametersFactory(sp));
+
+                return ActivatorUtilities.CreateInstance<TGameRound>(
+                    sp,
+                    parameters.ToArray());
+            });
+
+            SourceStoreGameRoundType = typeof(TGameRound);
+
+            return this;
+        }
+
         public GameRoundConfiguration SetGames<TGame>(Func<IServiceProvider, object[]>? parametersFactory = null)
-            where TGame : class, IGame
+                    where TGame : class, IGame
         {
             var sourceType = SourceStoreGameType;
 
