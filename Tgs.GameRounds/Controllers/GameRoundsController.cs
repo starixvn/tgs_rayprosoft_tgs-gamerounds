@@ -206,14 +206,14 @@ namespace Tgs.GameRounds.Controllers
         /// Gets the status asynchronous.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="rounid">The rounid.</param>
+        /// <param name="roundid">The roundid.</param>
         /// <returns></returns>
-        [HttpGet("{rounid}/status", Name = "GameRoundGetStatus")]
+        [HttpGet("{roundid}/status", Name = "GameRoundGetStatus")]
         public async ValueTask<GameRoundStatus?> GetStatusAsync(
             [FromServices] IGameRound repository,
-            Guid rounid)
+            Guid roundid)
         {
-            var round = await repository.GetAsync(rounid).ConfigureAwait(false);
+            var round = await repository.GetAsync(roundid).ConfigureAwait(false);
             return round?.Status;
         }
 
