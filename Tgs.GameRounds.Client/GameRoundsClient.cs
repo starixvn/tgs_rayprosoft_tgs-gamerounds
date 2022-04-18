@@ -109,7 +109,25 @@ namespace Tgs.GameRounds.Client
             return null;
         }
 
-        public async ValueTask<bool> UpdateRoundAsync(Guid roundId, UpdateRoundQueryViewModel model)
+        public async ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status)
+        {
+            var request = new
+            {
+                status
+            };
+            var requestContent = new StringContent(JsonSerializer.Serialize(request, _SerializerOptions));
+            requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+            var response = await _httpClient
+               .PutAsync(
+                   $"gamerounds/{roundId}/clientstatus",
+                   requestContent)
+               .ConfigureAwait(false);
+
+            _ = response.EnsureSuccessStatusCode();
+        }
+
+        public async ValueTask<bool> UpdateRoundAsync(Guid roundId, UpdateRoundViewModel model)
         {
             var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
             requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
@@ -137,9 +155,13 @@ namespace Tgs.GameRounds.Client
             _ = response.EnsureSuccessStatusCode();
         }
 
-        public async ValueTask UpdateRoundDetailAsync(Guid roundId, UpdateRoundDetailViewModel model)
+        public async ValueTask UpdateRoundDetailAsync(Guid roundId, string additionalData)
         {
-            var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
+            var request = new
+            {
+                additionalData
+            };
+            var requestContent = new StringContent(JsonSerializer.Serialize(request, _SerializerOptions));
             requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
 
             var response = await _httpClient
@@ -173,6 +195,25 @@ namespace Tgs.GameRounds.Client
             var response = await _httpClient
                .PutAsync(
                    $"gamerounds/{roundId}/reopen",
+                   requestContent)
+               .ConfigureAwait(false);
+
+            _ = response.EnsureSuccessStatusCode();
+        }
+
+        public async ValueTask UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null)
+        {
+            var request = new
+            {
+                status,
+                externalClosedOn
+            };
+            var requestContent = new StringContent(JsonSerializer.Serialize(request, _SerializerOptions));
+            requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+            var response = await _httpClient
+               .PutAsync(
+                   $"gamerounds/{roundId}/status",
                    requestContent)
                .ConfigureAwait(false);
 

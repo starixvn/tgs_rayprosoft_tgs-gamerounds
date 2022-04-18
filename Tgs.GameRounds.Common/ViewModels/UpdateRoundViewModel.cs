@@ -2,7 +2,7 @@
 
 namespace Tgs.GameRounds.Common.ViewModels
 {
-    public record UpdateRoundQueryViewModel()
+    public record UpdateRoundViewModel()
     {
         [Required]
         public GameRoundStatus Status { get; init; }
