@@ -1,4 +1,5 @@
-﻿using Tgs.GameRounds.Core.Models;
+﻿using Tgs.GameRounds.Common;
+using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core
 {
@@ -20,6 +21,8 @@ namespace Tgs.GameRounds.Core
 
         ValueTask UnLockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
 
+        ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status);
+
         ValueTask UpdateRoundAsync(UpdateRound round);
 
         ValueTask UpdateRoundClosedAsync(UpdateRoundClosed source);
@@ -29,5 +32,7 @@ namespace Tgs.GameRounds.Core
         ValueTask UpdateRoundOpenAsync(UpdateRoundOpen source);
 
         ValueTask UpdateRoundReopenAsync(UpdateRoundReopen source);
+
+        ValueTask UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using StackExchange.Redis;
+using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
 
@@ -84,6 +85,9 @@ namespace Tgs.GameRounds.Repositories
             _ = await _database.KeyDeleteAsync(key).ConfigureAwait(false);
         }
 
+        public ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status)
+            => _gameRound.UpdateClientStatusAsync(roundId, status);
+
         public ValueTask UpdateRoundAsync(UpdateRound round)
             => _gameRound.UpdateRoundAsync(round);
 
@@ -98,5 +102,8 @@ namespace Tgs.GameRounds.Repositories
 
         public ValueTask UpdateRoundReopenAsync(UpdateRoundReopen source)
             => _gameRound.UpdateRoundReopenAsync(source);
+
+        public ValueTask UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null)
+            => _gameRound.UpdateStatusAsync(roundId, status, externalClosedOn);
     }
 }

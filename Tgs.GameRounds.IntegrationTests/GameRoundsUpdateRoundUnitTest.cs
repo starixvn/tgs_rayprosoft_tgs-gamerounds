@@ -18,7 +18,7 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
             var roundId = Guid.NewGuid();
 
-            var viewModel = new UpdateRoundQueryViewModel()
+            var viewModel = new UpdateRoundViewModel()
             {
                 Status = GameRoundStatus.Closed,
                 ClosedOn = DateTimeOffset.UtcNow,
@@ -67,7 +67,7 @@ namespace Tgs.GameRounds.IntegrationTests
             var playerCode = "4ues8xikza7o";
             var roundId = Guid.NewGuid();
 
-            var data = new UpdateRoundQueryViewModel()
+            var data = new UpdateRoundViewModel()
             {
                 Status = GameRoundStatus.Closed,
                 ClosedOn = DateTimeOffset.UtcNow,
