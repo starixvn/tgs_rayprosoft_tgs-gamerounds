@@ -162,7 +162,7 @@ namespace Tgs.GameRounds.Repositories
             => (await GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false))?.RoundId;
 
         public ValueTask<bool> LockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
-            => ValueTask.FromResult(true);
+            => _gameRound.LockAsync(gameProviderId, externalRoundId, gameId, walletId);
 
         public async ValueTask<Guid?> NewRoundAsync(NewRound round)
         {
@@ -222,7 +222,19 @@ namespace Tgs.GameRounds.Repositories
             }
         }
 
-        public ValueTask UnLockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId) => throw new NotSupportedException();
+        public ValueTask UnLockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+            => _gameRound.UnLockAsync(gameProviderId, externalRoundId, gameId, walletId);
+
+        public async ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status)
+        {
+            var data = await _context.Rounds.SingleAsync(x => x.Id == roundId).ConfigureAwait(false);
+
+            data.UpdatedOn = DateTime.UtcNow;
+            data.ClientStatus = (short)status;
+
+            _ = _context.Rounds.Update(data);
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
 
         public async ValueTask UpdateRoundAsync(UpdateRound round)
         {
@@ -337,6 +349,18 @@ namespace Tgs.GameRounds.Repositories
             _ = _context.Rounds.Update(round);
             _ = _context.RoundDetails.Update(roundDetail);
 
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null)
+        {
+            var data = await _context.Rounds.SingleAsync(x => x.Id == roundId).ConfigureAwait(false);
+
+            data.UpdatedOn = DateTime.UtcNow;
+            data.Status = (short)status;
+            data.ExternalClosedOn = (externalClosedOn.HasValue) ? externalClosedOn.Value.UtcDateTime : data.ExternalClosedOn;
+
+            _ = _context.Rounds.Update(data);
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }
     }

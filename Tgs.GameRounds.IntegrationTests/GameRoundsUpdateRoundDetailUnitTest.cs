@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Client;
 using Tgs.GameRounds.Common;
-using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
 
 namespace Tgs.GameRounds.IntegrationTests
@@ -21,9 +20,7 @@ namespace Tgs.GameRounds.IntegrationTests
             var playerCode = "4ues8xikza7o";
             var roundId = Guid.NewGuid();
 
-            var viewModel = new UpdateRoundDetailViewModel(
-                AdditionalData: "{\"id\":10531704494,\"tableId\":10102,\"shoeId\":17,\"playId\":34,\"lobbyId\":1,\"gameType\":1,\"gameId\":1,\"memberId\":73304209,\"parentId\":19377,\"betTime\":\"2022-03-1709:19:38\",\"calTime\":\"2022-03-1709:20:01\",\"winOrLoss\":40.0,\"balanceBefore\":6020.41,\"betPoints\":20.0,\"betPointsz\":0.0,\"availableBet\":20.0,\"userName\":\"4UDW8YGX311V\",\"result\":\"{\\u0022result\\u0022:\\u00225,2,7\\u0022,\\u0022poker\\u0022:{\\u0022banker\\u0022:\\u002238-36-36\\u0022,\\u0022player\\u0022:\\u002246-36-0\\u0022}}\",\"betDetail\":\"{\\u0022player\\u0022:20.0,\\u0022playerW\\u0022:40.0}\",\"ip\":\"220.132.206.70\",\"ext\":\"220317B020851\",\"isRevocation\":1,\"currencyId\":1,\"deviceType\":5,\"serial\":\"-10531704494\",\"roadid\":0,\"pluginid\":0}"
-                );
+            var additionalData = "{\"id\":10531704494,\"tableId\":10102,\"shoeId\":17,\"playId\":34,\"lobbyId\":1,\"gameType\":1,\"gameId\":1,\"memberId\":73304209,\"parentId\":19377,\"betTime\":\"2022-03-1709:19:38\",\"calTime\":\"2022-03-1709:20:01\",\"winOrLoss\":40.0,\"balanceBefore\":6020.41,\"betPoints\":20.0,\"betPointsz\":0.0,\"availableBet\":20.0,\"userName\":\"4UDW8YGX311V\",\"result\":\"{\\u0022result\\u0022:\\u00225,2,7\\u0022,\\u0022poker\\u0022:{\\u0022banker\\u0022:\\u002238-36-36\\u0022,\\u0022player\\u0022:\\u002246-36-0\\u0022}}\",\"betDetail\":\"{\\u0022player\\u0022:20.0,\\u0022playerW\\u0022:40.0}\",\"ip\":\"220.132.206.70\",\"ext\":\"220317B020851\",\"isRevocation\":1,\"currencyId\":1,\"deviceType\":5,\"serial\":\"-10531704494\",\"roadid\":0,\"pluginid\":0}";
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
 
@@ -35,7 +32,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = fakeGameRound.UpdateRoundDetailAsync(
                     roundId,
-                    viewModel.AdditionalData);
+                    additionalData);
 
                 var gameRound = new GameRoundInfo(
                     RoundId: roundId,
@@ -64,7 +61,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     ReopenTurnoverAdjustment: null,
                     ReopenedOn: null,
                     EffectiveBettingPercentage: null,
-                    AdditionalData: viewModel.AdditionalData ?? string.Empty);
+                    AdditionalData: additionalData ?? string.Empty);
 
                 _ = fakeGameRound.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
@@ -77,7 +74,7 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            await sut.UpdateRoundDetailAsync(roundId, viewModel).ConfigureAwait(false);
+            await sut.UpdateRoundDetailAsync(roundId, additionalData).ConfigureAwait(false);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Any<GameRoundInfo>());
         }
