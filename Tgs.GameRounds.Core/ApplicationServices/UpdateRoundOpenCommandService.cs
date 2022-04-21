@@ -1,4 +1,5 @@
-﻿using Tgs.ServiceUtility;
+﻿using Tgs.GameRounds.Core.Models;
+using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Core.ApplicationServices
 {
@@ -22,14 +23,12 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 return;
             }
 
-            await _gameRound.UpdateRoundOpenAsync(new(
-                command.RoundId,
-                command.UpdatedOn,
-                command.BetAmount,
-                command.ValidBetAmount,
-                command.Commission,
-                command.Turnover,
-                command.AdditionalData)).ConfigureAwait(false);
+            await _gameRound.UpdateRoundOpenAsync(new UpdateRoundOpen(
+                RoundId: command.RoundId,
+                BetAmount: command.BetAmount,
+                ValidBetAmount: command.ValidBetAmount,
+                Commission: command.Commission,
+                Turnover: command.Turnover)).ConfigureAwait(false);
 
             var round = await _gameRound.GetAsync(command.RoundId).ConfigureAwait(false);
 

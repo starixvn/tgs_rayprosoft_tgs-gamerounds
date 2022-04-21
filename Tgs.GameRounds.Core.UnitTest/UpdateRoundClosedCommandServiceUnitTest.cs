@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest
 {
@@ -26,8 +27,6 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var data = new UpdateRoundClosedCommand(
                 RoundId: roundId,
-                ClosedOn: DateTimeOffset.UtcNow,
-                UpdatedOn: DateTimeOffset.UtcNow,
                 ExternalClosedOn: DateTimeOffset.UtcNow,
                 BetAmount: 10m,
                 ValidBetAmount: 10m,
@@ -35,7 +34,6 @@ namespace Tgs.GameRounds.Core.UnitTest
                 Commission: 0,
                 Turnover: 10m,
                 WinLoss: -10m,
-                TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Loss,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
@@ -73,20 +71,17 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             _ = fakeGameRound.ExistAsync(data.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
-            _ = fakeGameRound.UpdateRoundClosedAsync(
-                new(data.RoundId,
-                    data.ClosedOn,
-                    data.UpdatedOn,
-                    data.ExternalClosedOn,
-                    data.BetAmount,
-                    data.ValidBetAmount,
-                    data.SettleAmount,
-                    data.Commission,
-                    data.Turnover,
-                    data.WinLoss,
-                    data.TieBetAdjustment,
-                    data.ClientStatus,
-                    data.AdditionalData));
+            _ = fakeGameRound.UpdateRoundClosedAsync(new UpdateRoundClosed(
+                    RoundId: data.RoundId,
+                    ExternalClosedOn: data.ExternalClosedOn,
+                    BetAmount: data.BetAmount,
+                    ValidBetAmount: data.ValidBetAmount,
+                    SettleAmount: data.SettleAmount,
+                    Commission: data.Commission,
+                    Turnover: data.Turnover,
+                    WinLoss: data.WinLoss,
+                    ClientStatus: data.ClientStatus,
+                    AdditionalData: data.AdditionalData));
 
             _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 

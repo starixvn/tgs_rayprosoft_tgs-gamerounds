@@ -24,11 +24,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 return roundId.Value;
             }
 
-            if (!await _gameRound.LockAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false))
-            {
-                throw new Exception("This GameRound generated order is currently locked.");
-            }
-
             var newRoundId = await _gameRound.NewRoundAsync(
                 new NewRound(
                     query.ExternalRoundId,
@@ -40,8 +35,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                     query.WalletId,
                     query.BrandId,
                     query.ExternalCreatedOn)).ConfigureAwait(false);
-
-            await _gameRound.UnLockAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false);
 
             if (!newRoundId.HasValue)
             {

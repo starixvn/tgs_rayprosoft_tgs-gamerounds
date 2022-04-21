@@ -131,14 +131,6 @@ namespace Tgs.GameRounds.Core.UnitTest
             _ = await Assert.ThrowsExceptionAsync<Exception>(() => service.GetAsync(query).AsTask()).ConfigureAwait(false);
 
             _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
-
-            _ = fakeGameRound
-                .Received(1)
-                .UnLockAsync(
-                    query.GameProviderId,
-                    query.ExternalRoundId,
-                    query.GameId,
-                    query.WalletId);
         }
 
         [TestMethod]
@@ -260,14 +252,6 @@ namespace Tgs.GameRounds.Core.UnitTest
             Assert.AreEqual(expected, actual);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Is(gameRound));
-
-            _ = fakeGameRound
-                .Received(1)
-                .UnLockAsync(
-                    query.GameProviderId,
-                    query.ExternalRoundId,
-                    query.GameId,
-                    query.WalletId);
         }
     }
 }

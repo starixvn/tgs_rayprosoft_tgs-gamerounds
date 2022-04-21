@@ -9,7 +9,7 @@ namespace Tgs.GameRounds.Repositories
     internal class GameRoundRedisRepository : IGameRound
     {
         private const string KeyExist = "gameround:exist:{0}";
-        private const string KeyExternal = "gameround:external:{0}:{1}:{2}:{3}";
+        private const string KeyRoundId = "gameround:roundid:{0}:{1}:{2}:{3}";
         private const string KeyLock = "gameround:lock:{0}:{1}:{2}:{3}";
         private readonly IDatabase _database;
         private readonly TimeSpan _expiry;
@@ -22,8 +22,18 @@ namespace Tgs.GameRounds.Repositories
             _expiry = expiry;
         }
 
-        public ValueTask<Guid> AddRoundAsync(AddRound source)
-            => _gameRound.AddRoundAsync(source);
+        public async ValueTask<Guid?> AddRoundAsync(AddRound source)
+        {
+            if (!await LockAsync(source.GameProviderId, source.ExternalRoundId, source.GameId, source.WalletId).ConfigureAwait(false))
+            {
+                return default;
+            }
+            var guid = await _gameRound.AddRoundAsync(source).ConfigureAwait(false);
+
+            await UnLockAsync(source.GameProviderId, source.ExternalRoundId, source.GameId, source.WalletId).ConfigureAwait(false);
+
+            return guid;
+        }
 
         public async ValueTask<bool> ExistAsync(Guid roundId)
         {
@@ -54,7 +64,7 @@ namespace Tgs.GameRounds.Repositories
 
         public async ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
         {
-            string key = string.Format(KeyExternal, gameProviderId, externalRoundId, gameId, walletId).ToLower();
+            string key = string.Format(KeyRoundId, gameProviderId, externalRoundId, gameId, walletId).ToLower();
 
             if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
             {
@@ -76,8 +86,18 @@ namespace Tgs.GameRounds.Repositories
                 && await _database.StringSetAsync(key, Guid.Empty.ToString(), _expiry).ConfigureAwait(false);
         }
 
-        public ValueTask<Guid?> NewRoundAsync(NewRound round)
-            => _gameRound.NewRoundAsync(round);
+        public async ValueTask<Guid?> NewRoundAsync(NewRound source)
+        {
+            if (!await LockAsync(source.GameProviderId, source.ExternalRoundId, source.GameId, source.WalletId).ConfigureAwait(false))
+            {
+                return default;
+            }
+            var guid = await _gameRound.NewRoundAsync(source).ConfigureAwait(false);
+
+            await UnLockAsync(source.GameProviderId, source.ExternalRoundId, source.GameId, source.WalletId).ConfigureAwait(false);
+
+            return guid;
+        }
 
         public async ValueTask UnLockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
         {
@@ -88,8 +108,8 @@ namespace Tgs.GameRounds.Repositories
         public ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status)
             => _gameRound.UpdateClientStatusAsync(roundId, status);
 
-        public ValueTask UpdateRoundAsync(UpdateRound round)
-            => _gameRound.UpdateRoundAsync(round);
+        public ValueTask UpdateRoundAsync(UpdateRound source)
+            => _gameRound.UpdateRoundAsync(source);
 
         public ValueTask UpdateRoundClosedAsync(UpdateRoundClosed source)
             => _gameRound.UpdateRoundClosedAsync(source);
@@ -99,7 +119,8 @@ namespace Tgs.GameRounds.Repositories
 
         public ValueTask UpdateRoundOpenAsync(UpdateRoundOpen source)
              => _gameRound.UpdateRoundOpenAsync(source);
-
+        public ValueTask UpdateRoundOpenSettleAsync(UpdateRoundOpenSettle source)
+             => _gameRound.UpdateRoundOpenSettleAsync(source);
         public ValueTask UpdateRoundReopenAsync(UpdateRoundReopen source)
             => _gameRound.UpdateRoundReopenAsync(source);
 

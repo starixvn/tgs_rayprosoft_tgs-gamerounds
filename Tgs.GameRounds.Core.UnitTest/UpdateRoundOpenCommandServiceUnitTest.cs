@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest
 {
@@ -26,12 +27,10 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var data = new UpdateRoundOpenCommand(
                 RoundId: roundId,
-                UpdatedOn: DateTimeOffset.UtcNow,
                 BetAmount: 10m,
                 ValidBetAmount: 10m,
                 Commission: 0,
-                Turnover: 10m,
-                AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
+                Turnover: 10m);
 
             var expected = Guid.NewGuid();
 
@@ -67,14 +66,12 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             _ = fakeGameRound.ExistAsync(data.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
-            _ = fakeGameRound.UpdateRoundOpenAsync(
-                new(data.RoundId,
-                    data.UpdatedOn,
-                    data.BetAmount,
-                    data.ValidBetAmount,
-                    data.Commission,
-                    data.Turnover,
-                    data.AdditionalData));
+            _ = fakeGameRound.UpdateRoundOpenAsync(new UpdateRoundOpen(
+                RoundId: data.RoundId,
+                BetAmount: data.BetAmount,
+                ValidBetAmount: data.ValidBetAmount,
+                Commission: data.Commission,
+                Turnover: data.Turnover));
 
             _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 

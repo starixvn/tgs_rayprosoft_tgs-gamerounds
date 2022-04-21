@@ -24,72 +24,68 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 return;
             }
 
-            if (!await _gameRound.LockAsync(command.GameProviderId, command.ExternalRoundId, command.GameId, command.WalletId).ConfigureAwait(false))
-            {
-                return;
-            }
-
             var newRoundId = await _gameRound.AddRoundAsync(
                 new AddRound(
-                    command.ExternalRoundId,
-                    command.GameProviderId,
-                    command.PlayerCode,
-                    command.GameId,
-                    command.CurrencyCode,
-                    command.Status,
-                    command.GameProviderConfigurationId,
-                    command.WalletId,
-                    command.CreatedOn,
-                    command.ClosedOn,
-                    command.UpdatedOn,
-                    command.BrandId,
-                    command.ExternalCreatedOn,
-                    command.ExternalClosedOn,
-                    command.BetAmount,
-                    command.ValidBetAmount,
-                    command.SettleAmount,
-                    command.Commission,
-                    command.Turnover,
-                    command.WinLoss,
-                    command.TieBetAdjustment,
-                    command.ClientStatus,
-                    command.AdditionalData)).ConfigureAwait(false);
+                    ExternalRoundId: command.ExternalRoundId,
+                    GameProviderId: command.GameProviderId,
+                    PlayerCode: command.PlayerCode,
+                    GameId: command.GameId,
+                    CurrencyCode: command.CurrencyCode,
+                    Status: command.Status,
+                    GameProviderConfigurationId: command.GameProviderConfigurationId,
+                    WalletId: command.WalletId,
+                    BrandId: command.BrandId,
+                    ExternalCreatedOn: command.ExternalCreatedOn,
+                    ExternalClosedOn: command.ExternalClosedOn,
+                    BetAmount: command.BetAmount,
+                    ValidBetAmount: command.ValidBetAmount,
+                    SettleAmount: command.SettleAmount,
+                    Commission: command.Commission,
+                    Turnover: command.Turnover,
+                    WinLoss: command.WinLoss,
+                    ClientStatus: command.ClientStatus,
+                    AdditionalData: command.AdditionalData)).ConfigureAwait(false);
 
-            var round = await _gameRound.GetAsync(newRoundId).ConfigureAwait(false);
-
-            if (round is not null)
+            if (!newRoundId.HasValue)
             {
-                await _gameRoundRecordRepository.AddAsync(new(
-                    round.RoundId,
-                    round.ExternalRoundId,
-                    round.GameProviderId,
-                    round.PlayerCode,
-                    round.GameId,
-                    round.CurrencyCode,
-                    round.Status,
-                    round.GameProviderConfigurationId,
-                    round.WalletId,
-                    round.CreatedOn,
-                    round.ClosedOn,
-                    round.UpdatedOn,
-                    round.BrandId,
-                    round.ExternalCreatedOn,
-                    round.ExternalClosedOn,
-                    round.BetAmount,
-                    round.ValidBetAmount,
-                    round.SettleAmount,
-                    round.Commission,
-                    round.Turnover,
-                    round.WinLoss,
-                    round.TieBetAdjustment,
-                    round.ClientStatus,
-                    round.ReopenTurnoverAdjustment,
-                    round.ReopenedOn,
-                    round.EffectiveBettingPercentage,
-                    round.AdditionalData)).ConfigureAwait(false);
+                throw new Exception("This GameRound failed to create an order.");
             }
+            else
+            {
+                var round = await _gameRound.GetAsync(newRoundId.Value).ConfigureAwait(false);
 
-            await _gameRound.UnLockAsync(command.GameProviderId, command.ExternalRoundId, command.GameId, command.WalletId).ConfigureAwait(false);
+                if (round is not null)
+                {
+                    await _gameRoundRecordRepository.AddAsync(new(
+                        round.RoundId,
+                        round.ExternalRoundId,
+                        round.GameProviderId,
+                        round.PlayerCode,
+                        round.GameId,
+                        round.CurrencyCode,
+                        round.Status,
+                        round.GameProviderConfigurationId,
+                        round.WalletId,
+                        round.CreatedOn,
+                        round.ClosedOn,
+                        round.UpdatedOn,
+                        round.BrandId,
+                        round.ExternalCreatedOn,
+                        round.ExternalClosedOn,
+                        round.BetAmount,
+                        round.ValidBetAmount,
+                        round.SettleAmount,
+                        round.Commission,
+                        round.Turnover,
+                        round.WinLoss,
+                        round.TieBetAdjustment,
+                        round.ClientStatus,
+                        round.ReopenTurnoverAdjustment,
+                        round.ReopenedOn,
+                        round.EffectiveBettingPercentage,
+                        round.AdditionalData)).ConfigureAwait(false);
+                }
+            }
         }
     }
 }

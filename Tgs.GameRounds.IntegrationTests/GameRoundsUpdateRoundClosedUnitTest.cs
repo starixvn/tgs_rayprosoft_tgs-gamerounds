@@ -8,6 +8,7 @@ using Tgs.GameRounds.Client;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.IntegrationTests
 {
@@ -23,8 +24,6 @@ namespace Tgs.GameRounds.IntegrationTests
             var roundId = Guid.NewGuid();
 
             var viewModel = new UpdateRoundClosedViewModel(
-                ClosedOn: DateTimeOffset.UtcNow,
-                UpdatedOn: DateTimeOffset.UtcNow,
                 ExternalClosedOn: DateTimeOffset.UtcNow,
                 BetAmount: 10m,
                 ValidBetAmount: 10m,
@@ -32,7 +31,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 Commission: 0,
                 Turnover: 10m,
                 WinLoss: -10m,
-                TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Loss,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
@@ -44,20 +42,17 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(true));
 
-                _ = fakeGameRound.UpdateRoundClosedAsync(new(
-                    roundId,
-                    viewModel.ClosedOn,
-                    viewModel.UpdatedOn,
-                    viewModel.ExternalClosedOn,
-                    viewModel.BetAmount,
-                    viewModel.ValidBetAmount,
-                    viewModel.SettleAmount,
-                    viewModel.Commission,
-                    viewModel.Turnover,
-                    viewModel.WinLoss,
-                    viewModel.TieBetAdjustment,
-                    viewModel.ClientStatus,
-                    viewModel.AdditionalData));
+                _ = fakeGameRound.UpdateRoundClosedAsync(new UpdateRoundClosed(
+                    RoundId: roundId,
+                    ExternalClosedOn: viewModel.ExternalClosedOn,
+                    BetAmount: viewModel.BetAmount,
+                    ValidBetAmount: viewModel.ValidBetAmount,
+                    SettleAmount: viewModel.SettleAmount,
+                    Commission: viewModel.Commission,
+                    Turnover: viewModel.Turnover,
+                    WinLoss: viewModel.WinLoss,
+                    ClientStatus: viewModel.ClientStatus,
+                    AdditionalData: viewModel.AdditionalData));
 
                 var gameRound = new GameRoundInfo(
                     RoundId: roundId,
@@ -81,7 +76,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     Commission: viewModel.Commission,
                     Turnover: viewModel.Turnover,
                     WinLoss: viewModel.WinLoss,
-                    TieBetAdjustment: viewModel.TieBetAdjustment,
+                    TieBetAdjustment: 0,
                     ClientStatus: GameRoundClientStatus.Open,
                     ReopenTurnoverAdjustment: null,
                     ReopenedOn: null,

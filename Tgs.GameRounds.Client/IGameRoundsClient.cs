@@ -30,5 +30,7 @@ namespace Tgs.GameRounds.Client
         ValueTask UpdateRoundReopenAsync(Guid roundId, UpdateRoundReopenViewModel model);
 
         ValueTask UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null);
+
+        ValueTask UpdateRoundOpenSettleAsync(Guid roundId, UpdateRoundOpenSettleViewModel model);
     }
 }
