@@ -15,7 +15,7 @@ namespace Tgs.GameRounds.Core.UnitTest
         {
             var fakeGame = Substitute.For<IGame>();
             var fakeGameProvider = Substitute.For<IGameProvider>();
-            var fakeGameRound = Substitute.For<IGameRoundRepository>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
             var roundId = Guid.NewGuid();
 
@@ -56,17 +56,17 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var query = new GetGameRoundByExternalGameQuery(gameProviderId, externalRoundId, externalGameId, walletId);
 
-            var repository = new GetGameRoundByExternalGameGetService(
-                fakeGame,
-                fakeGameProvider,
-                fakeGameRound);
-
             _ = fakeGame.GetGameIdAsync(query.GameProviderId, query.ExternalGameId).Returns(ValueTask.FromResult(gameId));
             _ = fakeGameProvider.GetGameProviderCodeAsync(query.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
 
             _ = fakeGameRound.GetAsync(query.GameProviderId, query.ExternalRoundId, gameId, query.WalletId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
-            var actual = await repository.GetAsync(query).ConfigureAwait(false);
+            var service = new GetGameRoundByExternalGameGetService(
+                fakeGame,
+                fakeGameProvider,
+                fakeGameRound);
+
+            var actual = await service.GetAsync(query).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
             _ = Equals(gameRound, actual);

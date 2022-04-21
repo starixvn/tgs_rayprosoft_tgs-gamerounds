@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Tgs.GameRounds.Core;
@@ -44,16 +43,15 @@ namespace Tgs.GameRounds.Repositories
                     UpdatedOn = gameRound.UpdatedOn,
                     ExternalCreatedOn = gameRound.ExternalCreatedOn,
                     ExternalClosedOn = gameRound.ExternalClosedOn,
-                    Bet = gameRound.BetAmount.GetValueOrDefault(0).ToString(),
-                    ValidBet = gameRound.ValidBetAmount.GetValueOrDefault(0).ToString(),
-                    Settle = gameRound.SettleAmount.GetValueOrDefault(0).ToString(),
-                    Commission = gameRound.Commission.GetValueOrDefault(0).ToString(),
-                    Turnover = gameRound.Turnover.GetValueOrDefault(0).ToString(),
-                    WinLoss = gameRound.WinLoss.GetValueOrDefault(0).ToString(),
-                    TieBetAdjustment = gameRound.TieBetAdjustment.GetValueOrDefault(0).ToString(),
+                    Bet = gameRound.BetAmount.GetValueOrDefault(0),
+                    ValidBet = gameRound.ValidBetAmount.GetValueOrDefault(0),
+                    Settle = gameRound.SettleAmount.GetValueOrDefault(0),
+                    Commission = gameRound.Commission.GetValueOrDefault(0),
+                    Turnover = gameRound.Turnover.GetValueOrDefault(0),
+                    WinLoss = gameRound.WinLoss.GetValueOrDefault(0),
+                    TieBetAdjustment = gameRound.TieBetAdjustment.GetValueOrDefault(0),
                     ClientStatus = (int)gameRound.ClientStatus,
-                    ReopenTurnoverAdjustment = gameRound.ReopenTurnoverAdjustment.GetValueOrDefault(0).ToString(),
-                    ReopenedOn = gameRound.ReopenedOn,
+                    ReopenTurnoverAdjustment = gameRound.ReopenTurnoverAdjustment.GetValueOrDefault(0),
                     RecordOn = DateTimeOffset.UtcNow
                 }).ConfigureAwait(false);
             }

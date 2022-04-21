@@ -80,6 +80,7 @@ namespace Tgs.GameRounds.Repositories
         /// The created on
         /// </summary>
         [BsonElement("created_on")]
+        [BsonRepresentation(BsonType.String)]
         public DateTimeOffset CreatedOn { get; set; }
 
         /// <summary>
@@ -87,12 +88,14 @@ namespace Tgs.GameRounds.Repositories
         /// </summary>
         [BsonIgnoreIfNull]
         [BsonElement("closed_on")]
+        [BsonRepresentation(BsonType.String)]
         public DateTimeOffset? ClosedOn { get; set; }
 
         /// <summary>
         /// The updated on
         /// </summary>
         [BsonElement("updated_on")]
+        [BsonRepresentation(BsonType.String)]
         public DateTimeOffset UpdatedOn { get; set; }
 
         /// <summary>
@@ -100,6 +103,7 @@ namespace Tgs.GameRounds.Repositories
         /// </summary>
         [BsonIgnoreIfNull]
         [BsonElement("external_created_on")]
+        [BsonRepresentation(BsonType.String)]
         public DateTimeOffset? ExternalCreatedOn { get; set; }
 
         /// <summary>
@@ -107,6 +111,7 @@ namespace Tgs.GameRounds.Repositories
         /// </summary>
         [BsonIgnoreIfNull]
         [BsonElement("external_closed_on")]
+        [BsonRepresentation(BsonType.String)]
         public DateTimeOffset? ExternalClosedOn { get; set; }
 
         /// <summary>
@@ -115,7 +120,7 @@ namespace Tgs.GameRounds.Repositories
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
         [BsonRepresentation(BsonType.String)]
-        public string Bet { get; set; } = default!;
+        public decimal Bet { get; set; } = default!;
 
         /// <summary>
         /// The valid bet
@@ -124,7 +129,7 @@ namespace Tgs.GameRounds.Repositories
         [BsonDefaultValue(0)]
         [BsonElement("valid_bet")]
         [BsonRepresentation(BsonType.String)]
-        public string ValidBet { get; set; } = default!;
+        public decimal ValidBet { get; set; } = default!;
 
         /// <summary>
         /// The settle
@@ -133,7 +138,7 @@ namespace Tgs.GameRounds.Repositories
         [BsonDefaultValue(0)]
         [BsonElement("settle")]
         [BsonRepresentation(BsonType.String)]
-        public string Settle { get; set; } = default!;
+        public decimal Settle { get; set; } = default!;
 
         /// <summary>
         /// The commission
@@ -142,7 +147,7 @@ namespace Tgs.GameRounds.Repositories
         [BsonDefaultValue(0)]
         [BsonElement("commission")]
         [BsonRepresentation(BsonType.String)]
-        public string Commission { get; set; } = default!;
+        public decimal Commission { get; set; } = default!;
 
         /// <summary>
         /// The turnover
@@ -151,7 +156,7 @@ namespace Tgs.GameRounds.Repositories
         [BsonDefaultValue(0)]
         [BsonElement("turnover")]
         [BsonRepresentation(BsonType.String)]
-        public string Turnover { get; set; } = default!;
+        public decimal Turnover { get; set; } = default!;
 
         /// <summary>
         /// The win loss
@@ -160,7 +165,7 @@ namespace Tgs.GameRounds.Repositories
         [BsonDefaultValue(0)]
         [BsonElement("winLoss")]
         [BsonRepresentation(BsonType.String)]
-        public string WinLoss { get; set; } = default!;
+        public decimal WinLoss { get; set; } = default!;
 
         /// <summary>
         /// The tie bet adjustment
@@ -169,7 +174,7 @@ namespace Tgs.GameRounds.Repositories
         [BsonDefaultValue(0)]
         [BsonElement("tie_bet_adjustment")]
         [BsonRepresentation(BsonType.String)]
-        public string TieBetAdjustment { get; set; } = default!;
+        public decimal TieBetAdjustment { get; set; } = default!;
 
         /// <summary>
         /// The client status
@@ -186,19 +191,21 @@ namespace Tgs.GameRounds.Repositories
         [BsonDefaultValue(0)]
         [BsonElement("reopen_turnover_adjustment")]
         [BsonRepresentation(BsonType.String)]
-        public string ReopenTurnoverAdjustment { get; set; } = default!;
+        public decimal ReopenTurnoverAdjustment { get; set; } = default!;
 
         /// <summary>
         /// The reopened on
         /// </summary>
         [BsonIgnoreIfNull]
         [BsonElement("reopened_on")]
+        [BsonRepresentation(BsonType.String)]
         public DateTimeOffset? ReopenedOn { get; set; }
 
         /// <summary>
         /// The record on
         /// </summary>
         [BsonElement("record_on")]
+        [BsonRepresentation(BsonType.String)]
         public DateTimeOffset RecordOn { get; set; } = default!;
     }
 }

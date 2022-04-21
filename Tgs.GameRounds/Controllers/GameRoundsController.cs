@@ -3,7 +3,7 @@ using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.ApplicationServices;
-using Tgs.GameRounds.Core.Models;
+using Tgs.GameRounds.ViewModels;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Controllers
@@ -18,10 +18,10 @@ namespace Tgs.GameRounds.Controllers
         /// <param name="service">The service.</param>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        [HttpPost(Name = "GameRoundsAddRound")]
+        [HttpPost(Name = "Add")]
         public async ValueTask AddRoundAsync(
-                [FromServices] ICommandService<AddRoundCommand> service,
-                AddRoundViewModel model)
+            [FromServices] ICommandService<AddRoundCommand> service,
+            AddRoundViewModel model)
             => await service.ExecuteAsync(new(
                 model.ExternalRoundId,
                 model.GameProviderId,
@@ -55,8 +55,8 @@ namespace Tgs.GameRounds.Controllers
         /// <returns></returns>
         [HttpGet("{roundid}", Name = "GetGameRound")]
         public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(
-                [FromServices] IGetService<GetGameRoundQuery, GameRoundResult> service,
-                Guid roundid)
+            [FromServices] IGetService<GetGameRoundQuery, GameRoundResult> service,
+            Guid roundid)
         {
             var result = await service.GetAsync(new(roundid)).ConfigureAwait(false);
 
@@ -158,11 +158,11 @@ namespace Tgs.GameRounds.Controllers
         /// <returns></returns>
         [HttpGet("game", Name = "GetGameRoundByGame")]
         public async ValueTask<GameRoundViewModel?> GetGameRoundByGameAsync(
-                [FromServices] IGetService<GetGameRoundByGameQuery, GameRoundResult> service,
-                Guid gameProviderId,
-                string externalRoundId,
-                int gameId,
-                Guid walletId)
+            [FromServices] IGetService<GetGameRoundByGameQuery, GameRoundResult> service,
+            Guid gameProviderId,
+            string externalRoundId,
+            int gameId,
+            Guid walletId)
         {
             var result = await service.GetAsync(new(
                 gameProviderId,
@@ -206,14 +206,14 @@ namespace Tgs.GameRounds.Controllers
         /// Gets the status asynchronous.
         /// </summary>
         /// <param name="repository">The repository.</param>
-        /// <param name="rounid">The rounid.</param>
+        /// <param name="roundid">The roundid.</param>
         /// <returns></returns>
-        [HttpGet("{rounid}/status", Name = "GameRoundGetStatus")]
+        [HttpGet("{roundid}/status", Name = "GameRoundGetStatus")]
         public async ValueTask<GameRoundStatus?> GetStatusAsync(
-                   [FromServices] IGameRoundRepository repository,
-                   Guid rounid)
+            [FromServices] IGameRound repository,
+            Guid roundid)
         {
-            var round = await repository.GetAsync(rounid).ConfigureAwait(false);
+            var round = await repository.GetAsync(roundid).ConfigureAwait(false);
             return round?.Status;
         }
 
@@ -239,25 +239,36 @@ namespace Tgs.GameRounds.Controllers
         ///             "externalCreatedOn": "2022-03-07T01:37:01.625Z"
         ///         }
         /// </remarks>
-        [HttpPost("new", Name = "GameRoundsNewRound")]
-        public async ValueTask<NewRoundResultViewModel> NewRoundAsync(
-                [FromServices] IGetService<NewRoundQuery, NewRoundResult> service,
-                NewRoundQueryViewModel model)
-        {
-            var result = await service.GetAsync(new(
-                        model.ExternalRoundId,
-                        model.GameProviderId,
-                        model.PlayerCode,
-                        model.GameId,
-                        model.CurrencyCode,
-                        model.GameProviderConfigurationId,
-                        model.WalletId,
-                        model.BrandId,
-                        model.ExternalCreatedOn)).ConfigureAwait(false);
-            return new(
-                result.Success,
-                result.RoundId);
-        }
+        [HttpPost("new", Name = "NewRound")]
+        public ValueTask<Guid> NewRoundAsync(
+            [FromServices] IGetService<NewRoundQuery, Guid> service,
+            NewRoundQueryViewModel model)
+            => service.GetAsync(new NewRoundQuery(
+                model.ExternalRoundId,
+                model.GameProviderId,
+                model.PlayerCode,
+                model.GameId,
+                model.CurrencyCode,
+                model.GameProviderConfigurationId,
+                model.WalletId,
+                model.BrandId,
+                model.ExternalCreatedOn));
+
+        /// <summary>
+        /// Updates the client status asynchronous.
+        /// </summary>
+        /// <param name="service">The service.</param>
+        /// <param name="roundid">The roundid.</param>
+        /// <param name="model">The model.</param>
+        /// <returns></returns>
+        [HttpPut("{roundid}/clientstatus", Name = "UpdateClientStatus")]
+        public async ValueTask UpdateClientStatusAsync(
+            [FromServices] ICommandService<UpdateClientStatusCommand> service,
+            Guid roundid,
+            UpdateClientStatusViewModel model)
+            => await service.ExecuteAsync(new UpdateClientStatusCommand(
+                roundid,
+                model.Status)).ConfigureAwait(false);
 
         /// <summary>
         /// Games the rounds update round asynchronous.
@@ -287,40 +298,31 @@ namespace Tgs.GameRounds.Controllers
         ///             "additionalData": null
         ///         }
         /// </remarks>
-        [HttpPut("{roundid}", Name = "GameRoundsUpdateRound")]
-        public async ValueTask<UpdateRoundResultViewModel> UpdateRoundAsync(
-                [FromServices] IGetService<UpdateRoundQuery, UpdateRoundResult> service,
-                Guid roundid,
-                UpdateRoundQueryViewModel model)
-        {
-            if (!Enum.IsDefined(model.ClientStatus))
-            {
-                return new(false);
-            }
-
-            if (!Enum.IsDefined(model.Status))
-            {
-                return new(false);
-            }
-
-            var result = await service.GetAsync(new(
-                roundid,
-                model.Status,
-                model.ClosedOn,
-                model.ExternalClosedOn,
-                model.BetAmount,
-                model.ValidBetAmount,
-                model.SettleAmount,
-                model.Commission,
-                model.Turnover,
-                model.WinLoss,
-                model.TieBetAdjustment,
-                model.ClientStatus,
-                model.ReopenTurnoverAdjustment,
-                model.ReopenedOn,
-                model.AdditionalData)).ConfigureAwait(false);
-            return new(result.Success);
-        }
+        [HttpPut("{roundid}", Name = "UpdateRound")]
+        public ValueTask UpdateRoundAsync(
+            [FromServices] ICommandService<UpdateRoundCommand> service,
+            Guid roundid,
+            UpdateRoundViewModel model)
+            => !Enum.IsDefined(model.ClientStatus)
+                ? throw new Exception("This ClientStatus is not in the specified item. ( Open: 1, Void: 2, Win: 3, Loss: 4, Draw: 5)")
+                : !Enum.IsDefined(model.Status)
+                ? throw new Exception("This Status is not a specified item. (New:0,Open:1, Closed:2)")
+                : service.ExecuteAsync(new UpdateRoundCommand(
+                    roundid,
+                    model.Status,
+                    model.ClosedOn,
+                    model.ExternalClosedOn,
+                    model.BetAmount,
+                    model.ValidBetAmount,
+                    model.SettleAmount,
+                    model.Commission,
+                    model.Turnover,
+                    model.WinLoss,
+                    model.TieBetAdjustment,
+                    model.ClientStatus,
+                    model.ReopenTurnoverAdjustment,
+                    model.ReopenedOn,
+                    model.AdditionalData));
 
         /// <summary>
         /// Updates the round closed asynchronous.
@@ -329,11 +331,11 @@ namespace Tgs.GameRounds.Controllers
         /// <param name="roundid">The roundid.</param>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        [HttpPut("{roundid}/closed", Name = "GameRoundsUpdateRoundClosed")]
+        [HttpPut("{roundid}/closed", Name = "UpdateRoundClosed")]
         public async ValueTask UpdateRoundClosedAsync(
-                [FromServices] ICommandService<UpdateRoundClosedCommand> service,
-                Guid roundid,
-                UpdateRoundClosedViewModel model)
+            [FromServices] ICommandService<UpdateRoundClosedCommand> service,
+            Guid roundid,
+            UpdateRoundClosedViewModel model)
             => await service.ExecuteAsync(new(
                 roundid,
                 model.ClosedOn,
@@ -356,11 +358,11 @@ namespace Tgs.GameRounds.Controllers
         /// <param name="roundid">The roundid.</param>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        [HttpPut("{roundid}/detail", Name = "GameRoundsUpdateRoundDetail")]
+        [HttpPut("{roundid}/detail", Name = "UpdateRoundDetail")]
         public async ValueTask UpdateRoundDetailAsync(
-                [FromServices] ICommandService<UpdateRoundDetailCommand> service,
-                Guid roundid,
-                UpdateRoundDetailViewModel model)
+            [FromServices] ICommandService<UpdateRoundDetailCommand> service,
+            Guid roundid,
+            UpdateRoundDetailViewModel model)
             => await service.ExecuteAsync(new(
                 roundid,
                 model.AdditionalData)).ConfigureAwait(false);
@@ -372,11 +374,11 @@ namespace Tgs.GameRounds.Controllers
         /// <param name="roundid">The roundid.</param>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        [HttpPut("{roundid}/open", Name = "GameRoundsUpdateRoundOpen")]
+        [HttpPut("{roundid}/open", Name = "UpdateRoundOpen")]
         public async ValueTask UpdateRoundOpenAsync(
-                [FromServices] ICommandService<UpdateRoundOpenCommand> service,
-                Guid roundid,
-                UpdateRoundOpenViewModel model)
+            [FromServices] ICommandService<UpdateRoundOpenCommand> service,
+            Guid roundid,
+            UpdateRoundOpenViewModel model)
             => await service.ExecuteAsync(new(
                 roundid,
                 model.UpdatedOn,
@@ -393,11 +395,11 @@ namespace Tgs.GameRounds.Controllers
         /// <param name="roundid">The roundid.</param>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        [HttpPut("{roundid}/reopen", Name = "GameRoundsUpdateRoundReopen")]
+        [HttpPut("{roundid}/reopen", Name = "UpdateRoundReopen")]
         public async ValueTask UpdateRoundReopenAsync(
-                [FromServices] ICommandService<UpdateRoundReopenCommand> service,
-                Guid roundid,
-                UpdateRoundReopenViewModel model)
+            [FromServices] ICommandService<UpdateRoundReopenCommand> service,
+            Guid roundid,
+            UpdateRoundReopenViewModel model)
             => await service.ExecuteAsync(new(
                 roundid,
                 model.Status,
@@ -413,5 +415,22 @@ namespace Tgs.GameRounds.Controllers
                 model.TieBetAdjustment,
                 model.ClientStatus,
                 model.AdditionalData)).ConfigureAwait(false);
+
+        /// <summary>
+        /// Updates the status asynchronous.
+        /// </summary>
+        /// <param name="service">The service.</param>
+        /// <param name="roundid">The roundid.</param>
+        /// <param name="model">The model.</param>
+        /// <returns></returns>
+        [HttpPut("{roundid}/status", Name = "UpdateStatus")]
+        public async ValueTask UpdateStatusAsync(
+            [FromServices] ICommandService<UpdateStatusCommand> service,
+            Guid roundid,
+            UpdateStatusViewModel model)
+            => await service.ExecuteAsync(new UpdateStatusCommand(
+                roundid,
+                model.Status,
+                model.ExternalClosedOn)).ConfigureAwait(false);
     }
 }

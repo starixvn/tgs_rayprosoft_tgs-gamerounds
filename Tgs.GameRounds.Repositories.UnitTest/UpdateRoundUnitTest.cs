@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
+using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.Repositories.Entities;
 using Tgs.SerialNumberGenerator;
@@ -20,6 +21,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
         {
             var fakeLogger = NullLogger<GameRoundRepository>.Instance;
             var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+            var fakeGameRound = Substitute.For<IGameRound>();
             var options = new DbContextOptionsBuilder<BetContext>()
                .UseInMemoryDatabase(databaseName: "bet")
                .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -69,7 +71,11 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 AdditionalData: null
                 );
 
-            var fakeRoundRepository = new GameRoundRepository(context, fakeLogger, fakeSerialNumberGenerator);
+            var fakeRoundRepository = new GameRoundRepository(
+                context,
+                fakeGameRound,
+                fakeLogger,
+                fakeSerialNumberGenerator);
 
             await fakeRoundRepository.UpdateRoundAsync(data).ConfigureAwait(false);
 

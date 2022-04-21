@@ -5,10 +5,10 @@ namespace Tgs.GameRounds.Repositories
 {
     internal class GameProviderRedisRepository : IGameProvider
     {
+        private const string KeyGameProvider = "gameround:gameprovider:{0}";
         private readonly IDatabase _database;
         private readonly TimeSpan _expiry;
         private readonly IGameProvider _gameProvider;
-        private readonly string _key = "gameround:gameprovider:{0}";
 
         public GameProviderRedisRepository(IDatabase database, IGameProvider gameProvider, TimeSpan expiry)
         {
@@ -19,7 +19,7 @@ namespace Tgs.GameRounds.Repositories
 
         public async ValueTask<string> GetGameProviderCodeAsync(Guid gameProviderId)
         {
-            var key = string.Format(_key, gameProviderId);
+            var key = string.Format(KeyGameProvider, gameProviderId);
             if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
             {
                 var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(gameProviderId).ConfigureAwait(false);

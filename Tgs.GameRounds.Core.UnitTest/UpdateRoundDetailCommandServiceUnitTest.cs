@@ -13,9 +13,8 @@ namespace Tgs.GameRounds.Core.UnitTest
         [TestMethod]
         public async Task Normal_Process()
         {
-            var fakeGameRoundCache = Substitute.For<IGameRoundService>();
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
-            var fakeGameRound = Substitute.For<IGameRoundRepository>();
+            var fakeGameRound = Substitute.For<IGameRound>();
 
             var roundId = Guid.NewGuid();
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -60,16 +59,15 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: "{\"id\":10531704494,\"tableId\":10102,\"shoeId\":17,\"playId\":34,\"lobbyId\":1,\"gameType\":1,\"gameId\":1,\"memberId\":73304209,\"parentId\":19377,\"betTime\":\"2022-03-1709:19:38\",\"calTime\":\"2022-03-1709:20:01\",\"winOrLoss\":40.0,\"balanceBefore\":6020.41,\"betPoints\":20.0,\"betPointsz\":0.0,\"availableBet\":20.0,\"userName\":\"4UDW8YGX311V\",\"result\":\"{\\u0022result\\u0022:\\u00225,2,7\\u0022,\\u0022poker\\u0022:{\\u0022banker\\u0022:\\u002238-36-36\\u0022,\\u0022player\\u0022:\\u002246-36-0\\u0022}}\",\"betDetail\":\"{\\u0022player\\u0022:20.0,\\u0022playerW\\u0022:40.0}\",\"ip\":\"220.132.206.70\",\"ext\":\"220317B020851\",\"isRevocation\":1,\"currencyId\":1,\"deviceType\":5,\"serial\":\"-10531704494\",\"roadid\":0,\"pluginid\":0}"
                 );
 
-            var service = new UpdateRoundDetailCommandService(
-                fakeGameRoundCache,
-                fakeGameRoundRecord,
-                fakeGameRound);
-
-            _ = fakeGameRoundCache.ExistAsync(data.RoundId).Returns(ValueTask.FromResult<bool>(true));
+            _ = fakeGameRound.ExistAsync(data.RoundId).Returns(ValueTask.FromResult(true));
 
             _ = fakeGameRound.UpdateRoundDetailAsync(data.RoundId, data.AdditionalData);
 
-            _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult(gameRound));
+            _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
+
+            var service = new UpdateRoundDetailCommandService(
+                fakeGameRoundRecord,
+                fakeGameRound);
 
             await service.ExecuteAsync(data).ConfigureAwait(false);
 

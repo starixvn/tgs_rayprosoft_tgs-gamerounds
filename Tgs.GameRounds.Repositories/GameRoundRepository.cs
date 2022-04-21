@@ -9,18 +9,21 @@ using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories
 {
-    internal class GameRoundRepository : IGameRoundRepository
+    internal class GameRoundRepository : IGameRound
     {
         private readonly BetContext _context;
+        private readonly IGameRound _gameRound;
         private readonly ILogger<GameRoundRepository> _logger;
         private readonly ISerialNumberGenerator _serialNumberGenerator;
 
         public GameRoundRepository(
             BetContext context,
+            IGameRound gameRound,
             ILogger<GameRoundRepository> logger,
             ISerialNumberGenerator serialNumberGenerator)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
         }
@@ -71,7 +74,10 @@ namespace Tgs.GameRounds.Repositories
             return roundId;
         }
 
-        public ValueTask<GameRoundInfo> GetAsync(Guid roundId)
+        public async ValueTask<bool> ExistAsync(Guid roundId)
+            => (await GetAsync(roundId).ConfigureAwait(false)) is not null;
+
+        public ValueTask<GameRoundInfo?> GetAsync(Guid roundId)
             => (from round in _context.Rounds.AsQueryable()
                 join roundDetail in _context.RoundDetails.AsQueryable()
                 on round.Id equals roundDetail.RoundId
@@ -108,7 +114,7 @@ namespace Tgs.GameRounds.Repositories
                     data.AdditionalData
                     ))
             .ToAsyncEnumerable()
-            .FirstAsync();
+            .FirstOrDefaultAsync();
 
         public ValueTask<GameRoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
             => (from round in _context.Rounds.AsQueryable()
@@ -151,6 +157,12 @@ namespace Tgs.GameRounds.Repositories
                     ))
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync();
+
+        public async ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+            => (await GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false))?.RoundId;
+
+        public ValueTask<bool> LockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+            => _gameRound.LockAsync(gameProviderId, externalRoundId, gameId, walletId);
 
         public async ValueTask<Guid?> NewRoundAsync(NewRound round)
         {
@@ -208,6 +220,20 @@ namespace Tgs.GameRounds.Repositories
                 await transaction.RollbackAsync().ConfigureAwait(false);
                 return null;
             }
+        }
+
+        public ValueTask UnLockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+            => _gameRound.UnLockAsync(gameProviderId, externalRoundId, gameId, walletId);
+
+        public async ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status)
+        {
+            var data = await _context.Rounds.SingleAsync(x => x.Id == roundId).ConfigureAwait(false);
+
+            data.UpdatedOn = DateTime.UtcNow;
+            data.ClientStatus = (short)status;
+
+            _ = _context.Rounds.Update(data);
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async ValueTask UpdateRoundAsync(UpdateRound round)
@@ -323,6 +349,18 @@ namespace Tgs.GameRounds.Repositories
             _ = _context.Rounds.Update(round);
             _ = _context.RoundDetails.Update(roundDetail);
 
+            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async ValueTask UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null)
+        {
+            var data = await _context.Rounds.SingleAsync(x => x.Id == roundId).ConfigureAwait(false);
+
+            data.UpdatedOn = DateTime.UtcNow;
+            data.Status = (short)status;
+            data.ExternalClosedOn = (externalClosedOn.HasValue) ? externalClosedOn.Value.UtcDateTime : data.ExternalClosedOn;
+
+            _ = _context.Rounds.Update(data);
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }
     }

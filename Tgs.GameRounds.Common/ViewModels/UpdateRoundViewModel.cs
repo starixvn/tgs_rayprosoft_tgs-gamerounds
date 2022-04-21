@@ -2,10 +2,9 @@
 
 namespace Tgs.GameRounds.Common.ViewModels
 {
-    public record UpdateRoundQueryViewModel()
+    public record UpdateRoundViewModel()
     {
         [Required]
-        [Range(minimum: (int)GameRoundStatus.Open, maximum: (int)GameRoundStatus.Closed)]
         public GameRoundStatus Status { get; init; }
         public DateTimeOffset? ClosedOn { get; init; }
         public DateTimeOffset? ExternalClosedOn { get; init; }
@@ -17,7 +16,6 @@ namespace Tgs.GameRounds.Common.ViewModels
         public decimal? WinLoss { get; init; }
         public decimal? TieBetAdjustment { get; init; }
         [Required]
-        [Range(minimum: (int)GameRoundClientStatus.Open, maximum: (int)GameRoundClientStatus.Draw)]
         public GameRoundClientStatus ClientStatus { get; init; }
         public decimal? ReopenTurnoverAdjustment { get; init; }
         public DateTimeOffset? ReopenedOn { get; init; }
