@@ -2,7 +2,7 @@
 {
     public record UpdateRoundReopenViewModel(
         GameRoundStatus Status,
-        DateTimeOffset ExternalClosedOn,
+        DateTimeOffset? ExternalClosedOn,
         decimal BetAmount,
         decimal ValidBetAmount,
         decimal SettleAmount,

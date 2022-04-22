@@ -339,7 +339,7 @@ namespace Tgs.GameRounds.Repositories
             var round = await _context.Rounds.SingleAsync(x => x.Id == source.RoundId).ConfigureAwait(false);
             round.Status = (short)source.Status;
             round.UpdatedOn = DateTime.UtcNow;
-            round.ExternalClosedOn = DateTime.SpecifyKind(source.ExternalClosedOn.UtcDateTime, DateTimeKind.Utc);
+            round.ExternalClosedOn = (source.Status == GameRoundStatus.Closed) ? DateTime.SpecifyKind(source.ExternalClosedOn!.Value.UtcDateTime, DateTimeKind.Utc) : null;
             round.BetAmount = source.BetAmount;
             round.ValidBetAmount = source.ValidBetAmount;
             round.SettleAmount = source.SettleAmount;

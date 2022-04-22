@@ -5,7 +5,7 @@ namespace Tgs.GameRounds.Core.Models
     public record UpdateRoundReopen(
         Guid RoundId,
         GameRoundStatus Status,
-        DateTimeOffset ExternalClosedOn,
+        DateTimeOffset? ExternalClosedOn,
         decimal BetAmount,
         decimal ValidBetAmount,
         decimal SettleAmount,
