@@ -67,7 +67,7 @@ namespace Tgs.GameRounds.Repositories
                 _ = _context.RoundDetails.Add(new()
                 {
                     RoundId = getRound.Id,
-                    AdditionalData = string.Empty
+                    AdditionalData = source.AdditionalData ?? string.Empty,
                 });
                 _ = await _context.SaveChangesAsync().ConfigureAwait(false);
 
