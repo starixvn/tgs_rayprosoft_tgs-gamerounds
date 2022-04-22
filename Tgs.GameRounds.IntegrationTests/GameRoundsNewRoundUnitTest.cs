@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -50,7 +51,9 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.NewRoundAsync(model).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.AreEqual(expected, actual.RoundId);
         }
 
         [TestMethod]
@@ -102,7 +105,10 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var actual = await sut.NewRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNull(actual);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(false, actual.Success);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+            Assert.IsNull(actual.RoundId);
 
             _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
         }
@@ -141,7 +147,10 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var actual = await sut.NewRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNull(actual);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(false, actual.Success);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+            Assert.IsNull(actual.RoundId);
 
             _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
 
@@ -230,7 +239,9 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.NewRoundAsync(model).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.AreEqual(expected, actual.RoundId);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Any<GameRoundInfo>());
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,47 @@ namespace Tgs.GameRounds.IntegrationTests
 {
     public partial class GameRoundsClientUnitTest
     {
+        [TestMethod]
+        public async Task GameRounds_UpdateRoundReopen_ExternalRoundId_Not_Exist()
+        {
+            var roundId = Guid.NewGuid();
+
+            var model = new UpdateRoundReopenViewModel(
+                Status: GameRoundStatus.Closed,
+                ExternalClosedOn: DateTimeOffset.UtcNow,
+                BetAmount: 10m,
+                ValidBetAmount: 10m,
+                SettleAmount: 20m,
+                Commission: 0,
+                Turnover: 10m,
+                WinLoss: 10m,
+                ClientStatus: GameRoundClientStatus.Win,
+                AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
+
+            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+
+            var web = CreateTestSettingSite(services =>
+            {
+                var fakeGameRound = Substitute.For<IGameRound>();
+                _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(false));
+                _ = services.AddSingleton(fakeGameRound);
+
+                _ = services.AddSingleton(fakeGameRoundRecord);
+            });
+
+            var httpClient = web.CreateClient();
+
+            var sut = new GameRoundsClient(httpClient);
+
+            var actual = await sut.UpdateRoundReopenAsync(roundId, model).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(false, actual.Success);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+
+            _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
+        }
+
         [TestMethod]
         public async Task GameRounds_UpdateRoundReopen_Normal_Process()
         {
@@ -96,7 +138,11 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            await sut.UpdateRoundReopenAsync(roundId, model).ConfigureAwait(false);
+            var actual = await sut.UpdateRoundReopenAsync(roundId, model).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Any<GameRoundInfo>());
         }

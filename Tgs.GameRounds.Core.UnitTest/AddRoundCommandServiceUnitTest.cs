@@ -76,8 +76,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 ReopenTurnoverAdjustment: null,
                 ReopenedOn: null,
                 EffectiveBettingPercentage: null,
-                AdditionalData: string.Empty
-                );
+                AdditionalData: string.Empty);
 
             _ = fakeGameRound.LockAsync(
                 command.GameProviderId,

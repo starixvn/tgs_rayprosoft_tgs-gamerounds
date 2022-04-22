@@ -7,15 +7,12 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     internal class UpdateRoundDetailCommandService : ICommandService<UpdateRoundDetailCommand>
     {
         private readonly IGameRound _gameRound;
-        private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
         private readonly ILogger<UpdateRoundDetailCommandService> _logger;
 
         public UpdateRoundDetailCommandService(
-          IGameRoundRecordRepository gameRoundRecordRepository,
           IGameRound gameRound,
           ILogger<UpdateRoundDetailCommandService> logger)
         {
-            _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
             _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -31,40 +28,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
             await _gameRound.UpdateRoundDetailAsync(
                 command.RoundId,
                 command.AdditionalData).ConfigureAwait(false);
-
-            var round = await _gameRound.GetAsync(command.RoundId).ConfigureAwait(false);
-
-            if (round is not null)
-            {
-                await _gameRoundRecordRepository.AddAsync(new(
-                    round.RoundId,
-                    round.ExternalRoundId,
-                    round.GameProviderId,
-                    round.PlayerCode,
-                    round.GameId,
-                    round.CurrencyCode,
-                    round.Status,
-                    round.GameProviderConfigurationId,
-                    round.WalletId,
-                    round.CreatedOn,
-                    round.ClosedOn,
-                    round.UpdatedOn,
-                    round.BrandId,
-                    round.ExternalCreatedOn,
-                    round.ExternalClosedOn,
-                    round.BetAmount,
-                    round.ValidBetAmount,
-                    round.SettleAmount,
-                    round.Commission,
-                    round.Turnover,
-                    round.WinLoss,
-                    round.TieBetAdjustment,
-                    round.ClientStatus,
-                    round.ReopenTurnoverAdjustment,
-                    round.ReopenedOn,
-                    round.EffectiveBettingPercentage,
-                    round.AdditionalData)).ConfigureAwait(false);
-            }
         }
     }
 }
