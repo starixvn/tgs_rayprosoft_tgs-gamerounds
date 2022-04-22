@@ -5,16 +5,13 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     public record UpdateRoundReopenCommand(
         Guid RoundId,
         GameRoundStatus Status,
-        DateTimeOffset? ClosedOn,
-        DateTimeOffset UpdatedOn,
-        DateTimeOffset? ExternalClosedOn,
-        decimal? BetAmount,
-        decimal? ValidBetAmount,
-        decimal? SettleAmount,
-        decimal? Commission,
-        decimal? Turnover,
-        decimal? WinLoss,
-        decimal? TieBetAdjustment,
+        DateTimeOffset ExternalClosedOn,
+        decimal BetAmount,
+        decimal ValidBetAmount,
+        decimal SettleAmount,
+        decimal Commission,
+        decimal Turnover,
+        decimal WinLoss,
         GameRoundClientStatus ClientStatus,
         string AdditionalData);
 }

@@ -5,7 +5,7 @@ namespace Tgs.GameRounds.Core
 {
     public interface IGameRound
     {
-        ValueTask<Guid> AddRoundAsync(AddRound source);
+        ValueTask<Guid?> AddRoundAsync(AddRound source);
 
         ValueTask<bool> ExistAsync(Guid roundId);
 
@@ -30,6 +30,8 @@ namespace Tgs.GameRounds.Core
         ValueTask UpdateRoundDetailAsync(Guid roundId, string additionalData);
 
         ValueTask UpdateRoundOpenAsync(UpdateRoundOpen source);
+
+        ValueTask UpdateRoundOpenSettleAsync(UpdateRoundOpenSettle source);
 
         ValueTask UpdateRoundReopenAsync(UpdateRoundReopen source);
 

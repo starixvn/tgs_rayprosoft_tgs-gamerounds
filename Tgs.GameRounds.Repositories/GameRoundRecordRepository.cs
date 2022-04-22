@@ -57,7 +57,7 @@ namespace Tgs.GameRounds.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(exception: ex, "LogOn:{DateTime.Now.ToString(\"o\")} ErrorMessage: {ex.Message}", DateTime.Now.ToString("o"), ex.Message);
+                _logger.LogError(exception: ex, "LogOn:{DateTime.Now.ToString(\"o\")} ErrorMessage: Failed to build GameRoundRecord.", DateTime.Now.ToString("o"));
             }
         }
 

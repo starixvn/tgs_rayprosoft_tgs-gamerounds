@@ -29,6 +29,5 @@ namespace Tgs.GameRounds.Core
         decimal? ReopenTurnoverAdjustment,
         DateTimeOffset? ReopenedOn,
         decimal? EffectiveBettingPercentage,
-        string AdditionalData
-        );
+        string AdditionalData);
 }

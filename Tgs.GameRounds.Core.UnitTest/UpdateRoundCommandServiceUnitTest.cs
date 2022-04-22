@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.Core.Exceptions;
 
 namespace Tgs.GameRounds.Core.UnitTest
 {
@@ -15,11 +17,9 @@ namespace Tgs.GameRounds.Core.UnitTest
         {
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeLogger = NullLogger<UpdateRoundCommandService>.Instance;
 
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-            var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
-            var gameId = 500001;
-            var playerCode = "4ues8xikza7o";
             var roundId = Guid.NewGuid();
 
             var command = new UpdateRoundCommand(
@@ -40,44 +40,16 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: null
                 );
 
-            var gameRound = new GameRoundInfo(
-                RoundId: command.RoundId,
-                ExternalRoundId: externalRoundId,
-                GameProviderId: gameProviderId,
-                PlayerCode: playerCode,
-                GameId: gameId,
-                CurrencyCode: "CNY",
-                Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: Guid.NewGuid(),
-                WalletId: Guid.NewGuid(),
-                CreatedOn: DateTimeOffset.UtcNow,
-                ClosedOn: command.ClosedOn,
-                UpdatedOn: DateTimeOffset.UtcNow,
-                BrandId: Guid.NewGuid(),
-                ExternalCreatedOn: DateTimeOffset.UtcNow,
-                ExternalClosedOn: command.ExternalClosedOn,
-                BetAmount: command.BetAmount,
-                ValidBetAmount: command.ValidBetAmount,
-                SettleAmount: command.SettleAmount,
-                Commission: command.Commission,
-                Turnover: command.Turnover,
-                WinLoss: command.WinLoss,
-                TieBetAdjustment: command.TieBetAdjustment,
-                ClientStatus: GameRoundClientStatus.Open,
-                ReopenTurnoverAdjustment: command.ReopenTurnoverAdjustment,
-                ReopenedOn: command.ReopenedOn,
-                EffectiveBettingPercentage: null,
-                AdditionalData: command.AdditionalData ?? string.Empty);
-
             _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
 
             var service = new UpdateRoundCommandService(
                 fakeGameRoundRecord,
-                fakeGameRound);
+                fakeGameRound,
+                fakeLogger);
 
-            _ = await Assert.ThrowsExceptionAsync<Exception>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
+            _ = await Assert.ThrowsExceptionAsync<GameRoundDoesNotExistException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
 
-            _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Is(gameRound));
+            _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
         }
 
         [TestMethod]
@@ -85,6 +57,7 @@ namespace Tgs.GameRounds.Core.UnitTest
         {
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeLogger = NullLogger<UpdateRoundCommandService>.Instance;
 
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
@@ -164,7 +137,8 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var service = new UpdateRoundCommandService(
                 fakeGameRoundRecord,
-                fakeGameRound);
+                fakeGameRound,
+                fakeLogger);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
 

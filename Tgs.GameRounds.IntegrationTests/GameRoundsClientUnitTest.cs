@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,9 +78,12 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.GetGameRoundAsync(roundId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(roundId, actual.RoundId);
-            Assert.AreEqual(externalGameId, actual.ExternalGameId);
-            Assert.AreEqual(gameProviderCode, actual.GameProviderCode);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.IsNotNull(actual.Data);
+            Assert.AreEqual(roundId, actual.Data.RoundId);
+            Assert.AreEqual(externalGameId, actual.Data.ExternalGameId);
+            Assert.AreEqual(gameProviderCode, actual.Data.GameProviderCode);
         }
 
         [TestMethod]
@@ -149,9 +153,12 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, externalGameId, walletId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(roundId, actual.RoundId);
-            Assert.AreEqual(externalGameId, actual.ExternalGameId);
-            Assert.AreEqual(gameProviderCode, actual.GameProviderCode);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.IsNotNull(actual.Data);
+            Assert.AreEqual(roundId, actual.Data.RoundId);
+            Assert.AreEqual(externalGameId, actual.Data.ExternalGameId);
+            Assert.AreEqual(gameProviderCode, actual.Data.GameProviderCode);
         }
 
         [TestMethod]
@@ -221,9 +228,12 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(roundId, actual.RoundId);
-            Assert.AreEqual(externalGameId, actual.ExternalGameId);
-            Assert.AreEqual(gameProviderCode, actual.GameProviderCode);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.IsNotNull(actual.Data);
+            Assert.AreEqual(roundId, actual.Data.RoundId);
+            Assert.AreEqual(externalGameId, actual.Data.ExternalGameId);
+            Assert.AreEqual(gameProviderCode, actual.Data.GameProviderCode);
         }
 
         [TestMethod]
@@ -276,7 +286,9 @@ namespace Tgs.GameRounds.IntegrationTests
             var actual = await sut.GetStatusAsync(roundId).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.AreEqual(expected, actual.RoundStatus);
         }
 
         private static WebApplicationFactory<Program> CreateTestSettingSite(Action<IServiceCollection>? configureServices = null)

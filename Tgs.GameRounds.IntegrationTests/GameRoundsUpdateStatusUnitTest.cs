@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,16 +7,48 @@ using NSubstitute;
 using Tgs.GameRounds.Client;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
-using Tgs.GameRounds.Core.ApplicationServices;
-using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.IntegrationTests
 {
     public partial class GameRoundsClientUnitTest
     {
         [TestMethod]
+        public async Task GameRounds_UpdateStatus_ExternalRoundId_Not_Exist()
+        {
+            var roundId = Guid.NewGuid();
+
+            var status = GameRoundStatus.Closed;
+
+            var externalClosedOn = DateTimeOffset.UtcNow;
+
+            var web = CreateTestSettingSite(services =>
+            {
+                var fakeGameRound = Substitute.For<IGameRound>();
+                _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(false));
+                _ = services.AddSingleton(fakeGameRound);
+
+                var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+                _ = services.AddSingleton(fakeGameRoundRecord);
+            });
+
+            var httpClient = web.CreateClient();
+
+            var sut = new GameRoundsClient(httpClient);
+
+            var actual = await sut.UpdateStatusAsync(roundId, status, externalClosedOn).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(false, actual.Success);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+        }
+
+        [TestMethod]
         public async Task GameRounds_UpdateStatus_Normal_Process()
         {
+            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+            var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+            var gameId = 500001;
+            var playerCode = "4ues8xikza7o";
             var roundId = Guid.NewGuid();
 
             var status = GameRoundStatus.Closed;
@@ -26,9 +59,44 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var web = CreateTestSettingSite(services =>
             {
-                var fakeService = Substitute.For<ICommandService<UpdateStatusCommand>>();
-                _ = fakeService.ExecuteAsync(new UpdateStatusCommand(roundId, status, externalClosedOn)).Returns(ValueTask.CompletedTask);
-                _ = services.AddSingleton(fakeService);
+                var fakeGameRound = Substitute.For<IGameRound>();
+
+                _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(true));
+
+                _ = fakeGameRound.UpdateStatusAsync(roundId, status, externalClosedOn).Returns(ValueTask.CompletedTask);
+
+                var gameRound = new GameRoundInfo(
+                    RoundId: roundId,
+                    ExternalRoundId: externalRoundId,
+                    GameProviderId: gameProviderId,
+                    PlayerCode: playerCode,
+                    GameId: gameId,
+                    CurrencyCode: "CNY",
+                    Status: GameRoundStatus.Open,
+                    GameProviderConfigurationId: Guid.NewGuid(),
+                    WalletId: Guid.NewGuid(),
+                    CreatedOn: DateTimeOffset.UtcNow,
+                    ClosedOn: null,
+                    UpdatedOn: DateTimeOffset.UtcNow,
+                    BrandId: Guid.NewGuid(),
+                    ExternalCreatedOn: DateTimeOffset.UtcNow,
+                    ExternalClosedOn: DateTimeOffset.UtcNow,
+                    BetAmount: 10m,
+                    ValidBetAmount: 10m,
+                    SettleAmount: 0m,
+                    Commission: 0m,
+                    Turnover: 10m,
+                    WinLoss: -10m,
+                    TieBetAdjustment: 0,
+                    ClientStatus: GameRoundClientStatus.Open,
+                    ReopenTurnoverAdjustment: null,
+                    ReopenedOn: null,
+                    EffectiveBettingPercentage: null,
+                    AdditionalData: string.Empty);
+
+                _ = fakeGameRound.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
+
+                _ = services.AddSingleton(fakeGameRound);
 
                 _ = services.AddSingleton(fakeGameRoundRecord);
             });
@@ -37,7 +105,13 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            await sut.UpdateStatusAsync(roundId, status, externalClosedOn).ConfigureAwait(false);
+            var actual = await sut.UpdateStatusAsync(roundId, status, externalClosedOn).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+
+            _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Any<GameRoundInfo>());
         }
     }
 }

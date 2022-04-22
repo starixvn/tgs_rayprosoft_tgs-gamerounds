@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,24 +21,22 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var expected = Guid.NewGuid();
-            var viewModel = new NewRoundQueryViewModel()
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow
-            };
+            var model = new NewRoundQueryViewModel(
+                ExternalRoundId: externalRoundId,
+                GameProviderId: gameProviderId,
+                PlayerCode: playerCode,
+                GameId: gameId,
+                CurrencyCode: "CNY",
+                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId: new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn: DateTimeOffset.UtcNow);
 
             var web = CreateTestSettingSite(services =>
             {
                 var fakeGameRound = Substitute.For<IGameRound>();
 
-                _ = fakeGameRound.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(expected));
+                _ = fakeGameRound.GetRoundIdAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(ValueTask.FromResult<Guid?>(expected));
 
                 _ = services.AddSingleton(fakeGameRound);
 
@@ -49,10 +48,12 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.NewRoundAsync(viewModel).ConfigureAwait(false);
+            var actual = await sut.NewRoundAsync(model).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.AreEqual(expected, actual.RoundId);
         }
 
         [TestMethod]
@@ -62,38 +63,36 @@ namespace Tgs.GameRounds.IntegrationTests
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
-            var viewModel = new NewRoundQueryViewModel()
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow
-            };
+            var model = new NewRoundQueryViewModel(
+                ExternalRoundId: externalRoundId,
+                GameProviderId: gameProviderId,
+                PlayerCode: playerCode,
+                GameId: gameId,
+                CurrencyCode: "CNY",
+                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId: new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn: DateTimeOffset.UtcNow);
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRound>();
 
             var web = CreateTestSettingSite(services =>
             {
-                _ = fakeGameRound.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
+                _ = fakeGameRound.GetRoundIdAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
 
-                _ = fakeGameRound.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(true);
+                _ = fakeGameRound.LockAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(true);
 
                 _ = fakeGameRound.NewRoundAsync(new(
-                    viewModel.ExternalRoundId,
-                    viewModel.GameProviderId,
-                    viewModel.PlayerCode,
-                    viewModel.GameId,
-                    viewModel.CurrencyCode,
-                    viewModel.GameProviderConfigurationId,
-                    viewModel.WalletId,
-                    viewModel.BrandId,
-                    viewModel.ExternalCreatedOn)).Returns(ValueTask.FromResult<Guid?>(null));
+                    model.ExternalRoundId,
+                    model.GameProviderId,
+                    model.PlayerCode,
+                    model.GameId,
+                    model.CurrencyCode,
+                    model.GameProviderConfigurationId,
+                    model.WalletId,
+                    model.BrandId,
+                    model.ExternalCreatedOn)).Returns(ValueTask.FromResult<Guid?>(null));
 
                 _ = services.AddSingleton(fakeGameRound);
 
@@ -104,13 +103,14 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.NewRoundAsync(viewModel).ConfigureAwait(false);
+            var actual = await sut.NewRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNull(actual);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(false, actual.Success);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+            Assert.IsNull(actual.RoundId);
 
             _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
-
-            _ = fakeGameRound.Received(1).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
         }
 
         [TestMethod]
@@ -120,26 +120,24 @@ namespace Tgs.GameRounds.IntegrationTests
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
-            var viewModel = new NewRoundQueryViewModel()
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow
-            };
+            var model = new NewRoundQueryViewModel(
+                ExternalRoundId: externalRoundId,
+                GameProviderId: gameProviderId,
+                PlayerCode: playerCode,
+                GameId: gameId,
+                CurrencyCode: "CNY",
+                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId: new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn: DateTimeOffset.UtcNow);
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRound>();
 
             var web = CreateTestSettingSite(services =>
             {
-                _ = fakeGameRound.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
-                _ = fakeGameRound.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(false);
+                _ = fakeGameRound.GetRoundIdAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
+                _ = fakeGameRound.LockAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(false);
                 _ = services.AddSingleton(fakeGameRound);
             });
 
@@ -147,13 +145,16 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.NewRoundAsync(viewModel).ConfigureAwait(false);
+            var actual = await sut.NewRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNull(actual);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(false, actual.Success);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+            Assert.IsNull(actual.RoundId);
 
             _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
 
-            _ = fakeGameRound.Received(0).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
+            _ = fakeGameRound.Received(0).UnLockAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId);
         }
 
         [TestMethod]
@@ -164,54 +165,52 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var expected = Guid.NewGuid();
-            var viewModel = new NewRoundQueryViewModel()
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow
-            };
+            var model = new NewRoundQueryViewModel(
+                ExternalRoundId: externalRoundId,
+                GameProviderId: gameProviderId,
+                PlayerCode: playerCode,
+                GameId: gameId,
+                CurrencyCode: "CNY",
+                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId: new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn: DateTimeOffset.UtcNow);
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRound>();
 
             var web = CreateTestSettingSite(services =>
             {
-                _ = fakeGameRound.GetRoundIdAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
+                _ = fakeGameRound.GetRoundIdAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
 
-                _ = fakeGameRound.LockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId).Returns(true);
+                _ = fakeGameRound.LockAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(true);
 
                 _ = fakeGameRound.NewRoundAsync(new(
-                    viewModel.ExternalRoundId,
-                    viewModel.GameProviderId,
-                    viewModel.PlayerCode,
-                    viewModel.GameId,
-                    viewModel.CurrencyCode,
-                    viewModel.GameProviderConfigurationId,
-                    viewModel.WalletId,
-                    viewModel.BrandId,
-                    viewModel.ExternalCreatedOn)).Returns(ValueTask.FromResult<Guid?>(expected));
+                    model.ExternalRoundId,
+                    model.GameProviderId,
+                    model.PlayerCode,
+                    model.GameId,
+                    model.CurrencyCode,
+                    model.GameProviderConfigurationId,
+                    model.WalletId,
+                    model.BrandId,
+                    model.ExternalCreatedOn)).Returns(ValueTask.FromResult<Guid?>(expected));
 
                 var gameRound = new GameRoundInfo(
                     RoundId: expected,
-                    ExternalRoundId: viewModel.ExternalRoundId,
-                    GameProviderId: viewModel.GameProviderId,
-                    PlayerCode: viewModel.PlayerCode,
-                    GameId: viewModel.GameId,
-                    CurrencyCode: viewModel.CurrencyCode,
+                    ExternalRoundId: model.ExternalRoundId,
+                    GameProviderId: model.GameProviderId,
+                    PlayerCode: model.PlayerCode,
+                    GameId: model.GameId,
+                    CurrencyCode: model.CurrencyCode,
                     Status: GameRoundStatus.Open,
-                    GameProviderConfigurationId: viewModel.GameProviderConfigurationId,
-                    WalletId: viewModel.WalletId,
+                    GameProviderConfigurationId: model.GameProviderConfigurationId,
+                    WalletId: model.WalletId,
                     CreatedOn: DateTimeOffset.UtcNow,
                     ClosedOn: null,
                     UpdatedOn: DateTimeOffset.UtcNow,
-                    BrandId: viewModel.BrandId,
-                    ExternalCreatedOn: viewModel.ExternalCreatedOn,
+                    BrandId: model.BrandId,
+                    ExternalCreatedOn: model.ExternalCreatedOn,
                     ExternalClosedOn: null,
                     BetAmount: null,
                     ValidBetAmount: null,
@@ -237,14 +236,14 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.NewRoundAsync(viewModel).ConfigureAwait(false);
+            var actual = await sut.NewRoundAsync(model).ConfigureAwait(false);
 
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.AreEqual(expected, actual.RoundId);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Any<GameRoundInfo>());
-
-            _ = fakeGameRound.Received(1).UnLockAsync(viewModel.GameProviderId, viewModel.ExternalRoundId, viewModel.GameId, viewModel.WalletId);
         }
     }
 }
