@@ -8,7 +8,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
-using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.Repositories.Entities;
 using Tgs.SerialNumberGenerator;
 

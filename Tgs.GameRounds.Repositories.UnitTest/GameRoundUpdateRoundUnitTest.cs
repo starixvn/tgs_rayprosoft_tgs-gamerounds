@@ -7,13 +7,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.Repositories.Entities;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories.UnitTest
 {
     [TestClass]
-    public class UpdateStatusUnitTest
+    public class GameRoundUpdateRoundUnitTest
     {
         [TestMethod]
         public async Task Normal_Process()
@@ -33,7 +34,6 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var roundId = Guid.NewGuid();
-
             var round = new Round()
             {
                 Id = roundId,
@@ -48,41 +48,28 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
                 CreatedOn = DateTime.UtcNow,
                 ExternalCreatedOn = DateTime.UtcNow,
-                BetAmount = 20m,
-                ValidBetAmount = 20m,
-                SettleAmount = 40m,
-                Commission = 0m,
-                Turnover = 20m,
-                WinLoss = -20m,
-                ClientStatus = (short)GameRoundClientStatus.Win
+                ClientStatus = (short)GameRoundClientStatus.Open
             };
-
             _ = await context.AddAsync(round).ConfigureAwait(false);
             _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
-            var fakeRoundRepository = new GameRoundRepository(
-                context,
-                fakeGameRound,
-                fakeLogger,
-                fakeSerialNumberGenerator);
-
-            await fakeRoundRepository.UpdateStatusAsync(roundId, GameRoundStatus.Closed, DateTimeOffset.UtcNow).ConfigureAwait(false);
-        }
-
-        [TestMethod]
-        public async Task Round_Did_Not_Exist()
-        {
-            var fakeLogger = NullLogger<GameRoundRepository>.Instance;
-            var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-            var fakeGameRound = Substitute.For<IGameRound>();
-            var options = new DbContextOptionsBuilder<BetContext>()
-               .UseInMemoryDatabase(databaseName: "bet")
-               .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-               .Options;
-            var context = new BetContext(options);
-            _ = context.Database.EnsureDeleted();
-
-            var roundId = Guid.NewGuid();
+            var data = new UpdateRound(
+                RoundId: roundId,
+                Status: GameRoundStatus.Closed,
+                ClosedOn: DateTimeOffset.UtcNow,
+                ExternalClosedOn: DateTimeOffset.UtcNow,
+                BetAmount: 20m,
+                ValidBetAmount: 20m,
+                SettleAmount: 40m,
+                Commission: 0m,
+                Turnover: 20m,
+                WinLoss: -20m,
+                TieBetAdjustment: null,
+                ClientStatus: GameRoundClientStatus.Win,
+                ReopenTurnoverAdjustment: null,
+                ReopenedOn: null,
+                AdditionalData: null
+                );
 
             var fakeRoundRepository = new GameRoundRepository(
                 context,
@@ -90,10 +77,18 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 fakeLogger,
                 fakeSerialNumberGenerator);
 
-            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateStatusAsync(
-                roundId,
-                GameRoundStatus.Closed,
-                DateTimeOffset.UtcNow).AsTask()).ConfigureAwait(false);
+            await fakeRoundRepository.UpdateRoundAsync(data).ConfigureAwait(false);
+
+            var actual = await fakeRoundRepository.GetAsync(roundId).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(GameRoundStatus.Closed, actual.Status);
+            Assert.AreEqual(data.BetAmount, actual.BetAmount);
+            Assert.AreEqual(data.ValidBetAmount, actual.ValidBetAmount);
+            Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
+            Assert.AreEqual(data.Commission, actual.Commission);
+            Assert.AreEqual(data.Turnover, actual.Turnover);
+            Assert.AreEqual(data.WinLoss, actual.WinLoss);
         }
     }
 }

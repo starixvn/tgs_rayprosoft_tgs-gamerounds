@@ -9,8 +9,8 @@ namespace Tgs.GameRounds.Repositories
     internal class GameRoundRedisRepository : IGameRound
     {
         private const string KeyExist = "gameround:exist:{0}";
-        private const string KeyRoundId = "gameround:roundid:{0}:{1}:{2}:{3}";
         private const string KeyLock = "gameround:lock:{0}:{1}:{2}:{3}";
+        private const string KeyRoundId = "gameround:roundid:{0}:{1}:{2}:{3}";
         private readonly IDatabase _database;
         private readonly TimeSpan _expiry;
         private readonly IGameRound _gameRound;
@@ -119,8 +119,10 @@ namespace Tgs.GameRounds.Repositories
 
         public ValueTask UpdateRoundOpenAsync(UpdateRoundOpen source)
              => _gameRound.UpdateRoundOpenAsync(source);
+
         public ValueTask UpdateRoundOpenSettleAsync(UpdateRoundOpenSettle source)
              => _gameRound.UpdateRoundOpenSettleAsync(source);
+
         public ValueTask UpdateRoundReopenAsync(UpdateRoundReopen source)
             => _gameRound.UpdateRoundReopenAsync(source);
 

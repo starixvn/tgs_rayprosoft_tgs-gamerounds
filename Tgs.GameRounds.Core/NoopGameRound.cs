@@ -30,7 +30,9 @@ namespace Tgs.GameRounds.Core
         public ValueTask UpdateRoundDetailAsync(Guid roundId, string additionalData) => throw new NotSupportedException();
 
         public ValueTask UpdateRoundOpenAsync(UpdateRoundOpen source) => throw new NotSupportedException();
+
         public ValueTask UpdateRoundOpenSettleAsync(UpdateRoundOpenSettle source) => throw new NotSupportedException();
+
         public ValueTask UpdateRoundReopenAsync(UpdateRoundReopen source) => throw new NotSupportedException();
 
         public ValueTask UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null) => throw new NotSupportedException();

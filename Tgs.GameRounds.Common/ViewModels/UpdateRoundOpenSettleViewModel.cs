@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tgs.GameRounds.Common.ViewModels
+﻿namespace Tgs.GameRounds.Common.ViewModels
 {
     public record UpdateRoundOpenSettleViewModel(
         decimal BetAmount,

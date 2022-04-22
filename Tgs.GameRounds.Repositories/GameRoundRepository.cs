@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
@@ -81,7 +80,6 @@ namespace Tgs.GameRounds.Repositories
                 await transaction.RollbackAsync().ConfigureAwait(false);
                 return null;
             }
-
         }
 
         public async ValueTask<bool> ExistAsync(Guid roundId)

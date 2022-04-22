@@ -1,4 +1,6 @@
-﻿using Tgs.ServiceUtility;
+﻿using Microsoft.Extensions.Logging;
+using Tgs.GameRounds.Core.Exceptions;
+using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Core.ApplicationServices
 {
@@ -6,20 +8,24 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     {
         private readonly IGameRound _gameRound;
         private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly ILogger<UpdateRoundCommandService> _logger;
 
         public UpdateRoundCommandService(
           IGameRoundRecordRepository gameRoundRecordRepository,
-          IGameRound gameRound)
+          IGameRound gameRound,
+          ILogger<UpdateRoundCommandService> logger)
         {
             _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
             _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async ValueTask ExecuteAsync(UpdateRoundCommand command, CancellationToken cancellationToken = default)
         {
             if (!await _gameRound.ExistAsync(command.RoundId).ConfigureAwait(false))
             {
-                throw new Exception("This GameRound order does not exist.");
+                _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
+                throw new GameRoundDoesNotExistException();
             }
 
             await _gameRound.UpdateRoundAsync(new(

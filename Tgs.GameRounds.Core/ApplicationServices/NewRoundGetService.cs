@@ -1,4 +1,6 @@
-﻿using Tgs.GameRounds.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using Tgs.GameRounds.Core.Exceptions;
+using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Core.ApplicationServices
@@ -7,13 +9,16 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     {
         private readonly IGameRound _gameRound;
         private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly ILogger<NewRoundGetService> _logger;
 
         public NewRoundGetService(
-          IGameRoundRecordRepository gameRoundRecordRepository,
-          IGameRound gameRound)
+            IGameRoundRecordRepository gameRoundRecordRepository,
+            IGameRound gameRound,
+            ILogger<NewRoundGetService> logger)
         {
             _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
             _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async ValueTask<Guid> GetAsync(NewRoundQuery query, CancellationToken cancellationToken = default)
@@ -38,7 +43,8 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 
             if (!newRoundId.HasValue)
             {
-                throw new Exception("This GameRound failed to create an order.");
+                _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundCreationFailedException", DateTime.Now.ToString("o"), query);
+                throw new GameRoundCreationFailedException();
             }
             else
             {
