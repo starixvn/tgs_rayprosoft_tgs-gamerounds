@@ -5,7 +5,7 @@ namespace Tgs.GameRounds.Client
 {
     public interface IGameRoundsClient
     {
-        ValueTask AddRoundAsync(AddRoundViewModel model);
+        ValueTask<GameRoundResponse> AddRoundAsync(AddRoundViewModel model);
 
         ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid rounid);
 

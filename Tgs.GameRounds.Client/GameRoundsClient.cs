@@ -24,7 +24,7 @@ namespace Tgs.GameRounds.Client
         public GameRoundsClient(HttpClient httpClient)
            => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
-        public async ValueTask AddRoundAsync(AddRoundViewModel model)
+        public async ValueTask<GameRoundResponse> AddRoundAsync(AddRoundViewModel model)
         {
             var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
             requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
@@ -35,7 +35,9 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
         public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid rounid)
