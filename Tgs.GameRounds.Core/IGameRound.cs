@@ -23,8 +23,6 @@ namespace Tgs.GameRounds.Core
 
         ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status);
 
-        ValueTask UpdateRoundAsync(UpdateRound round);
-
         ValueTask UpdateRoundClosedAsync(UpdateRoundClosed source);
 
         ValueTask UpdateRoundDetailAsync(Guid roundId, string additionalData);

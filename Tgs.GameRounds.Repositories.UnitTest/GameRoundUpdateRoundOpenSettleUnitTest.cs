@@ -74,7 +74,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 SettleAmount: 40m,
                 Commission: 0,
                 Turnover: 20m,
-                WinLoss: 20m);
+                PlayerWinLoss: 20m);
 
             await fakeRoundRepository.UpdateRoundOpenSettleAsync(data).ConfigureAwait(false);
 
@@ -88,7 +88,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
             Assert.AreEqual(data.Commission, actual.Commission);
             Assert.AreEqual(data.Turnover, actual.Turnover);
-            Assert.AreEqual(-data.WinLoss, actual.WinLoss);
+            Assert.AreEqual(-data.PlayerWinLoss, actual.CompanyWinLoss);
         }
 
         [TestMethod]
@@ -119,7 +119,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 SettleAmount: 40m,
                 Commission: 0,
                 Turnover: 20m,
-                WinLoss: 20m);
+                PlayerWinLoss: 20m);
 
             _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundOpenSettleAsync(data).AsTask()).ConfigureAwait(false);
         }

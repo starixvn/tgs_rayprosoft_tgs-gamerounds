@@ -23,8 +23,6 @@ namespace Tgs.GameRounds.Core
 
         public ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status) => throw new NotSupportedException();
 
-        public ValueTask UpdateRoundAsync(UpdateRound source) => throw new NotSupportedException();
-
         public ValueTask UpdateRoundClosedAsync(UpdateRoundClosed source) => throw new NotSupportedException();
 
         public ValueTask UpdateRoundDetailAsync(Guid roundId, string additionalData) => throw new NotSupportedException();

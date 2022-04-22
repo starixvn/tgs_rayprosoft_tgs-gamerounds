@@ -39,7 +39,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 SettleAmount: null,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: null,
+                PlayerWinLoss: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 AdditionalData: "{}");
 
@@ -91,7 +91,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 SettleAmount: null,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: null,
+                PlayerWinLoss: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 AdditionalData: "{}");
 
@@ -121,7 +121,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     SettleAmount: model.SettleAmount,
                     Commission: model.Commission,
                     Turnover: model.Turnover,
-                    WinLoss: model.WinLoss,
+                    PlayerWinLoss: model.PlayerWinLoss,
                     ClientStatus: model.ClientStatus,
                     AdditionalData: model.AdditionalData)).Returns(ValueTask.FromResult<Guid?>(null));
 
@@ -168,7 +168,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 SettleAmount: null,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: null,
+                PlayerWinLoss: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 AdditionalData: "{}");
 
@@ -222,7 +222,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 SettleAmount: null,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: null,
+                PlayerWinLoss: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 AdditionalData: "{}");
 
@@ -254,7 +254,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     SettleAmount: model.SettleAmount,
                     Commission: model.Commission,
                     Turnover: model.Turnover,
-                    WinLoss: model.WinLoss,
+                    PlayerWinLoss: model.PlayerWinLoss,
                     ClientStatus: model.ClientStatus,
                     AdditionalData: model.AdditionalData)).Returns(ValueTask.FromResult<Guid?>(expected));
 
@@ -279,7 +279,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     SettleAmount: null,
                     Commission: null,
                     Turnover: null,
-                    WinLoss: null,
+                    CompanyWinLoss: null,
                     TieBetAdjustment: null,
                     ClientStatus: GameRoundClientStatus.Open,
                     ReopenTurnoverAdjustment: null,

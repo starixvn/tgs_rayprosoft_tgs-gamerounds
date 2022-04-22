@@ -7,7 +7,7 @@
         decimal SettleAmount,
         decimal Commission,
         decimal Turnover,
-        decimal WinLoss,
+        decimal PlayerWinLoss,
         GameRoundClientStatus ClientStatus,
         string AdditionalData);
 }

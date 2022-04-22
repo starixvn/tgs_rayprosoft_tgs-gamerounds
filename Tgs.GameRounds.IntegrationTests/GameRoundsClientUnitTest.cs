@@ -42,7 +42,7 @@ namespace Tgs.GameRounds.IntegrationTests
                SettleAmount: null,
                Commission: null,
                Turnover: null,
-               WinLoss: null,
+               CompanyWinLoss: null,
                TieBetAdjustment: null,
                ClientStatus: GameRoundClientStatus.Open,
                ReopenTurnoverAdjustment: null,
@@ -117,7 +117,7 @@ namespace Tgs.GameRounds.IntegrationTests
               SettleAmount: null,
               Commission: null,
               Turnover: null,
-              WinLoss: null,
+              CompanyWinLoss: null,
               TieBetAdjustment: null,
               ClientStatus: GameRoundClientStatus.Open,
               ReopenTurnoverAdjustment: null,
@@ -192,7 +192,7 @@ namespace Tgs.GameRounds.IntegrationTests
               SettleAmount: null,
               Commission: null,
               Turnover: null,
-              WinLoss: null,
+              CompanyWinLoss: null,
               TieBetAdjustment: null,
               ClientStatus: GameRoundClientStatus.Open,
               ReopenTurnoverAdjustment: null,
@@ -262,7 +262,7 @@ namespace Tgs.GameRounds.IntegrationTests
                SettleAmount: null,
                Commission: null,
                Turnover: null,
-               WinLoss: null,
+               CompanyWinLoss: null,
                TieBetAdjustment: null,
                ClientStatus: GameRoundClientStatus.Open,
                ReopenTurnoverAdjustment: null,
@@ -302,10 +302,6 @@ namespace Tgs.GameRounds.IntegrationTests
                 .ConfigureServices(services =>
                 {
                     configureServices?.Invoke(services);
-                    /*
-                     var fake = Substitute.For<ISerialNumberGenerator>();
-                     services.AddSingleton(fake);
-                    */
                 });
             });
     }

@@ -108,9 +108,6 @@ namespace Tgs.GameRounds.Repositories
         public ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status)
             => _gameRound.UpdateClientStatusAsync(roundId, status);
 
-        public ValueTask UpdateRoundAsync(UpdateRound source)
-            => _gameRound.UpdateRoundAsync(source);
-
         public ValueTask UpdateRoundClosedAsync(UpdateRoundClosed source)
             => _gameRound.UpdateRoundClosedAsync(source);
 

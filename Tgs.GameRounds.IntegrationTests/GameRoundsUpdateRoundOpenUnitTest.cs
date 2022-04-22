@@ -100,7 +100,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     SettleAmount: null,
                     Commission: model.Commission,
                     Turnover: model.Turnover,
-                    WinLoss: null,
+                    CompanyWinLoss: null,
                     TieBetAdjustment: null,
                     ClientStatus: GameRoundClientStatus.Open,
                     ReopenTurnoverAdjustment: null,

@@ -48,7 +48,7 @@ namespace Tgs.GameRounds.Repositories
                     Settle = gameRound.SettleAmount.GetValueOrDefault(0),
                     Commission = gameRound.Commission.GetValueOrDefault(0),
                     Turnover = gameRound.Turnover.GetValueOrDefault(0),
-                    WinLoss = gameRound.WinLoss.GetValueOrDefault(0),
+                    CompanyWinLoss = gameRound.CompanyWinLoss.GetValueOrDefault(0),
                     TieBetAdjustment = gameRound.TieBetAdjustment.GetValueOrDefault(0),
                     ClientStatus = (int)gameRound.ClientStatus,
                     ReopenTurnoverAdjustment = gameRound.ReopenTurnoverAdjustment.GetValueOrDefault(0),

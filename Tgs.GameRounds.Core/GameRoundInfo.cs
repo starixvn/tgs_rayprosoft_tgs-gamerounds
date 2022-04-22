@@ -23,7 +23,7 @@ namespace Tgs.GameRounds.Core
         decimal? SettleAmount,
         decimal? Commission,
         decimal? Turnover,
-        decimal? WinLoss,
+        decimal? CompanyWinLoss,
         decimal? TieBetAdjustment,
         GameRoundClientStatus ClientStatus,
         decimal? ReopenTurnoverAdjustment,

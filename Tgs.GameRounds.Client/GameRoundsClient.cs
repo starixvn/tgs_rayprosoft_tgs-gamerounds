@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -123,20 +122,6 @@ namespace Tgs.GameRounds.Client
             return new GameRoundResponse(
                     Success: response.IsSuccessStatusCode,
                     HttpStatusCode: response.StatusCode);
-        }
-
-        public async ValueTask<bool> UpdateRoundAsync(Guid roundId, UpdateRoundViewModel model)
-        {
-            var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
-            requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
-
-            var response = await _httpClient
-               .PutAsync(
-                   $"gamerounds/{roundId}",
-                   requestContent)
-               .ConfigureAwait(false);
-
-            return response.StatusCode == HttpStatusCode.OK;
         }
 
         public async ValueTask<GameRoundResponse> UpdateRoundClosedAsync(Guid roundId, UpdateRoundClosedViewModel model)

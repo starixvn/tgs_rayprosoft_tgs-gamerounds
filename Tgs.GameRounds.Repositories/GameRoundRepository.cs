@@ -52,7 +52,7 @@ namespace Tgs.GameRounds.Repositories
                 SettleAmount = source.SettleAmount,
                 Commission = source.Commission,
                 Turnover = source.Turnover,
-                WinLoss = source.WinLoss.HasValue ? -(source.WinLoss) : null,
+                WinLoss = source.PlayerWinLoss.HasValue ? -(source.PlayerWinLoss) : null,
                 ClientStatus = (short)source.ClientStatus
             };
             using var transaction = _context.Database.BeginTransaction();
@@ -234,44 +234,6 @@ namespace Tgs.GameRounds.Repositories
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        public async ValueTask UpdateRoundAsync(UpdateRound round)
-        {
-            var data = await _context.Rounds.SingleAsync(x => x.Id == round.RoundId).ConfigureAwait(false);
-            data.Status = (short)round.Status;
-
-            data.UpdatedOn = DateTime.UtcNow;
-            data.ClosedOn = (round.ClosedOn.HasValue) ? DateTime.SpecifyKind(round.ClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null;
-            data.ExternalClosedOn = (round.ExternalClosedOn.HasValue) ? DateTime.SpecifyKind(round.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null;
-            data.BetAmount = round.BetAmount;
-            data.ValidBetAmount = round.ValidBetAmount;
-            data.SettleAmount = round.SettleAmount;
-            data.Commission = round.Commission;
-            data.Turnover = round.Turnover;
-            data.WinLoss = round.WinLoss;
-            data.TieBetAdjustment = round.TieBetAdjustment;
-            data.ClientStatus = (short)round.ClientStatus;
-            data.ReopenTurnoverAdjustment = round.ReopenTurnoverAdjustment;
-            data.ReopenedOn = (round.ReopenedOn.HasValue) ? DateTime.SpecifyKind(round.ReopenedOn.Value.UtcDateTime, DateTimeKind.Utc) : null;
-            _ = _context.Rounds.Update(data);
-            var detail = await _context.RoundDetails.FirstOrDefaultAsync(x => x.RoundId == round.RoundId).ConfigureAwait(false);
-            if (detail == null)
-            {
-                detail = new RoundDetail()
-                {
-                    RoundId = round.RoundId,
-                    AdditionalData = round.AdditionalData ?? string.Empty
-                };
-                _ = await _context.RoundDetails.AddAsync(detail).ConfigureAwait(false);
-            }
-            else
-            {
-                detail.AdditionalData = round.AdditionalData ?? string.Empty;
-                _ = _context.RoundDetails.Update(detail);
-            }
-
-            _ = await _context.SaveChangesAsync().ConfigureAwait(false);
-        }
-
         public async ValueTask UpdateRoundClosedAsync(UpdateRoundClosed source)
         {
             var round = await _context.Rounds.SingleAsync(x => x.Id == source.RoundId).ConfigureAwait(false);
@@ -284,7 +246,7 @@ namespace Tgs.GameRounds.Repositories
             round.SettleAmount = source.SettleAmount;
             round.Commission = source.Commission;
             round.Turnover = source.Turnover;
-            round.WinLoss = -source.WinLoss;
+            round.WinLoss = -source.PlayerWinLoss;
             round.TieBetAdjustment = 0;
             round.ClientStatus = (short)source.ClientStatus;
             var roundDetail = await _context.RoundDetails.SingleAsync(x => x.RoundId == source.RoundId).ConfigureAwait(false);
@@ -328,7 +290,7 @@ namespace Tgs.GameRounds.Repositories
             round.SettleAmount = source.SettleAmount;
             round.Commission = source.Commission;
             round.Turnover = source.Turnover;
-            round.WinLoss = -source.WinLoss;
+            round.WinLoss = -source.PlayerWinLoss;
 
             _ = _context.Rounds.Update(round);
             _ = await _context.SaveChangesAsync().ConfigureAwait(false);
@@ -345,7 +307,7 @@ namespace Tgs.GameRounds.Repositories
             round.SettleAmount = source.SettleAmount;
             round.Commission = source.Commission;
             round.Turnover = source.Turnover;
-            round.WinLoss = -source.WinLoss;
+            round.WinLoss = -source.PlayerWinLoss;
             round.TieBetAdjustment = 0;
             round.ClientStatus = (short)source.ClientStatus;
             round.ReopenTurnoverAdjustment = round.Turnover ?? 0;

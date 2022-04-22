@@ -28,7 +28,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 SettleAmount: 20m,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: 10m,
+                PlayerWinLoss: 10m,
                 ClientStatus: GameRoundClientStatus.Win,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
@@ -73,7 +73,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 SettleAmount: 20m,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: 10m,
+                PlayerWinLoss: 10m,
                 ClientStatus: GameRoundClientStatus.Win,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
@@ -94,7 +94,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     SettleAmount: model.SettleAmount,
                     Commission: model.Commission,
                     Turnover: model.Turnover,
-                    WinLoss: model.WinLoss,
+                    PlayerWinLoss: model.PlayerWinLoss,
                     ClientStatus: model.ClientStatus,
                     AdditionalData: model.AdditionalData));
 
@@ -119,7 +119,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     SettleAmount: model.SettleAmount,
                     Commission: model.Commission,
                     Turnover: model.Turnover,
-                    WinLoss: model.WinLoss,
+                    CompanyWinLoss: -model.PlayerWinLoss,
                     TieBetAdjustment: null,
                     ClientStatus: GameRoundClientStatus.Open,
                     ReopenTurnoverAdjustment: null,

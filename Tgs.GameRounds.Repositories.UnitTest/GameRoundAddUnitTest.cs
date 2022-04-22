@@ -60,7 +60,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 SettleAmount: null,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: null,
+                PlayerWinLoss: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 AdditionalData: "{}");
 
@@ -81,7 +81,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
             Assert.AreEqual(data.Commission, actual.Commission);
             Assert.AreEqual(data.Turnover, actual.Turnover);
-            Assert.AreEqual(-data.WinLoss, actual.WinLoss);
+            Assert.AreEqual(-data.PlayerWinLoss, actual.CompanyWinLoss);
         }
 
         [TestMethod]
@@ -120,7 +120,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 SettleAmount: 20m,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: 10m,
+                PlayerWinLoss: 10m,
                 ClientStatus: GameRoundClientStatus.Win,
                 AdditionalData: "{}");
 
@@ -147,7 +147,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
             Assert.AreEqual(data.Commission, actual.Commission);
             Assert.AreEqual(data.Turnover, actual.Turnover);
-            Assert.AreEqual(-data.WinLoss, actual.WinLoss);
+            Assert.AreEqual(-data.PlayerWinLoss, actual.CompanyWinLoss);
         }
     }
 }

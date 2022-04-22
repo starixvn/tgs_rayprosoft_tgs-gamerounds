@@ -82,7 +82,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: 40m,
                 Commission: 0m,
                 Turnover: 20m,
-                WinLoss: 20m,
+                CompanyWinLoss: 20m,
                 TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Win,
                 ReopenTurnoverAdjustment: null,

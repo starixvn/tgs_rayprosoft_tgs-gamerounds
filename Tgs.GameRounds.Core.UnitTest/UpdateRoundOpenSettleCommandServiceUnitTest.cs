@@ -31,7 +31,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: 20m,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: 10m);
+                PlayerWinLoss: 10m);
 
             _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
 
@@ -66,7 +66,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: 20m,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: 10m);
+                PlayerWinLoss: 10m);
 
             var expected = Guid.NewGuid();
 
@@ -91,7 +91,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: null,
                 Commission: null,
                 Turnover: null,
-                WinLoss: null,
+                CompanyWinLoss: null,
                 TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 ReopenTurnoverAdjustment: null,
@@ -109,7 +109,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: command.SettleAmount,
                 Commission: command.Commission,
                 Turnover: command.Turnover,
-                WinLoss: command.WinLoss));
+                PlayerWinLoss: command.PlayerWinLoss));
 
             _ = fakeGameRound.GetAsync(command.RoundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 

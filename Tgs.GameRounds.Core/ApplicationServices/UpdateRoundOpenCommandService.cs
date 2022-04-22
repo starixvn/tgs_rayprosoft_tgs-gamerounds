@@ -40,34 +40,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 
             if (round is not null)
             {
-                await _gameRoundRecordRepository.AddAsync(new(
-                    round.RoundId,
-                    round.ExternalRoundId,
-                    round.GameProviderId,
-                    round.PlayerCode,
-                    round.GameId,
-                    round.CurrencyCode,
-                    round.Status,
-                    round.GameProviderConfigurationId,
-                    round.WalletId,
-                    round.CreatedOn,
-                    round.ClosedOn,
-                    round.UpdatedOn,
-                    round.BrandId,
-                    round.ExternalCreatedOn,
-                    round.ExternalClosedOn,
-                    round.BetAmount,
-                    round.ValidBetAmount,
-                    round.SettleAmount,
-                    round.Commission,
-                    round.Turnover,
-                    round.WinLoss,
-                    round.TieBetAdjustment,
-                    round.ClientStatus,
-                    round.ReopenTurnoverAdjustment,
-                    round.ReopenedOn,
-                    round.EffectiveBettingPercentage,
-                    round.AdditionalData)).ConfigureAwait(false);
+                await _gameRoundRecordRepository.AddAsync(round).ConfigureAwait(false);
             }
         }
     }

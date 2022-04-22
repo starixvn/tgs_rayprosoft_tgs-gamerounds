@@ -19,7 +19,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
         decimal? SettleAmount,
         decimal Commission,
         decimal Turnover,
-        decimal? WinLoss,
+        decimal? PlayerWinLoss,
         GameRoundClientStatus ClientStatus = GameRoundClientStatus.Open,
         string? AdditionalData = null);
 }

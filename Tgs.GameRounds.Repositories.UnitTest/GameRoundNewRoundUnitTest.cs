@@ -77,7 +77,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             Assert.IsNull(actual.SettleAmount);
             Assert.IsNull(actual.Commission);
             Assert.IsNull(actual.Turnover);
-            Assert.IsNull(actual.WinLoss);
+            Assert.IsNull(actual.CompanyWinLoss);
         }
     }
 }

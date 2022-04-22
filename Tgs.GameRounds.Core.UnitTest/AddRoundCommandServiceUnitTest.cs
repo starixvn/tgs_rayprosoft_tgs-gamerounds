@@ -43,7 +43,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: null,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: null,
+                PlayerWinLoss: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 AdditionalData: "{}");
 
@@ -70,7 +70,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: null,
                 Commission: null,
                 Turnover: null,
-                WinLoss: null,
+                CompanyWinLoss: null,
                 TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 ReopenTurnoverAdjustment: null,
@@ -132,7 +132,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: null,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: null,
+                PlayerWinLoss: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 AdditionalData: "{}");
 
@@ -159,7 +159,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: null,
                 Commission: null,
                 Turnover: null,
-                WinLoss: null,
+                CompanyWinLoss: null,
                 TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 ReopenTurnoverAdjustment: null,
@@ -191,7 +191,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: command.SettleAmount,
                 Commission: command.Commission,
                 Turnover: command.Turnover,
-                WinLoss: command.WinLoss,
+                PlayerWinLoss: command.PlayerWinLoss,
                 ClientStatus: command.ClientStatus,
                 AdditionalData: command.AdditionalData)).Returns(ValueTask.FromResult<Guid?>(expected));
 

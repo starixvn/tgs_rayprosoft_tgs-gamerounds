@@ -34,7 +34,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: 20m,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: 10m,
+                PlayerWinLoss: 10m,
                 ClientStatus: GameRoundClientStatus.Win,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
@@ -73,7 +73,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: 20m,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: 10m,
+                PlayerWinLoss: 10m,
                 ClientStatus: GameRoundClientStatus.Win,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
@@ -100,7 +100,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: null,
                 Commission: null,
                 Turnover: null,
-                WinLoss: null,
+                CompanyWinLoss: null,
                 TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 ReopenTurnoverAdjustment: null,
@@ -120,7 +120,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: command.SettleAmount,
                 Commission: command.Commission,
                 Turnover: command.Turnover,
-                WinLoss: command.WinLoss,
+                PlayerWinLoss: command.PlayerWinLoss,
                 ClientStatus: command.ClientStatus,
                 AdditionalData: command.AdditionalData));
 
