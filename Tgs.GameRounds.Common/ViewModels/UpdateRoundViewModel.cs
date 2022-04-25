@@ -13,7 +13,7 @@ namespace Tgs.GameRounds.Common.ViewModels
         public decimal? SettleAmount { get; init; }
         public decimal? Commission { get; init; }
         public decimal? Turnover { get; init; }
-        public decimal? WinLoss { get; init; }
+        public decimal? PlayerWinLoss { get; init; }
         public decimal? TieBetAdjustment { get; init; }
         [Required]
         public GameRoundClientStatus ClientStatus { get; init; }

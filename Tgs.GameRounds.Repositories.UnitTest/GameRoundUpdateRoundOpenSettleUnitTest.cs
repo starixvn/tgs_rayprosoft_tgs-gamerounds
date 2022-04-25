@@ -7,13 +7,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.Repositories.Entities;
 using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories.UnitTest
 {
     [TestClass]
-    public class UpdateClientStatusUnitTest
+    public class GameRoundUpdateRoundOpenSettleUnitTest
     {
         [TestMethod]
         public async Task Normal_Process()
@@ -33,7 +34,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var roundId = Guid.NewGuid();
-
+            var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
             var round = new Round()
             {
                 Id = roundId,
@@ -44,16 +45,16 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 CurrencyCode = "CNY",
                 Status = (short)GameRoundStatus.Open,
                 GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+                WalletId = walletId,
                 BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
                 CreatedOn = DateTime.UtcNow,
                 ExternalCreatedOn = DateTime.UtcNow,
                 BetAmount = 20m,
                 ValidBetAmount = 20m,
-                SettleAmount = 40m,
+                SettleAmount = 0m,
                 Commission = 0m,
                 Turnover = 20m,
-                WinLoss = -20m,
+                WinLoss = 0m,
                 ClientStatus = (short)GameRoundClientStatus.Open
             };
 
@@ -66,7 +67,28 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 fakeLogger,
                 fakeSerialNumberGenerator);
 
-            await fakeRoundRepository.UpdateClientStatusAsync(roundId, GameRoundClientStatus.Win).ConfigureAwait(false);
+            var data = new UpdateRoundOpenSettle(
+                RoundId: roundId,
+                BetAmount: 20m,
+                ValidBetAmount: 20m,
+                SettleAmount: 40m,
+                Commission: 0,
+                Turnover: 20m,
+                PlayerWinLoss: 20m);
+
+            await fakeRoundRepository.UpdateRoundOpenSettleAsync(data).ConfigureAwait(false);
+
+            var actual = await fakeRoundRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(roundId, actual.RoundId);
+            Assert.AreEqual(GameRoundStatus.Open, actual.Status);
+            Assert.AreEqual(GameRoundClientStatus.Open, actual.ClientStatus);
+            Assert.AreEqual(data.BetAmount, actual.BetAmount);
+            Assert.AreEqual(data.ValidBetAmount, actual.ValidBetAmount);
+            Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
+            Assert.AreEqual(data.Commission, actual.Commission);
+            Assert.AreEqual(data.Turnover, actual.Turnover);
+            Assert.AreEqual(-data.PlayerWinLoss, actual.CompanyWinLoss);
         }
 
         [TestMethod]
@@ -90,9 +112,16 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 fakeLogger,
                 fakeSerialNumberGenerator);
 
-            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateClientStatusAsync(
-                roundId,
-                GameRoundClientStatus.Win).AsTask()).ConfigureAwait(false);
+            var data = new UpdateRoundOpenSettle(
+                RoundId: roundId,
+                BetAmount: 20m,
+                ValidBetAmount: 20m,
+                SettleAmount: 40m,
+                Commission: 0,
+                Turnover: 20m,
+                PlayerWinLoss: 20m);
+
+            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundOpenSettleAsync(data).AsTask()).ConfigureAwait(false);
         }
     }
 }

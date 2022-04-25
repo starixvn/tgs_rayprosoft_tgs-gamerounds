@@ -2,10 +2,8 @@
 {
     public record UpdateRoundOpen(
         Guid RoundId,
-        DateTimeOffset UpdatedOn,
-        decimal? BetAmount,
-        decimal? ValidBetAmount,
-        decimal? Commission,
-        decimal? Turnover,
-        string AdditionalData);
+        decimal BetAmount,
+        decimal ValidBetAmount,
+        decimal Commission,
+        decimal Turnover);
 }

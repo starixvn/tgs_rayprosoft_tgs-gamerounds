@@ -1,4 +1,6 @@
-﻿using Tgs.GameRounds.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using Tgs.GameRounds.Core.Exceptions;
+using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Core.ApplicationServices
@@ -7,13 +9,16 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     {
         private readonly IGameRound _gameRound;
         private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly ILogger<NewRoundGetService> _logger;
 
         public NewRoundGetService(
-          IGameRoundRecordRepository gameRoundRecordRepository,
-          IGameRound gameRound)
+            IGameRoundRecordRepository gameRoundRecordRepository,
+            IGameRound gameRound,
+            ILogger<NewRoundGetService> logger)
         {
             _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
             _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async ValueTask<Guid> GetAsync(NewRoundQuery query, CancellationToken cancellationToken = default)
@@ -22,11 +27,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
             if (roundId.HasValue)
             {
                 return roundId.Value;
-            }
-
-            if (!await _gameRound.LockAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false))
-            {
-                throw new Exception("This GameRound generated order is currently locked.");
             }
 
             var newRoundId = await _gameRound.NewRoundAsync(
@@ -41,11 +41,10 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                     query.BrandId,
                     query.ExternalCreatedOn)).ConfigureAwait(false);
 
-            await _gameRound.UnLockAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false);
-
             if (!newRoundId.HasValue)
             {
-                throw new Exception("This GameRound failed to create an order.");
+                _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundCreationFailedException", DateTime.Now.ToString("o"), query);
+                throw new GameRoundCreationFailedException();
             }
             else
             {
@@ -53,34 +52,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 
                 if (round is not null)
                 {
-                    await _gameRoundRecordRepository.AddAsync(new(
-                        round.RoundId,
-                        round.ExternalRoundId,
-                        round.GameProviderId,
-                        round.PlayerCode,
-                        round.GameId,
-                        round.CurrencyCode,
-                        round.Status,
-                        round.GameProviderConfigurationId,
-                        round.WalletId,
-                        round.CreatedOn,
-                        round.ClosedOn,
-                        round.UpdatedOn,
-                        round.BrandId,
-                        round.ExternalCreatedOn,
-                        round.ExternalClosedOn,
-                        round.BetAmount,
-                        round.ValidBetAmount,
-                        round.SettleAmount,
-                        round.Commission,
-                        round.Turnover,
-                        round.WinLoss,
-                        round.TieBetAdjustment,
-                        round.ClientStatus,
-                        round.ReopenTurnoverAdjustment,
-                        round.ReopenedOn,
-                        round.EffectiveBettingPercentage,
-                        round.AdditionalData)).ConfigureAwait(false);
+                    await _gameRoundRecordRepository.AddAsync(round).ConfigureAwait(false);
                 }
             }
 

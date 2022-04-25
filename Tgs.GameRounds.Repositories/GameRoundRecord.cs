@@ -163,9 +163,9 @@ namespace Tgs.GameRounds.Repositories
         /// </summary>
         [BsonIgnoreIfDefault]
         [BsonDefaultValue(0)]
-        [BsonElement("winLoss")]
+        [BsonElement("company_winloss")]
         [BsonRepresentation(BsonType.String)]
-        public decimal WinLoss { get; set; } = default!;
+        public decimal CompanyWinLoss { get; set; } = default!;
 
         /// <summary>
         /// The tie bet adjustment
