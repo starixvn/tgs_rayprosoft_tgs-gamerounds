@@ -22,30 +22,26 @@ namespace Tgs.GameRounds.Controllers
         public async ValueTask AddRoundAsync(
             [FromServices] ICommandService<AddRoundCommand> service,
             AddRoundViewModel model)
-            => await service.ExecuteAsync(new(
-                model.ExternalRoundId,
-                model.GameProviderId,
-                model.PlayerCode,
-                model.GameId,
-                model.CurrencyCode,
-                model.Status,
-                model.GameProviderConfigurationId,
-                model.WalletId,
-                model.CreatedOn,
-                model.ClosedOn,
-                model.UpdatedOn,
-                model.BrandId,
-                model.ExternalCreatedOn,
-                model.ExternalClosedOn,
-                model.BetAmount,
-                model.ValidBetAmount,
-                model.SettleAmount,
-                model.Commission,
-                model.Turnover,
-                model.WinLoss,
-                model.TieBetAdjustment,
-                model.ClientStatus,
-                model.AdditionalData)).ConfigureAwait(false);
+            => await service.ExecuteAsync(new AddRoundCommand(
+                ExternalRoundId: model.ExternalRoundId,
+                GameProviderId: model.GameProviderId,
+                PlayerCode: model.PlayerCode,
+                GameId: model.GameId,
+                CurrencyCode: model.CurrencyCode,
+                Status: model.Status,
+                GameProviderConfigurationId: model.GameProviderConfigurationId,
+                WalletId: model.WalletId,
+                BrandId: model.BrandId,
+                ExternalCreatedOn: model.ExternalCreatedOn,
+                ExternalClosedOn: model.ExternalClosedOn,
+                BetAmount: model.BetAmount,
+                ValidBetAmount: model.ValidBetAmount,
+                SettleAmount: model.SettleAmount,
+                Commission: model.Commission,
+                Turnover: model.Turnover,
+                PlayerWinLoss: model.PlayerWinLoss,
+                ClientStatus: model.ClientStatus,
+                AdditionalData: model.AdditionalData)).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the game round asynchronous.
@@ -83,7 +79,7 @@ namespace Tgs.GameRounds.Controllers
                 result.SettleAmount,
                 result.Commission,
                 result.Turnover,
-                result.WinLoss,
+                result.CompanyWinLoss,
                 result.TieBetAdjustment,
                 result.ClientStatus,
                 result.ReopenTurnoverAdjustment,
@@ -138,7 +134,7 @@ namespace Tgs.GameRounds.Controllers
                 result.SettleAmount,
                 result.Commission,
                 result.Turnover,
-                result.WinLoss,
+                result.CompanyWinLoss,
                 result.TieBetAdjustment,
                 result.ClientStatus,
                 result.ReopenTurnoverAdjustment,
@@ -193,7 +189,7 @@ namespace Tgs.GameRounds.Controllers
                 result.SettleAmount,
                 result.Commission,
                 result.Turnover,
-                result.WinLoss,
+                result.CompanyWinLoss,
                 result.TieBetAdjustment,
                 result.ClientStatus,
                 result.ReopenTurnoverAdjustment,
@@ -271,60 +267,6 @@ namespace Tgs.GameRounds.Controllers
                 model.Status)).ConfigureAwait(false);
 
         /// <summary>
-        /// Games the rounds update round asynchronous.
-        /// </summary>
-        /// <param name="service">The service.</param>
-        /// <param name="roundid">The roundid.</param>
-        /// <param name="model">The model.</param>
-        /// <returns></returns>
-        /// <remarks>
-        /// <b>Example</b><br />
-        ///
-        ///     Put /6208f0ac-7f01-0000-0001-0000310c07fd
-        ///         {
-        ///             "status": 1,
-        ///             "closedOn": null,
-        ///             "externalClosedOn": null,
-        ///             "betAmount": 10,
-        ///             "validBetAmount": 10,
-        ///             "settleAmount": null,
-        ///             "commission": null,
-        ///             "turnover": null,
-        ///             "winLoss":null,
-        ///             "tieBetAdjustment": null,
-        ///             "clientStatus": 1,
-        ///             "reopenTurnoverAdjustment": null,
-        ///             "reopenedOn": null,
-        ///             "additionalData": null
-        ///         }
-        /// </remarks>
-        [HttpPut("{roundid}", Name = "UpdateRound")]
-        public ValueTask UpdateRoundAsync(
-            [FromServices] ICommandService<UpdateRoundCommand> service,
-            Guid roundid,
-            UpdateRoundViewModel model)
-            => !Enum.IsDefined(model.ClientStatus)
-                ? throw new Exception("This ClientStatus is not in the specified item. ( Open: 1, Void: 2, Win: 3, Loss: 4, Draw: 5)")
-                : !Enum.IsDefined(model.Status)
-                ? throw new Exception("This Status is not a specified item. (New:0,Open:1, Closed:2)")
-                : service.ExecuteAsync(new UpdateRoundCommand(
-                    roundid,
-                    model.Status,
-                    model.ClosedOn,
-                    model.ExternalClosedOn,
-                    model.BetAmount,
-                    model.ValidBetAmount,
-                    model.SettleAmount,
-                    model.Commission,
-                    model.Turnover,
-                    model.WinLoss,
-                    model.TieBetAdjustment,
-                    model.ClientStatus,
-                    model.ReopenTurnoverAdjustment,
-                    model.ReopenedOn,
-                    model.AdditionalData));
-
-        /// <summary>
         /// Updates the round closed asynchronous.
         /// </summary>
         /// <param name="service">The service.</param>
@@ -336,20 +278,17 @@ namespace Tgs.GameRounds.Controllers
             [FromServices] ICommandService<UpdateRoundClosedCommand> service,
             Guid roundid,
             UpdateRoundClosedViewModel model)
-            => await service.ExecuteAsync(new(
-                roundid,
-                model.ClosedOn,
-                model.UpdatedOn,
-                model.ExternalClosedOn,
-                model.BetAmount,
-                model.ValidBetAmount,
-                model.SettleAmount,
-                model.Commission,
-                model.Turnover,
-                model.WinLoss,
-                model.TieBetAdjustment,
-                model.ClientStatus,
-                model.AdditionalData)).ConfigureAwait(false);
+            => await service.ExecuteAsync(new UpdateRoundClosedCommand(
+                RoundId: roundid,
+                ExternalClosedOn: model.ExternalClosedOn,
+                BetAmount: model.BetAmount,
+                ValidBetAmount: model.ValidBetAmount,
+                SettleAmount: model.SettleAmount,
+                Commission: model.Commission,
+                Turnover: model.Turnover,
+                PlayerWinLoss: model.PlayerWinLoss,
+                ClientStatus: model.ClientStatus,
+                AdditionalData: model.AdditionalData)).ConfigureAwait(false);
 
         /// <summary>
         /// Updates the round detail asynchronous.
@@ -379,14 +318,33 @@ namespace Tgs.GameRounds.Controllers
             [FromServices] ICommandService<UpdateRoundOpenCommand> service,
             Guid roundid,
             UpdateRoundOpenViewModel model)
-            => await service.ExecuteAsync(new(
-                roundid,
-                model.UpdatedOn,
-                model.BetAmount,
-                model.ValidBetAmount,
-                model.Commission,
-                model.Turnover,
-                model.AdditionalData)).ConfigureAwait(false);
+            => await service.ExecuteAsync(new UpdateRoundOpenCommand(
+                RoundId: roundid,
+                BetAmount: model.BetAmount,
+                ValidBetAmount: model.ValidBetAmount,
+                Commission: model.Commission,
+                Turnover: model.Turnover)).ConfigureAwait(false);
+
+        /// <summary>
+        /// Updates the round open asynchronous.
+        /// </summary>
+        /// <param name="service">The service.</param>
+        /// <param name="roundid">The roundid.</param>
+        /// <param name="model">The model.</param>
+        /// <returns></returns>
+        [HttpPut("{roundid}/open/settle", Name = "UpdateRoundOpenSettle")]
+        public async ValueTask UpdateRoundOpenSettleAsync(
+            [FromServices] ICommandService<UpdateRoundOpenSettleCommand> service,
+            Guid roundid,
+            UpdateRoundOpenSettleViewModel model)
+            => await service.ExecuteAsync(new UpdateRoundOpenSettleCommand(
+                RoundId: roundid,
+                BetAmount: model.BetAmount,
+                ValidBetAmount: model.ValidBetAmount,
+                SettleAmount: model.SettleAmount,
+                Commission: model.Commission,
+                Turnover: model.Turnover,
+                PlayerWinLoss: model.PlayerWinLoss)).ConfigureAwait(false);
 
         /// <summary>
         /// Updates the round reopen asynchronous.
@@ -400,21 +358,18 @@ namespace Tgs.GameRounds.Controllers
             [FromServices] ICommandService<UpdateRoundReopenCommand> service,
             Guid roundid,
             UpdateRoundReopenViewModel model)
-            => await service.ExecuteAsync(new(
-                roundid,
-                model.Status,
-                model.ClosedOn,
-                model.UpdatedOn,
-                model.ExternalClosedOn,
-                model.BetAmount,
-                model.ValidBetAmount,
-                model.SettleAmount,
-                model.Commission,
-                model.Turnover,
-                model.WinLoss,
-                model.TieBetAdjustment,
-                model.ClientStatus,
-                model.AdditionalData)).ConfigureAwait(false);
+            => await service.ExecuteAsync(new UpdateRoundReopenCommand(
+                RoundId: roundid,
+                ExternalClosedOn: model.ExternalClosedOn,
+                Status: model.Status,
+                BetAmount: model.BetAmount,
+                ValidBetAmount: model.ValidBetAmount,
+                SettleAmount: model.SettleAmount,
+                Commission: model.Commission,
+                Turnover: model.Turnover,
+                PlayerWinLoss: model.PlayerWinLoss,
+                ClientStatus: model.ClientStatus,
+                AdditionalData: model.AdditionalData)).ConfigureAwait(false);
 
         /// <summary>
         /// Updates the status asynchronous.

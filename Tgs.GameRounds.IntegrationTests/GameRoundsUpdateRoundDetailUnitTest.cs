@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,6 +12,35 @@ namespace Tgs.GameRounds.IntegrationTests
 {
     public partial class GameRoundsClientUnitTest
     {
+        [TestMethod]
+        public async Task GameRounds_UpdateRoundDetail_ExternalRoundId_Not_Exist()
+        {
+            var roundId = Guid.NewGuid();
+
+            var additionalData = "{\"id\":10531704494,\"tableId\":10102,\"shoeId\":17,\"playId\":34,\"lobbyId\":1,\"gameType\":1,\"gameId\":1,\"memberId\":73304209,\"parentId\":19377,\"betTime\":\"2022-03-1709:19:38\",\"calTime\":\"2022-03-1709:20:01\",\"winOrLoss\":40.0,\"balanceBefore\":6020.41,\"betPoints\":20.0,\"betPointsz\":0.0,\"availableBet\":20.0,\"userName\":\"4UDW8YGX311V\",\"result\":\"{\\u0022result\\u0022:\\u00225,2,7\\u0022,\\u0022poker\\u0022:{\\u0022banker\\u0022:\\u002238-36-36\\u0022,\\u0022player\\u0022:\\u002246-36-0\\u0022}}\",\"betDetail\":\"{\\u0022player\\u0022:20.0,\\u0022playerW\\u0022:40.0}\",\"ip\":\"220.132.206.70\",\"ext\":\"220317B020851\",\"isRevocation\":1,\"currencyId\":1,\"deviceType\":5,\"serial\":\"-10531704494\",\"roadid\":0,\"pluginid\":0}";
+
+            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+
+            var web = CreateTestSettingSite(services =>
+            {
+                var fakeGameRound = Substitute.For<IGameRound>();
+                _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(false));
+                _ = services.AddSingleton(fakeGameRound);
+
+                _ = services.AddSingleton(fakeGameRoundRecord);
+            });
+
+            var httpClient = web.CreateClient();
+
+            var sut = new GameRoundsClient(httpClient);
+
+            var actual = await sut.UpdateRoundDetailAsync(roundId, additionalData).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(false, actual.Success);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+        }
+
         [TestMethod]
         public async Task GameRounds_UpdateRoundDetail_Normal_Process()
         {
@@ -55,7 +85,7 @@ namespace Tgs.GameRounds.IntegrationTests
                     SettleAmount: null,
                     Commission: null,
                     Turnover: null,
-                    WinLoss: null,
+                    CompanyWinLoss: null,
                     TieBetAdjustment: null,
                     ClientStatus: GameRoundClientStatus.Open,
                     ReopenTurnoverAdjustment: null,
@@ -74,9 +104,11 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            await sut.UpdateRoundDetailAsync(roundId, additionalData).ConfigureAwait(false);
+            var actual = await sut.UpdateRoundDetailAsync(roundId, additionalData).ConfigureAwait(false);
 
-            _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Any<GameRoundInfo>());
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
         }
     }
 }

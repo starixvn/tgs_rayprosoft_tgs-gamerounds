@@ -51,7 +51,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                     gameRoundInfo.SettleAmount,
                     gameRoundInfo.Commission,
                     gameRoundInfo.Turnover,
-                    gameRoundInfo.WinLoss,
+                    gameRoundInfo.CompanyWinLoss,
                     gameRoundInfo.TieBetAdjustment,
                     gameRoundInfo.ClientStatus,
                     gameRoundInfo.ReopenTurnoverAdjustment,

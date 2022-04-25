@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -24,7 +23,7 @@ namespace Tgs.GameRounds.Client
         public GameRoundsClient(HttpClient httpClient)
            => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
-        public async ValueTask AddRoundAsync(AddRoundViewModel model)
+        public async ValueTask<GameRoundResponse> AddRoundAsync(AddRoundViewModel model)
         {
             var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
             requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
@@ -35,62 +34,60 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
-        public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid rounid)
+        public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid rounid)
         {
             var response = await _httpClient
                 .GetAsync($"gamerounds/{rounid}")
                 .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
-
-            var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            return (string.IsNullOrEmpty(contentJson)) ? null : JsonSerializer.Deserialize<GameRoundViewModel?>(contentJson, _SerializerOptions);
+            return new GameRoundDataResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode,
+                    Data: await GetResultAsync<GameRoundViewModel>(response).ConfigureAwait(false));
         }
 
-        public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, string externalGameId, Guid walletId)
+        public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, string externalGameId, Guid walletId)
         {
             var response = await _httpClient
                 .GetAsync($"gamerounds/externalgame?gameProviderId={gameProviderId}&externalRoundId={externalRoundId}&externalGameId={externalGameId}&walletId={walletId}")
                 .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
-
-            var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            return (string.IsNullOrEmpty(contentJson)) ? null : JsonSerializer.Deserialize<GameRoundViewModel?>(contentJson, _SerializerOptions);
+            return new GameRoundDataResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode,
+                    Data: await GetResultAsync<GameRoundViewModel>(response).ConfigureAwait(false));
         }
 
-        public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+        public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
         {
             var response = await _httpClient
                 .GetAsync($"gamerounds/game?gameProviderId={gameProviderId}&externalRoundId={externalRoundId}&gameId={gameId}&walletId={walletId}")
                 .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
-
-            var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            return (string.IsNullOrEmpty(contentJson)) ? null : JsonSerializer.Deserialize<GameRoundViewModel?>(contentJson, _SerializerOptions);
+            return new GameRoundDataResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode,
+                    Data: await GetResultAsync<GameRoundViewModel>(response).ConfigureAwait(false));
         }
 
-        public async ValueTask<GameRoundStatus?> GetStatusAsync(Guid rounid)
+        public async ValueTask<GameRoundRoundStatusResponse> GetStatusAsync(Guid rounid)
         {
             var response = await _httpClient
                 .GetAsync($"gamerounds/{rounid}/status")
                 .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
-
-            var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            return (string.IsNullOrEmpty(contentJson)) ? null : JsonSerializer.Deserialize<GameRoundStatus?>(contentJson, _SerializerOptions);
+            return new GameRoundRoundStatusResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode,
+                    RoundStatus: await GetResultAsync<GameRoundStatus>(response).ConfigureAwait(false));
         }
 
-        public async ValueTask<Guid?> NewRoundAsync(NewRoundQueryViewModel model)
+        public async ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundQueryViewModel model)
         {
             var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
             requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
@@ -101,15 +98,13 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                var contentJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return JsonSerializer.Deserialize<Guid>(contentJson, _SerializerOptions);
-            }
-            return null;
+            return new GameRoundRoundIdResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode,
+                    RoundId: await GetResultAsync<Guid?>(response).ConfigureAwait(false));
         }
 
-        public async ValueTask UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status)
+        public async ValueTask<GameRoundResponse> UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status)
         {
             var request = new
             {
@@ -124,24 +119,12 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
-        public async ValueTask<bool> UpdateRoundAsync(Guid roundId, UpdateRoundViewModel model)
-        {
-            var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
-            requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
-
-            var response = await _httpClient
-               .PutAsync(
-                   $"gamerounds/{roundId}",
-                   requestContent)
-               .ConfigureAwait(false);
-
-            return response.StatusCode == HttpStatusCode.OK;
-        }
-
-        public async ValueTask UpdateRoundClosedAsync(Guid roundId, UpdateRoundClosedViewModel model)
+        public async ValueTask<GameRoundResponse> UpdateRoundClosedAsync(Guid roundId, UpdateRoundClosedViewModel model)
         {
             var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
             requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
@@ -152,10 +135,12 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
-        public async ValueTask UpdateRoundDetailAsync(Guid roundId, string additionalData)
+        public async ValueTask<GameRoundResponse> UpdateRoundDetailAsync(Guid roundId, string additionalData)
         {
             var request = new
             {
@@ -170,10 +155,12 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
-        public async ValueTask UpdateRoundOpenAsync(Guid roundId, UpdateRoundOpenViewModel model)
+        public async ValueTask<GameRoundResponse> UpdateRoundOpenAsync(Guid roundId, UpdateRoundOpenViewModel model)
         {
             var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
             requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
@@ -184,10 +171,28 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
-        public async ValueTask UpdateRoundReopenAsync(Guid roundId, UpdateRoundReopenViewModel model)
+        public async ValueTask<GameRoundResponse> UpdateRoundOpenSettleAsync(Guid roundId, UpdateRoundOpenSettleViewModel model)
+        {
+            var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
+            requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
+
+            var response = await _httpClient
+               .PutAsync(
+                   $"gamerounds/{roundId}/open",
+                   requestContent)
+               .ConfigureAwait(false);
+
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
+        }
+
+        public async ValueTask<GameRoundResponse> UpdateRoundReopenAsync(Guid roundId, UpdateRoundReopenViewModel model)
         {
             var requestContent = new StringContent(JsonSerializer.Serialize(model, _SerializerOptions));
             requestContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
@@ -198,10 +203,12 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
-        public async ValueTask UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null)
+        public async ValueTask<GameRoundResponse> UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null)
         {
             var request = new
             {
@@ -217,7 +224,37 @@ namespace Tgs.GameRounds.Client
                    requestContent)
                .ConfigureAwait(false);
 
-            _ = response.EnsureSuccessStatusCode();
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
+        }
+
+        private static async Task<TResult?> GetResultAsync<TResult>(HttpResponseMessage responseMessage)
+        {
+            var content = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return default;
+            }
+
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                return JsonSerializer.Deserialize<TResult?>(content, _SerializerOptions);
+            }
+
+            if (responseMessage.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize<TResult?>(content, _SerializerOptions);
+                }
+                catch
+                {
+                    return default;
+                }
+            }
+            return default;
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.Core.Exceptions;
 
 namespace Tgs.GameRounds.Core.UnitTest
 {
@@ -11,10 +13,37 @@ namespace Tgs.GameRounds.Core.UnitTest
     public class UpdateClientStatusCommandServiceUnitTest
     {
         [TestMethod]
+        public async Task ExternalRoundId_Not_Exist()
+        {
+            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+            var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeLogger = NullLogger<UpdateClientStatusCommandService>.Instance;
+
+            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+            var roundId = Guid.NewGuid();
+
+            var command = new UpdateClientStatusCommand(
+                RoundId: roundId,
+                Status: GameRoundClientStatus.Loss);
+
+            _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
+
+            var service = new UpdateClientStatusCommandService(
+                fakeGameRoundRecord,
+                fakeGameRound,
+                fakeLogger);
+
+            _ = await Assert.ThrowsExceptionAsync<GameRoundDoesNotExistException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
+
+            _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
+        }
+
+        [TestMethod]
         public async Task Normal_Process()
         {
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeLogger = NullLogger<UpdateClientStatusCommandService>.Instance;
 
             var roundId = Guid.NewGuid();
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -50,7 +79,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: 40m,
                 Commission: 0m,
                 Turnover: 20m,
-                WinLoss: 20m,
+                CompanyWinLoss: -20m,
                 TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 ReopenTurnoverAdjustment: null,
@@ -69,7 +98,8 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var service = new UpdateClientStatusCommandService(
                 fakeGameRoundRecord,
-                fakeGameRound);
+                fakeGameRound,
+                fakeLogger);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
 

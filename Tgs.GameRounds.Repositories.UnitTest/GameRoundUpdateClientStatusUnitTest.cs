@@ -13,7 +13,7 @@ using Tgs.SerialNumberGenerator;
 namespace Tgs.GameRounds.Repositories.UnitTest
 {
     [TestClass]
-    public class UpdateStatusUnitTest
+    public class GameRoundUpdateClientStatusUnitTest
     {
         [TestMethod]
         public async Task Normal_Process()
@@ -54,7 +54,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 Commission = 0m,
                 Turnover = 20m,
                 WinLoss = -20m,
-                ClientStatus = (short)GameRoundClientStatus.Win
+                ClientStatus = (short)GameRoundClientStatus.Open
             };
 
             _ = await context.AddAsync(round).ConfigureAwait(false);
@@ -66,7 +66,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 fakeLogger,
                 fakeSerialNumberGenerator);
 
-            await fakeRoundRepository.UpdateStatusAsync(roundId, GameRoundStatus.Closed, DateTimeOffset.UtcNow).ConfigureAwait(false);
+            await fakeRoundRepository.UpdateClientStatusAsync(roundId, GameRoundClientStatus.Win).ConfigureAwait(false);
         }
 
         [TestMethod]
@@ -90,10 +90,9 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 fakeLogger,
                 fakeSerialNumberGenerator);
 
-            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateStatusAsync(
+            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateClientStatusAsync(
                 roundId,
-                GameRoundStatus.Closed,
-                DateTimeOffset.UtcNow).AsTask()).ConfigureAwait(false);
+                GameRoundClientStatus.Win).AsTask()).ConfigureAwait(false);
         }
     }
 }

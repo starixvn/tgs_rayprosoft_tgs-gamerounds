@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.Core.Exceptions;
+using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest
 {
@@ -12,10 +15,47 @@ namespace Tgs.GameRounds.Core.UnitTest
     public class UpdateRoundReopenCommandServiceUnitTest
     {
         [TestMethod]
+        public async Task ExternalRoundId_Not_Exist()
+        {
+            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+            var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeLogger = NullLogger<UpdateRoundReopenCommandService>.Instance;
+
+            var roundId = Guid.NewGuid();
+            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+            var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+
+            var command = new UpdateRoundReopenCommand(
+                RoundId: roundId,
+                Status: GameRoundStatus.Closed,
+                ExternalClosedOn: DateTimeOffset.UtcNow,
+                BetAmount: 10m,
+                ValidBetAmount: 10m,
+                SettleAmount: 20m,
+                Commission: 0,
+                Turnover: 10m,
+                PlayerWinLoss: 10m,
+                ClientStatus: GameRoundClientStatus.Win,
+                AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
+
+            _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
+
+            var service = new UpdateRoundReopenCommandService(
+                fakeGameRoundRecord,
+                fakeGameRound,
+                fakeLogger);
+
+            _ = await Assert.ThrowsExceptionAsync<GameRoundDoesNotExistException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
+
+            _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
+        }
+
+        [TestMethod]
         public async Task Normal_Process()
         {
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeLogger = NullLogger<UpdateRoundReopenCommandService>.Instance;
 
             var roundId = Guid.NewGuid();
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -24,19 +64,16 @@ namespace Tgs.GameRounds.Core.UnitTest
             var playerCode = "4ues8xikza7o";
             var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
 
-            var data = new UpdateRoundReopenCommand(
+            var command = new UpdateRoundReopenCommand(
                 RoundId: roundId,
                 Status: GameRoundStatus.Closed,
-                ClosedOn: DateTimeOffset.UtcNow,
-                UpdatedOn: DateTimeOffset.UtcNow,
                 ExternalClosedOn: DateTimeOffset.UtcNow,
                 BetAmount: 10m,
                 ValidBetAmount: 10m,
                 SettleAmount: 20m,
                 Commission: 0,
                 Turnover: 10m,
-                WinLoss: 10m,
-                TieBetAdjustment: null,
+                PlayerWinLoss: 10m,
                 ClientStatus: GameRoundClientStatus.Win,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
@@ -63,7 +100,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 SettleAmount: null,
                 Commission: null,
                 Turnover: null,
-                WinLoss: null,
+                CompanyWinLoss: null,
                 TieBetAdjustment: null,
                 ClientStatus: GameRoundClientStatus.Open,
                 ReopenTurnoverAdjustment: null,
@@ -72,31 +109,29 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: string.Empty
                 );
 
-            _ = fakeGameRound.ExistAsync(data.RoundId).Returns(ValueTask.FromResult<bool>(true));
+            _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
-            _ = fakeGameRound.UpdateRoundReopenAsync(
-                new(data.RoundId,
-                    data.Status,
-                    data.ClosedOn,
-                    data.UpdatedOn,
-                    data.ExternalClosedOn,
-                    data.BetAmount,
-                    data.ValidBetAmount,
-                    data.SettleAmount,
-                    data.Commission,
-                    data.Turnover,
-                    data.WinLoss,
-                    data.TieBetAdjustment,
-                    data.ClientStatus,
-                    data.AdditionalData));
+            _ = fakeGameRound.UpdateRoundReopenAsync(new UpdateRoundReopen(
+                RoundId: command.RoundId,
+                Status: command.Status,
+                ExternalClosedOn: command.ExternalClosedOn,
+                BetAmount: command.BetAmount,
+                ValidBetAmount: command.ValidBetAmount,
+                SettleAmount: command.SettleAmount,
+                Commission: command.Commission,
+                Turnover: command.Turnover,
+                PlayerWinLoss: command.PlayerWinLoss,
+                ClientStatus: command.ClientStatus,
+                AdditionalData: command.AdditionalData));
 
-            _ = fakeGameRound.GetAsync(data.RoundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
+            _ = fakeGameRound.GetAsync(command.RoundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
             var service = new UpdateRoundReopenCommandService(
                 fakeGameRoundRecord,
-                fakeGameRound);
+                fakeGameRound,
+                fakeLogger);
 
-            await service.ExecuteAsync(data).ConfigureAwait(false);
+            await service.ExecuteAsync(command).ConfigureAwait(false);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Is(gameRound));
         }

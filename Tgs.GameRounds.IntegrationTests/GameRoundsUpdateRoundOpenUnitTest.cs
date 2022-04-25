@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,11 +8,47 @@ using Tgs.GameRounds.Client;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.IntegrationTests
 {
     public partial class GameRoundsClientUnitTest
     {
+        [TestMethod]
+        public async Task GameRounds_UpdateRoundOpen_ExternalRoundId_Not_Exist()
+        {
+            var roundId = Guid.NewGuid();
+
+            var model = new UpdateRoundOpenViewModel(
+                BetAmount: 10m,
+                ValidBetAmount: 10m,
+                Commission: 0,
+                Turnover: 10m);
+
+            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+
+            var web = CreateTestSettingSite(services =>
+            {
+                var fakeGameRound = Substitute.For<IGameRound>();
+                _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(false));
+                _ = services.AddSingleton(fakeGameRound);
+
+                _ = services.AddSingleton(fakeGameRoundRecord);
+            });
+
+            var httpClient = web.CreateClient();
+
+            var sut = new GameRoundsClient(httpClient);
+
+            var actual = await sut.UpdateRoundOpenAsync(roundId, model).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(false, actual.Success);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+
+            _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
+        }
+
         [TestMethod]
         public async Task GameRounds_UpdateRoundOpen_Normal_Process()
         {
@@ -22,13 +58,11 @@ namespace Tgs.GameRounds.IntegrationTests
             var playerCode = "4ues8xikza7o";
             var roundId = Guid.NewGuid();
 
-            var viewModel = new UpdateRoundOpenViewModel(
-                UpdatedOn: DateTimeOffset.UtcNow,
+            var model = new UpdateRoundOpenViewModel(
                 BetAmount: 10m,
                 ValidBetAmount: 10m,
                 Commission: 0,
-                Turnover: 10m,
-                AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
+                Turnover: 10m);
 
             var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
 
@@ -38,14 +72,12 @@ namespace Tgs.GameRounds.IntegrationTests
 
                 _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(true));
 
-                _ = fakeGameRound.UpdateRoundOpenAsync(new(
-                    roundId,
-                    viewModel.UpdatedOn,
-                    viewModel.BetAmount,
-                    viewModel.ValidBetAmount,
-                    viewModel.Commission,
-                    viewModel.Turnover,
-                    viewModel.AdditionalData));
+                _ = fakeGameRound.UpdateRoundOpenAsync(new UpdateRoundOpen(
+                    RoundId: roundId,
+                    BetAmount: model.BetAmount,
+                    ValidBetAmount: model.ValidBetAmount,
+                    Commission: model.Commission,
+                    Turnover: model.Turnover));
 
                 var gameRound = new GameRoundInfo(
                     RoundId: roundId,
@@ -63,18 +95,18 @@ namespace Tgs.GameRounds.IntegrationTests
                     BrandId: Guid.NewGuid(),
                     ExternalCreatedOn: DateTimeOffset.UtcNow,
                     ExternalClosedOn: null,
-                    BetAmount: viewModel.BetAmount,
-                    ValidBetAmount: viewModel.ValidBetAmount,
+                    BetAmount: model.BetAmount,
+                    ValidBetAmount: model.ValidBetAmount,
                     SettleAmount: null,
-                    Commission: viewModel.Commission,
-                    Turnover: viewModel.Turnover,
-                    WinLoss: null,
+                    Commission: model.Commission,
+                    Turnover: model.Turnover,
+                    CompanyWinLoss: null,
                     TieBetAdjustment: null,
                     ClientStatus: GameRoundClientStatus.Open,
                     ReopenTurnoverAdjustment: null,
                     ReopenedOn: null,
                     EffectiveBettingPercentage: null,
-                    AdditionalData: viewModel.AdditionalData ?? string.Empty);
+                    AdditionalData: string.Empty);
 
                 _ = fakeGameRound.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 
@@ -87,7 +119,11 @@ namespace Tgs.GameRounds.IntegrationTests
 
             var sut = new GameRoundsClient(httpClient);
 
-            await sut.UpdateRoundOpenAsync(roundId, viewModel).ConfigureAwait(false);
+            var actual = await sut.UpdateRoundOpenAsync(roundId, model).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
 
             _ = fakeGameRoundRecord.Received(1).AddAsync(Arg.Any<GameRoundInfo>());
         }
