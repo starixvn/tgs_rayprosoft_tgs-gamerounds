@@ -199,6 +199,26 @@ namespace Tgs.GameRounds.Controllers
         }
 
         /// <summary>
+        /// Gets the round detail asynchronous.
+        /// </summary>
+        /// <param name="service">The service.</param>
+        /// <param name="roundid">The roundid.</param>
+        /// <returns></returns>
+        [HttpGet("{roundid}/getdetail", Name = "GetRoundDetail")]
+        public async ValueTask<GameRoundDetailViewModel?> GetRoundDetailAsync(
+                    [FromServices] IGetService<GetRoundDetailQuery, GameRoundDetailResult> service,
+                    Guid roundid)
+        {
+            var result = await service
+                .GetAsync(new(roundid))
+                .ConfigureAwait(false);
+
+            return result != null ? new GameRoundDetailViewModel(
+                result.RoundId,
+                result.AdditionalData) : null;
+        }
+
+        /// <summary>
         /// Gets the status asynchronous.
         /// </summary>
         /// <param name="repository">The repository.</param>

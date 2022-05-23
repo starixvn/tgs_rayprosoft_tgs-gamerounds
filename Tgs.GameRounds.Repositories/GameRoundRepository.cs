@@ -166,6 +166,15 @@ namespace Tgs.GameRounds.Repositories
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync();
 
+        public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(Guid roundId)
+        {
+            var roundDetail = _context.RoundDetails.FirstOrDefault(x => x.RoundId == roundId);
+
+            return ValueTask.FromResult(roundDetail == null
+                ? null
+                : new GameRoundDetailInfo(roundDetail.RoundId, roundDetail.AdditionalData));
+        }
+
         public async ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
             => (await GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false))?.RoundId;
 

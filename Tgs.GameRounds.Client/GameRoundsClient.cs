@@ -39,10 +39,10 @@ namespace Tgs.GameRounds.Client
                     HttpStatusCode: response.StatusCode);
         }
 
-        public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid rounid)
+        public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid roundId)
         {
             var response = await _httpClient
-                .GetAsync($"gamerounds/{rounid}")
+                .GetAsync($"gamerounds/{roundId}")
                 .ConfigureAwait(false);
 
             return new GameRoundDataResponse(
@@ -75,10 +75,22 @@ namespace Tgs.GameRounds.Client
                     Data: await GetResultAsync<GameRoundViewModel>(response).ConfigureAwait(false));
         }
 
-        public async ValueTask<GameRoundRoundStatusResponse> GetStatusAsync(Guid rounid)
+        public async ValueTask<GameRoundDetailDataResponse> GetRoundDetailAsync(Guid roundId)
         {
             var response = await _httpClient
-                .GetAsync($"gamerounds/{rounid}/status")
+                .GetAsync($"gamerounds/{roundId}/getdetail")
+                .ConfigureAwait(false);
+
+            return new GameRoundDetailDataResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode,
+                    Data: await GetResultAsync<GameRoundDetailViewModel>(response).ConfigureAwait(false));
+        }
+
+        public async ValueTask<GameRoundRoundStatusResponse> GetStatusAsync(Guid roundId)
+        {
+            var response = await _httpClient
+                .GetAsync($"gamerounds/{roundId}/status")
                 .ConfigureAwait(false);
 
             return new GameRoundRoundStatusResponse(

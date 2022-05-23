@@ -13,6 +13,8 @@ namespace Tgs.GameRounds.Core
 
         ValueTask<GameRoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
 
+        ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(Guid roundId);
+
         ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
 
         ValueTask<bool> LockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
