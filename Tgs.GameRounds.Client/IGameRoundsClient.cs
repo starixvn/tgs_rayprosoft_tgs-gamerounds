@@ -7,13 +7,15 @@ namespace Tgs.GameRounds.Client
     {
         ValueTask<GameRoundResponse> AddRoundAsync(AddRoundViewModel model);
 
-        ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid rounid);
+        ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid roundId);
 
         ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, string externalGameId, Guid walletId);
 
         ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId);
 
-        ValueTask<GameRoundRoundStatusResponse> GetStatusAsync(Guid rounid);
+        ValueTask<GameRoundDetailDataResponse> GetRoundDetailAsync(Guid roundId);
+
+        ValueTask<GameRoundRoundStatusResponse> GetStatusAsync(Guid roundId);
 
         ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundQueryViewModel model);
 
