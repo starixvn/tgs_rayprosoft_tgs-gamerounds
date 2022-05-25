@@ -62,6 +62,9 @@ namespace Tgs.GameRounds.Repositories
         public ValueTask<GameRoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
             => _gameRound.GetAsync(gameProviderId, externalRoundId, gameId, walletId);
 
+        public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(Guid roundId)
+            => _gameRound.GetRoundDetailAsync(roundId);
+
         public async ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
         {
             string key = string.Format(KeyRoundId, gameProviderId, externalRoundId, gameId, walletId).ToLower();

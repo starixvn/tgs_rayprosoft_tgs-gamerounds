@@ -13,6 +13,8 @@ namespace Tgs.GameRounds.Core
 
         public ValueTask<GameRoundInfo?> GetAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId) => throw new NotSupportedException();
 
+        public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(Guid roundId) => throw new NotImplementedException();
+
         public ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId) => throw new NotSupportedException();
 
         public ValueTask<bool> LockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId) => throw new NotSupportedException();
