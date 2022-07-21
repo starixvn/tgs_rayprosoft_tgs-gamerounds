@@ -19,14 +19,17 @@ pipeline {
                         case ['origin/main','main']:
                             env.kube_ns = "prod";
                             env.k8s_config = 'stag-k8s-config';
+                            env.autoscaling='{"enabled":true,"minReplicas":5,"maxReplicas":15,"targetCPUUtilizationPercentage":60}';
                             break;
                         case ['origin/release','release']:
                             env.kube_ns = "staging";
                             env.k8s_config = 'stag-k8s-config';
+                            env.autoscaling='{"enabled":true,"minReplicas":3,"maxReplicas":5,"targetCPUUtilizationPercentage":60}';
                             break;
                         default:
                             env.kube_ns = "dev";
                             env.k8s_config = 'k8s-kube-config' 
+                            env.autoscaling='{"enabled":false,"minReplicas":1,"maxReplicas":3,"targetCPUUtilizationPercentage":60}';
                             break;
                     }
                 }
@@ -115,7 +118,8 @@ pipeline {
                             {
                                 "nodeSelector": $node_selector,
                                 "tolerations": [$dedicated],
-                                "resources": $resources
+                                "resources": $resources,
+                                "autoscaling": ${autoscaling}
                             }
                         """
                         sh """
@@ -127,7 +131,8 @@ pipeline {
                             {
                                 "nodeSelector": $node_selector,
                                 "tolerations": [$dedicated],
-                                "resources": $resources
+                                "resources": $resources,
+                                "autoscaling": ${autoscaling}
                             }
                         """
                     }
