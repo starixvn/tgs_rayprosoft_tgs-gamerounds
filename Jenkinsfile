@@ -19,17 +19,14 @@ pipeline {
                         case ['origin/main','main']:
                             env.kube_ns = "prod";
                             env.k8s_config = 'stag-k8s-config';
-                            env.autoscaling='{"enabled":true,"minReplicas":5,"maxReplicas":15,"targetCPUUtilizationPercentage":60}';
                             break;
                         case ['origin/release','release']:
                             env.kube_ns = "staging";
                             env.k8s_config = 'stag-k8s-config';
-                            env.autoscaling='{"enabled":true,"minReplicas":3,"maxReplicas":5,"targetCPUUtilizationPercentage":60}';
                             break;
                         default:
                             env.kube_ns = "dev";
                             env.k8s_config = 'k8s-kube-config' 
-                            env.autoscaling='{"enabled":false,"minReplicas":1,"maxReplicas":3,"targetCPUUtilizationPercentage":60}';
                             break;
                     }
                 }
@@ -105,6 +102,7 @@ pipeline {
                         def resources = getResources(env.k8s_config, env.kube_ns, "game-gamerounds")
                         def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
                         def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
+                        def autoscaling = getAutoscaling(env.k8s_config, env.kube_ns, "game-gamerounds")
                         
                         println resources
                         println dedicated
