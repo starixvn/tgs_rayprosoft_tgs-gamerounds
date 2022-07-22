@@ -117,7 +117,7 @@ pipeline {
                                 "nodeSelector": $node_selector,
                                 "tolerations": [$dedicated],
                                 "resources": $resources,
-                                "autoscaling": ${autoscaling}
+                                "autoscaling": $autoscaling
                             }
                         """
                         sh """
@@ -130,7 +130,7 @@ pipeline {
                                 "nodeSelector": $node_selector,
                                 "tolerations": [$dedicated],
                                 "resources": $resources,
-                                "autoscaling": ${autoscaling}
+                                "autoscaling": $autoscaling
                             }
                         """
                     }
