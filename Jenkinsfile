@@ -105,7 +105,7 @@ pipeline {
                         def resources = getResources(env.k8s_config, env.kube_ns, "game-gamerounds")
                         def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
                         def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
-                        def autoscaling = getAutoscaling(env.k8s_config, env.kube_ns, "game-gamerounds")
+                        //def autoscaling = getAutoscaling(env.k8s_config, env.kube_ns, "game-gamerounds")
                         
                         println resources
                         println dedicated
