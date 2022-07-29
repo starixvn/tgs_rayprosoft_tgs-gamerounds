@@ -1,4 +1,5 @@
-﻿using System.Net.Mime;
+﻿using System.Net;
+using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -144,7 +145,7 @@ namespace Tgs.GameRounds.Client
             return new GameRoundIdResponse(
                     Success: response.IsSuccessStatusCode,
                     HttpStatusCode: response.StatusCode,
-                    RoundId: JsonSerializer.Deserialize<Guid?>(content, _SerializerOptions));
+                    RoundId: response.StatusCode == HttpStatusCode.OK ? JsonSerializer.Deserialize<Guid?>(content, _SerializerOptions) : null);
         }
 
         public async ValueTask<GameRoundRoundStatusResponse> GetStatusAsync(Guid roundId, CancellationToken cancellationToken = default)
