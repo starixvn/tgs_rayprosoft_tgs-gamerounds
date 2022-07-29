@@ -155,10 +155,10 @@ namespace Tgs.GameRounds.Controllers
         [HttpGet("game", Name = "GetGameRoundByGame")]
         public async ValueTask<GameRoundViewModel?> GetGameRoundByGameAsync(
             [FromServices] IGetService<GetGameRoundByGameQuery, GameRoundResult> service,
-            Guid gameProviderId,
-            string externalRoundId,
-            int gameId,
-            Guid walletId)
+            [FromQuery] Guid gameProviderId,
+            [FromQuery] string externalRoundId,
+            [FromQuery] int gameId,
+            [FromQuery] Guid walletId)
         {
             var result = await service.GetAsync(new(
                 gameProviderId,
@@ -201,22 +201,44 @@ namespace Tgs.GameRounds.Controllers
         /// <summary>
         /// Gets the round detail asynchronous.
         /// </summary>
-        /// <param name="service">The service.</param>
+        /// <param name="gameRound">The game round.</param>
         /// <param name="roundid">The roundid.</param>
         /// <returns></returns>
         [HttpGet("{roundid}/getdetail", Name = "GetRoundDetail")]
         public async ValueTask<GameRoundDetailViewModel?> GetRoundDetailAsync(
-                    [FromServices] IGetService<GetRoundDetailQuery, GameRoundDetailResult> service,
-                    Guid roundid)
+            [FromServices] IGameRound gameRound,
+            Guid roundid)
         {
-            var result = await service
-                .GetAsync(new(roundid))
+            var result = await gameRound
+                .GetRoundDetailAsync(roundid)
                 .ConfigureAwait(false);
 
             return result != null ? new GameRoundDetailViewModel(
                 result.RoundId,
                 result.AdditionalData) : null;
         }
+
+        /// <summary>
+        /// Gets the round identifier asynchronous.
+        /// </summary>
+        /// <param name="gameRound">The game round.</param>
+        /// <param name="gameProviderId">The game provider identifier.</param>
+        /// <param name="externalRoundId">The external round identifier.</param>
+        /// <param name="gameId">The game identifier.</param>
+        /// <param name="walletId">The wallet identifier.</param>
+        /// <returns></returns>
+        [HttpGet("getroundid", Name = "GetRoundId")]
+        public async ValueTask<Guid?> GetRoundIdAsync(
+            [FromServices] IGameRound gameRound,
+            [FromQuery] Guid gameProviderId,
+            [FromQuery] string externalRoundId,
+            [FromQuery] int gameId,
+            [FromQuery] Guid walletId)
+            => await gameRound.GetRoundIdAsync(
+                gameProviderId,
+                externalRoundId,
+                gameId,
+                walletId).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the status asynchronous.
