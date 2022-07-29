@@ -83,11 +83,10 @@ namespace Tgs.GameRounds.Repositories
         }
 
         public async ValueTask<bool> ExistAsync(Guid roundId)
-            => (await _context.Rounds.AsQueryable()
-            .Where(x => x.Id == roundId)
-            .Select(x => (Guid?)x.Id)
-            .FirstOrDefaultAsync()
-            .ConfigureAwait(false)).HasValue;
+            => await _context.Rounds
+            .AsQueryable()
+            .AnyAsync(x => x.Id == roundId)
+            .ConfigureAwait(false);
 
         public ValueTask<GameRoundInfo?> GetAsync(Guid roundId)
             => (from round in _context.Rounds.AsQueryable()

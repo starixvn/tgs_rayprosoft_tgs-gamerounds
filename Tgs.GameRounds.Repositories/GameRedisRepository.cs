@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
-using StackExchange.Redis;
+﻿using StackExchange.Redis;
 using Tgs.GameRounds.Core;
 
 namespace Tgs.GameRounds.Repositories

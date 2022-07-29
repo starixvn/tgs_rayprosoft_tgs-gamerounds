@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -239,6 +240,65 @@ namespace Tgs.GameRounds.IntegrationTests
         }
 
         [TestMethod]
+        public async Task GameRounds_GetRoundId()
+        {
+            var roundId = Guid.NewGuid();
+            Guid gameProviderId = Guid.NewGuid();
+            string externalRoundId = Guid.NewGuid().ToString("N");
+            int gameId = 1;
+            Guid walletId = Guid.NewGuid();
+            var data = new GameRoundInfo(
+              RoundId: roundId,
+              ExternalRoundId: externalRoundId,
+              GameProviderId: gameProviderId,
+              PlayerCode: "test",
+              GameId: gameId,
+              CurrencyCode: "CNY",
+              Status: GameRoundStatus.Open,
+              GameProviderConfigurationId: Guid.NewGuid(),
+              WalletId: walletId,
+              CreatedOn: DateTimeOffset.UtcNow,
+              ClosedOn: null,
+              UpdatedOn: DateTimeOffset.UtcNow,
+              BrandId: Guid.NewGuid(),
+              ExternalCreatedOn: null,
+              ExternalClosedOn: null,
+              BetAmount: null,
+              ValidBetAmount: null,
+              SettleAmount: null,
+              Commission: null,
+              Turnover: null,
+              CompanyWinLoss: null,
+              TieBetAdjustment: null,
+              ClientStatus: GameRoundClientStatus.Open,
+              ReopenTurnoverAdjustment: null,
+              ReopenedOn: null,
+              EffectiveBettingPercentage: null,
+              AdditionalData: string.Empty);
+
+            var web = CreateTestSettingSite(services =>
+            {
+                var fakeRepository = Substitute.For<IGameRound>();
+
+                _ = fakeRepository.GetRoundIdAsync(gameProviderId, externalRoundId, gameId, walletId).Returns(ValueTask.FromResult<Guid?>(roundId));
+
+                _ = services.AddSingleton(fakeRepository);
+            });
+
+            var httpClient = web.CreateClient();
+
+            var sut = new GameRoundsClient(httpClient);
+
+            var actual = await sut.GetRoundIdAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.IsNotNull(actual.RoundId);
+            Assert.AreEqual(roundId, actual.RoundId);
+        }
+
+        [TestMethod]
         public async Task GameRounds_GetStatus()
         {
             var roundId = Guid.NewGuid();
@@ -291,6 +351,39 @@ namespace Tgs.GameRounds.IntegrationTests
             Assert.AreEqual(true, actual.Success);
             Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
             Assert.AreEqual(expected, actual.RoundStatus);
+        }
+
+        [TestMethod]
+        public async Task GameRounds_GetRoundDetail()
+        {
+            var roundId = Guid.NewGuid();
+            var data = new GameRoundDetailInfo(
+               RoundId: roundId,
+               AdditionalData: JsonSerializer.Serialize(new
+               {
+                   roundId
+               }));
+
+            var web = CreateTestSettingSite(services =>
+            {
+                var fakeGameRound = Substitute.For<IGameRound>();
+
+                _ = fakeGameRound.GetRoundDetailAsync(roundId).Returns(ValueTask.FromResult<GameRoundDetailInfo?>(data));
+
+                _ = services.AddSingleton(fakeGameRound);
+            });
+
+            var httpClient = web.CreateClient();
+
+            var sut = new GameRoundsClient(httpClient);
+
+            var actual = await sut.GetRoundDetailAsync(roundId).ConfigureAwait(false);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(true, actual.Success);
+            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+            Assert.IsNotNull(actual.Data);
+            Assert.AreEqual(roundId, actual.Data.RoundId);
         }
 
         private static WebApplicationFactory<Program> CreateTestSettingSite(Action<IServiceCollection>? configureServices = null)
