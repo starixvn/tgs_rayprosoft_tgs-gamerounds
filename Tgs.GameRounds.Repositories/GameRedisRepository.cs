@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using StackExchange.Redis;
 using Tgs.GameRounds.Core;
 
@@ -43,8 +44,9 @@ namespace Tgs.GameRounds.Repositories
                 _ = await _database.StringSetAsync(key, gameId, _expiry);
                 return gameId;
             }
+            var value = await _database.StringGetAsync(key).ConfigureAwait(false);
 
-            return JsonSerializer.Deserialize<int>(await _database.StringGetAsync(key).ConfigureAwait(false));
+            return int.Parse(value!);
         }
     }
 }

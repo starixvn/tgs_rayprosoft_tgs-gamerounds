@@ -83,7 +83,11 @@ namespace Tgs.GameRounds.Repositories
         }
 
         public async ValueTask<bool> ExistAsync(Guid roundId)
-            => (await GetAsync(roundId).ConfigureAwait(false)) is not null;
+            => (await _context.Rounds.AsQueryable()
+            .Where(x => x.Id == roundId)
+            .Select(x => (Guid?)x.Id)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false)).HasValue;
 
         public ValueTask<GameRoundInfo?> GetAsync(Guid roundId)
             => (from round in _context.Rounds.AsQueryable()
@@ -130,8 +134,8 @@ namespace Tgs.GameRounds.Repositories
                 on round.Id equals roundDetail.RoundId
                 into roundDetailData
                 from data in roundDetailData.DefaultIfEmpty()
-                where round.GameProviderId == gameProviderId
-                && round.ExternalRoundId == externalRoundId
+                where round.ExternalRoundId == externalRoundId
+                && round.GameProviderId == gameProviderId
                 && round.GameId == gameId
                 && round.WalletId == walletId
                 select new GameRoundInfo(
@@ -166,17 +170,22 @@ namespace Tgs.GameRounds.Repositories
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync();
 
-        public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(Guid roundId)
-        {
-            var roundDetail = _context.RoundDetails.FirstOrDefault(x => x.RoundId == roundId);
-
-            return ValueTask.FromResult(roundDetail == null
-                ? null
-                : new GameRoundDetailInfo(roundDetail.RoundId, roundDetail.AdditionalData));
-        }
+        public async ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(Guid roundId)
+            => await _context.RoundDetails
+                .AsQueryable()
+                .Where(x => x.RoundId == roundId)
+                .Select(x => new GameRoundDetailInfo(x.RoundId, x.AdditionalData))
+                .FirstOrDefaultAsync();
 
         public async ValueTask<Guid?> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
-            => (await GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false))?.RoundId;
+            => await _context.Rounds.AsQueryable()
+            .Where(x => x.ExternalRoundId == externalRoundId
+                && x.GameProviderId == gameProviderId
+                && x.GameId == gameId
+                && x.WalletId == walletId)
+            .Select(x => (Guid?)x.Id)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
 
         public ValueTask<bool> LockAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
             => _gameRound.LockAsync(gameProviderId, externalRoundId, gameId, walletId);

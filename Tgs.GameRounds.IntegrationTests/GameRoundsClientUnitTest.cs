@@ -3,8 +3,10 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using OpenTelemetry.Exporter;
 using Tgs.GameRounds.Client;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
@@ -301,6 +303,14 @@ namespace Tgs.GameRounds.IntegrationTests
                 })
                 .ConfigureServices(services =>
                 {
+                    _ = services
+                    .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
+                        sp => new ConfigureNamedOptions<OtlpExporterOptions>(
+                            Options.DefaultName,
+                            exporterOptions =>
+                            {
+                                exporterOptions.TimeoutMilliseconds = 0;
+                            }));
                     configureServices?.Invoke(services);
                 });
             });
