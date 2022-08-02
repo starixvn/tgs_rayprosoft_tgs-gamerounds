@@ -38,10 +38,10 @@ internal class GameRoundConvert : IGameRoundConvert
 
         return new GameRoundConvertResult(
             BetAmount: result.BetAmount,
-         Commission: result.Commission,
-         SettleAmount: result.SettleAmount,
-         Turnover: result.Turnover,
-         ValidBetAmount: result.ValidBetAmount,
-         PlayerWinLoss: result.WinLoss);
+            Commission: result.Commission,
+            SettleAmount: result.SettleAmount,
+            Turnover: result.Turnover,
+            ValidBetAmount: result.ValidBetAmount,
+            PlayerWinLoss: result.WinLoss);
     }
 }
