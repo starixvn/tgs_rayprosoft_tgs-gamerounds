@@ -2,6 +2,8 @@
 {
     public interface IGameRoundRecordRepository
     {
-        public ValueTask AddAsync(GameRoundInfo gameRound);
+        public ValueTask AddAsync(
+            GameRoundInfo gameRound,
+            CancellationToken cancellationToken = default);
     }
 }

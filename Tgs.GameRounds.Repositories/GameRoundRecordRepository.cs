@@ -12,20 +12,29 @@ namespace Tgs.GameRounds.Repositories
         private readonly ILogger<GameRoundRecordRepository> _logger;
         private readonly ISerialNumberGenerator _serialNumberGenerator;
 
-        public GameRoundRecordRepository(IMongoDatabase database, ILogger<GameRoundRecordRepository> logger, ISerialNumberGenerator serialNumberGenerator)
+        public GameRoundRecordRepository(
+            IMongoDatabase database,
+            ILogger<GameRoundRecordRepository> logger,
+            ISerialNumberGenerator serialNumberGenerator)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
         }
 
-        public async ValueTask AddAsync(GameRoundInfo gameRound)
+        public async ValueTask AddAsync(
+            GameRoundInfo gameRound,
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                var collection = await GetCollectionAsync().ConfigureAwait(false);
-                var gameCashRecordId = await _serialNumberGenerator.GenerateAsync().ConfigureAwait(false);
-                await collection.InsertOneAsync(new GameRoundRecord()
+                var collection = await GetCollectionAsync(
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                var gameCashRecordId = await _serialNumberGenerator.GenerateAsync(
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                var document = new GameRoundRecord()
                 {
                     GameRoundRecordId = gameCashRecordId,
                     RoundId = gameRound.RoundId,
@@ -53,7 +62,11 @@ namespace Tgs.GameRounds.Repositories
                     ClientStatus = (int)gameRound.ClientStatus,
                     ReopenTurnoverAdjustment = gameRound.ReopenTurnoverAdjustment.GetValueOrDefault(0),
                     RecordOn = DateTimeOffset.UtcNow
-                }).ConfigureAwait(false);
+                };
+
+                await collection.InsertOneAsync(
+                    document: document,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -61,7 +74,9 @@ namespace Tgs.GameRounds.Repositories
             }
         }
 
-        private static Task CreatedOnIndexAsync(IMongoCollection<GameRoundRecord> collection)
+        private static Task CreatedOnIndexAsync(
+            IMongoCollection<GameRoundRecord> collection,
+            CancellationToken cancellationToken = default)
         {
             var index = Builders<GameRoundRecord>.IndexKeys
                 .Ascending(m => m.RecordOn);
@@ -72,10 +87,14 @@ namespace Tgs.GameRounds.Repositories
             };
             var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
-            return collection.Indexes.CreateOneAsync(createIndexModel);
+            return collection.Indexes.CreateOneAsync(
+                model: createIndexModel,
+                cancellationToken: cancellationToken);
         }
 
-        private static Task PrimaryKeyIndexAsync(IMongoCollection<GameRoundRecord> collection)
+        private static Task PrimaryKeyIndexAsync(
+            IMongoCollection<GameRoundRecord> collection,
+            CancellationToken cancellationToken = default)
         {
             var index = Builders<GameRoundRecord>.IndexKeys
                .Ascending(m => m.GameRoundRecordId);
@@ -86,10 +105,14 @@ namespace Tgs.GameRounds.Repositories
             };
             var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
-            return collection.Indexes.CreateOneAsync(createIndexModel);
+            return collection.Indexes.CreateOneAsync(
+                model: createIndexModel,
+                cancellationToken: cancellationToken);
         }
 
-        private static Task RoundIdIndexAsync(IMongoCollection<GameRoundRecord> collection)
+        private static Task RoundIdIndexAsync(
+            IMongoCollection<GameRoundRecord> collection,
+            CancellationToken cancellationToken = default)
         {
             var index = Builders<GameRoundRecord>.IndexKeys
                .Ascending(m => m.RoundId);
@@ -100,13 +123,26 @@ namespace Tgs.GameRounds.Repositories
             };
             var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
-            return collection.Indexes.CreateOneAsync(createIndexModel);
+            return collection.Indexes.CreateOneAsync(
+                model: createIndexModel,
+                cancellationToken: cancellationToken);
         }
 
-        private async ValueTask<bool> CollectionExistsAsync(string collectionName)
-            => await (await _database.ListCollectionsAsync(new ListCollectionsOptions { Filter = new BsonDocument("name", collectionName) }).ConfigureAwait(false)).AnyAsync().ConfigureAwait(false);
+        private async ValueTask<bool> CollectionExistsAsync(
+            string collectionName,
+            CancellationToken cancellationToken = default)
+        {
+            var options = new ListCollectionsOptions { Filter = new BsonDocument("name", collectionName) };
 
-        private async Task<IMongoCollection<GameRoundRecord>> GetCollectionAsync()
+            var cursor = await _database.ListCollectionsAsync(
+                options: options,
+                 cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            return await cursor.AnyAsync(
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<IMongoCollection<GameRoundRecord>> GetCollectionAsync(CancellationToken cancellationToken = default)
         {
             var collection = _database.GetCollection<GameRoundRecord>(typeof(GameRoundRecord).Name);
             if (collection.CollectionNamespace == null)
@@ -114,11 +150,21 @@ namespace Tgs.GameRounds.Repositories
                 return collection;
             }
 
-            if (!await CollectionExistsAsync(collection.CollectionNamespace.CollectionName.ToString()).ConfigureAwait(false))
+            if (!await CollectionExistsAsync(
+                collectionName: collection.CollectionNamespace.CollectionName.ToString(),
+                cancellationToken: cancellationToken).ConfigureAwait(false))
             {
-                await PrimaryKeyIndexAsync(collection).ConfigureAwait(false);
-                await CreatedOnIndexAsync(collection).ConfigureAwait(false);
-                await RoundIdIndexAsync(collection).ConfigureAwait(false);
+                await PrimaryKeyIndexAsync(
+                    collection: collection,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                await CreatedOnIndexAsync(
+                    collection: collection,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                await RoundIdIndexAsync(
+                    collection: collection,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
             }
 
             return collection;

@@ -1,4 +1,7 @@
-﻿using Tgs.GameRounds;
+﻿using Microsoft.EntityFrameworkCore;
+using Tgs.GameCurrency.Client;
+using Tgs.GameRounds;
+using Tgs.GameRounds.Core;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -7,7 +10,11 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddGameRounds(
             this IServiceCollection services,
             Action<MongoDBOptions, IServiceProvider> mongoDBconfigure,
-            Action<RedisOptions, IServiceProvider> redisDBconfigure)
+            Action<RedisOptions, IServiceProvider> redisDBconfigure,
+            Action<IServiceProvider, DbContextOptionsBuilder> tgsConfigure,
+            Action<IServiceProvider, DbContextOptionsBuilder> betConfigure,
+            Action<GameCurrencyClientOptions, IServiceProvider> gameCurrencyClientOptions,
+            Action<GameLockedOptions, IServiceProvider> gameLockedOptions)
             => services
                 .AddOptions<MongoDBOptions>()
                 .Configure(mongoDBconfigure)
@@ -16,6 +23,18 @@ namespace Microsoft.Extensions.DependencyInjection
                 .Configure(redisDBconfigure)
                 .Services
                 .AddSingleton<MongoDBConnectionManager>()
-                .AddSingleton<RedisConnectionManager>();
+                .AddSingleton<RedisConnectionManager>()
+                .AddGameRoundsCore(
+                gameCurrencyClientOptions,
+                gameLockedOptions)
+                .AddGameRoundBetRepositories(
+                betConfigure,
+                (sp) => sp.GetRequiredService<RedisConnectionManager>().Database,
+                (sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database)
+                .AddGameRoundTgsRepositories(
+                tgsConfigure,
+                (sp) => sp.GetRequiredService<RedisConnectionManager>().Database)
+                .AddGameRoundRepositories(
+                (sp) => sp.GetRequiredService<RedisConnectionManager>().Database);
     }
 }
