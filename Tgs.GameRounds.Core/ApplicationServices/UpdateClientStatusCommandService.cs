@@ -22,19 +22,28 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 
         public async ValueTask ExecuteAsync(UpdateClientStatusCommand command, CancellationToken cancellationToken = default)
         {
-            if (!await _gameRound.ExistAsync(command.RoundId).ConfigureAwait(false))
+            if (!await _gameRound.ExistAsync(
+                roundId: command.RoundId,
+                cancellationToken: cancellationToken).ConfigureAwait(false))
             {
                 _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
                 throw new GameRoundDoesNotExistException();
             }
 
-            await _gameRound.UpdateClientStatusAsync(command.RoundId, command.Status).ConfigureAwait(false);
+            await _gameRound.UpdateClientStatusAsync(
+                roundId: command.RoundId,
+                status: command.Status,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var round = await _gameRound.GetAsync(command.RoundId).ConfigureAwait(false);
+            var round = await _gameRound.GetAsync(
+                roundId: command.RoundId,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (round is not null)
             {
-                await _gameRoundRecordRepository.AddAsync(round).ConfigureAwait(false);
+                await _gameRoundRecordRepository.AddAsync(
+                    gameRound: round,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
             }
         }
     }

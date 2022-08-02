@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Repositories.Entities;
 
 namespace Tgs.GameRounds.Repositories.UnitTest
@@ -15,7 +13,6 @@ namespace Tgs.GameRounds.Repositories.UnitTest
         [TestMethod]
         public async Task Get_GameProviderCode()
         {
-            var fakeGameProvider = Substitute.For<IGameProvider>();
             var options = new DbContextOptionsBuilder<TgsContext>()
                .UseInMemoryDatabase(databaseName: "dbo")
                .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -47,7 +44,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             _ = await context.GameProviders.AddAsync(gameProvider).ConfigureAwait(false);
             _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
-            var fakeRoundRepository = new GameProviderRepository(fakeGameProvider, context);
+            var fakeRoundRepository = new GameProviderRepository(context);
 
             var actual = await fakeRoundRepository.GetGameProviderCodeAsync(gameProviderId).ConfigureAwait(false);
 

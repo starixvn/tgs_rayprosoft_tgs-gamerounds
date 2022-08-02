@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -33,7 +34,11 @@ builder.Logging
 
 builder.Services
     .AddRouting(options => options.LowercaseUrls = true)
-    .AddControllers()
+    .AddControllers(options =>
+    {
+        options.Filters.Add(new ProducesAttribute("application/json"));
+        options.Filters.Add(new ConsumesAttribute("application/json"));
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -72,41 +77,42 @@ builder.Services
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
         options.ConnectionString = configuration.GetConnectionString("Redis");
-    })
-    .AddGameRoundsCore(
-    configuration =>
+    },
+    (sp, dbBuilder) =>
     {
-        _ = configuration
-           .AddGameRoundTgsRepositories((sp, dbBuilder) =>
-           {
-               var configuration = sp.GetRequiredService<IConfiguration>();
-               _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
-                   serverOption =>
-                   {
-                       _ = serverOption.SetPostgresVersion(12, 5);
-                       _ = serverOption.CommandTimeout(180);
-                   });
-           },
-           sp => sp.GetRequiredService<RedisConnectionManager>().Database);
-        _ = configuration
-           .AddGameRoundBetRepositories((sp, dbBuilder) =>
-           {
-               var configuration = sp.GetRequiredService<IConfiguration>();
-               _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
-                   serverOption =>
-                   {
-                       _ = serverOption.SetPostgresVersion(12, 5);
-                       _ = serverOption.CommandTimeout(180);
-                   });
-           },
-           sp => sp.GetRequiredService<RedisConnectionManager>().Database);
-    })
-    .AddGameRoundRepositories((sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database);
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
+            serverOption =>
+            {
+                _ = serverOption.SetPostgresVersion(12, 5);
+                _ = serverOption.CommandTimeout(180);
+            });
+    },
+    (sp, dbBuilder) =>
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
+            serverOption =>
+            {
+                _ = serverOption.SetPostgresVersion(12, 5);
+                _ = serverOption.CommandTimeout(180);
+            });
+    },
+    (options, sp) =>
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        options.BaseUrl = configuration.GetValue<Uri>("GameRounds:GameCurrencyClientBaseUrl");
+    },
+    (options, sp) =>
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        configuration.GetSection("GameLocked").Bind(options);
+    });
 
 builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
         sp => new ConfigureNamedOptions<OtlpExporterOptions>(
-            Microsoft.Extensions.Options.Options.DefaultName,
+            Options.DefaultName,
             exporterOptions =>
             {
                 var config = sp.GetRequiredService<IConfiguration>();
