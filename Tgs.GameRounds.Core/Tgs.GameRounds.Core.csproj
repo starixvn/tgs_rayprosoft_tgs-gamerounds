@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -8,7 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+    <PackageReference Include="Scrutor" Version="4.2.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
+    <PackageReference Include="Tgs.GameCurrency.Client" Version="0.0.7" />
+    <PackageReference Include="Tgs.SerialNumberGenerator" Version="0.0.3" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.1.0" />
   </ItemGroup>
 

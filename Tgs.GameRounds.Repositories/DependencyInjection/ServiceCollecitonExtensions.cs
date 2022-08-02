@@ -2,7 +2,6 @@
 using MongoDB.Driver;
 using StackExchange.Redis;
 using Tgs.GameRounds.Core;
-using Tgs.GameRounds.Core.Configuration;
 using Tgs.GameRounds.Repositories;
 using Tgs.GameRounds.Repositories.Entities;
 
@@ -10,41 +9,32 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollecitonExtensions
     {
-        public static GameRoundConfiguration AddGameRoundBetRepositories(
-            this GameRoundConfiguration configuration,
+        public static IServiceCollection AddGameRoundBetRepositories(
+            this IServiceCollection services,
             Action<IServiceProvider, DbContextOptionsBuilder> configure,
-            Func<IServiceProvider, IDatabase> redisDatabaseResolver)
-        {
-            _ = configuration.Services.AddSerialNumberGenerator();
-
-            _ = configuration.Services.AddDbContext<BetContext>(configure);
-
-            return configuration
-                .SetGameRounds<GameRoundRepository>()
-                .SetGameRounds<GameRoundRedisRepository>(sp => new object[] { redisDatabaseResolver(sp), TimeSpan.FromMinutes(30) });
-        }
-
-        public static IServiceCollection AddGameRoundRepositories(
-                    this IServiceCollection services,
+            Func<IServiceProvider, IDatabase> redisDatabaseResolver,
             Func<IServiceProvider, IMongoDatabase> mongoDatabaseResolver)
             => services
-                .AddSerialNumberGenerator()
+                .AddDbContext<BetContext>(configure)
+                .AddTransient<IGameRound, GameRoundRepository>()
+                .Decorate<IGameRound>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameRoundCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(30)))
                 .AddTransient<IGameRoundRecordRepository>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)));
 
-        public static GameRoundConfiguration AddGameRoundTgsRepositories(
-            this GameRoundConfiguration configuration,
-             Action<IServiceProvider, DbContextOptionsBuilder> configure,
-             Func<IServiceProvider, IDatabase> redisDatabaseResolver)
-        {
-            _ = configuration.Services.AddSerialNumberGenerator();
+        public static IServiceCollection AddGameRoundRepositories(
+            this IServiceCollection services,
+            Func<IServiceProvider, IDatabase> redisDatabaseResolver)
+            => services
+                .AddTransient<IGameRoundLocked>((sp) => ActivatorUtilities.CreateInstance<GameRoundLocked>(sp, redisDatabaseResolver(sp)));
 
-            _ = configuration.Services.AddDbContext<TgsContext>(configure);
-
-            return configuration
-                .SetGameProviders<GameProviderRepository>()
-                .SetGameProviders<GameProviderRedisRepository>(sp => new object[] { redisDatabaseResolver(sp), TimeSpan.FromHours(1) })
-                .SetGames<GameRepository>()
-                .SetGames<GameRedisRepository>(sp => new object[] { redisDatabaseResolver(sp), TimeSpan.FromHours(1) });
-        }
+        public static IServiceCollection AddGameRoundTgsRepositories(
+            this IServiceCollection services,
+            Action<IServiceProvider, DbContextOptionsBuilder> configure,
+            Func<IServiceProvider, IDatabase> redisDatabaseResolver)
+            => services
+                .AddDbContext<TgsContext>(configure)
+                .AddTransient<IGameProvider, GameProviderRepository>()
+                .Decorate<IGameProvider>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameProviderCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromHours(1)))
+                .AddTransient<IGame, GameRepository>()
+                .Decorate<IGame>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromHours(1)));
     }
 }

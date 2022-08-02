@@ -20,11 +20,18 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 
         public async ValueTask<GameRoundResult?> GetAsync(GetGameRoundByExternalGameQuery query, CancellationToken cancellationToken = default)
         {
-            var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(query.GameProviderId).ConfigureAwait(false);
+            var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(
+                gameProviderId: query.GameProviderId,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             var gameId = await _game.GetGameIdAsync(query.GameProviderId, query.ExternalGameId).ConfigureAwait(false);
 
-            var gameRoundInfo = await _gameRoundRepository.GetAsync(query.GameProviderId, query.ExternalRoundId, gameId, query.WalletId).ConfigureAwait(false);
+            var gameRoundInfo = await _gameRoundRepository.GetAsync(
+                gameProviderId: query.GameProviderId,
+                externalRoundId: query.ExternalRoundId,
+                gameId: gameId,
+                walletId: query.WalletId,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return gameRoundInfo != null ? new GameRoundResult(
                 gameRoundInfo.RoundId,
