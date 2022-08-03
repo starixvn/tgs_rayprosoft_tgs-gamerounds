@@ -182,24 +182,6 @@ namespace Tgs.GameRounds.Repositories
             .ToAsyncEnumerable()
             .FirstOrDefaultAsync(cancellationToken);
 
-        public async ValueTask<(Guid GameProviderId, string CurrencyCode)> GetByCurrencyInfoAsync(
-            Guid roundId,
-            CancellationToken cancellationToken = default)
-        {
-            var round = await _context.Rounds
-                .AsQueryable()
-                .Where(x => x.Id == roundId)
-                .Select(x => new
-                {
-                    x.GameProviderId,
-                    x.CurrencyCode
-                })
-                .SingleAsync()
-                .ConfigureAwait(false);
-
-            return (round.GameProviderId, round.CurrencyCode);
-        }
-
         public async ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
             Guid roundId,
             CancellationToken cancellationToken = default)

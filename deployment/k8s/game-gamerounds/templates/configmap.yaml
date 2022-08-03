@@ -7,9 +7,6 @@ metadata:
 data:
   appsettings.json: |
     {
-      "GameRounds": {
-        "GameCurrencyClientBaseUrl": "http://game-gamecurrency/"
-      },
       "GameLocked": {
         "LocksRedisKey": "gameroundlock:{0}:{1}:{2}:{3}",
         "LockSeconds": "60"
