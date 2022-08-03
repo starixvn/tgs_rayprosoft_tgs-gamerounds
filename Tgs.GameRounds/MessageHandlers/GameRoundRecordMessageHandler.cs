@@ -32,7 +32,7 @@ namespace Tgs.GameRounds.MessageHandlers
                 return ValueTask.CompletedTask;
             }
 
-            _logger.LogError("LogOn:{logOn} Information Received:{model}", DateTime.Now.ToString("o"), model);
+            _logger.LogInformation("LogOn:{logOn} Information Received:{model}", DateTime.Now.ToString("o"), model);
 
             var command = new AddGameRoundRecordCommand(
                 RoundId: model.RoundId);
