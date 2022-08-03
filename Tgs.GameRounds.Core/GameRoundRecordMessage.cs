@@ -27,7 +27,7 @@ namespace Tgs.GameRounds.Core
 
             try
             {
-                await _messageSender.SendAsync(
+                await _messageSender.PublishAsync(
                     subject: "gp.gameround.gameroundrecord.add",
                     data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(request)),
                     cancellationToken: cancellationToken);
