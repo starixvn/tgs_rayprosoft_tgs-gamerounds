@@ -9,19 +9,19 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     {
         private readonly IGameRound _gameRound;
         private readonly IGameRoundConvert _gameRoundConvert;
-        private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
         private readonly ILogger<UpdateRoundOpenCommandService> _logger;
 
         public UpdateRoundOpenCommandService(
-          IGameRoundRecordRepository gameRoundRecordRepository,
-          IGameRound gameRound,
-          IGameRoundConvert gameRoundConvert,
-          ILogger<UpdateRoundOpenCommandService> logger)
+            ILogger<UpdateRoundOpenCommandService> logger,
+            IGameRound gameRound,
+            IGameRoundRecordMessage gameRoundRecordMessage,
+            IGameRoundConvert gameRoundConvert)
         {
-            _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
-            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
-            _gameRoundConvert = gameRoundConvert ?? throw new ArgumentNullException(nameof(gameRoundConvert));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
+            _gameRoundConvert = gameRoundConvert ?? throw new ArgumentNullException(nameof(gameRoundConvert));
         }
 
         public async ValueTask ExecuteAsync(UpdateRoundOpenCommand command, CancellationToken cancellationToken = default)
@@ -65,16 +65,9 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 source: updateRoundOpen,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var round = await _gameRound.GetAsync(
+            await _gameRoundRecordMessage.SenderGameRoundRecord(
                 roundId: command.RoundId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            if (round is not null)
-            {
-                await _gameRoundRecordRepository.AddAsync(
-                    gameRound: round,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
-            }
         }
     }
 }

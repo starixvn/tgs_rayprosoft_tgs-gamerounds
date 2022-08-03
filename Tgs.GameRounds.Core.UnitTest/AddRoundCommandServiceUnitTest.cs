@@ -19,7 +19,7 @@ namespace Tgs.GameRounds.Core.UnitTest
             var fakeGameRound = Substitute.For<IGameRound>();
             var fakeGameRoundConvert = Substitute.For<IGameRoundConvert>();
             var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
-            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+            var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
 
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
@@ -50,35 +50,6 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             var expected = Guid.NewGuid();
 
-            var gameRound = new GameRoundInfo(
-                RoundId: expected,
-                ExternalRoundId: command.ExternalRoundId,
-                GameProviderId: command.GameProviderId,
-                PlayerCode: command.PlayerCode,
-                GameId: command.GameId,
-                CurrencyCode: command.CurrencyCode,
-                Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: command.GameProviderConfigurationId,
-                WalletId: command.WalletId,
-                CreatedOn: DateTimeOffset.UtcNow,
-                ClosedOn: null,
-                UpdatedOn: DateTimeOffset.UtcNow,
-                BrandId: command.BrandId,
-                ExternalCreatedOn: command.ExternalCreatedOn,
-                ExternalClosedOn: null,
-                BetAmount: null,
-                ValidBetAmount: null,
-                SettleAmount: null,
-                Commission: null,
-                Turnover: null,
-                CompanyWinLoss: null,
-                TieBetAdjustment: null,
-                ClientStatus: GameRoundClientStatus.Open,
-                ReopenTurnoverAdjustment: null,
-                ReopenedOn: null,
-                EffectiveBettingPercentage: null,
-                AdditionalData: string.Empty);
-
             _ = fakeGameRoundLocked.LockingAsync(
                 Arg.Is(command.GameProviderId),
                 Arg.Is(command.ExternalRoundId),
@@ -90,13 +61,13 @@ namespace Tgs.GameRounds.Core.UnitTest
                 fakeGameRound,
                 fakeGameRoundConvert,
                 fakeGameRoundLocked,
-                fakeGameRoundRecord);
+                fakeGameRoundRecordMessage);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
 
-            _ = fakeGameRoundRecord
+            _ = fakeGameRoundRecordMessage
                 .Received(0)
-                .AddAsync(Arg.Is(gameRound));
+                .SenderGameRoundRecord(Arg.Is(expected));
 
             _ = fakeGameRoundLocked
                 .Received(0)
@@ -114,7 +85,7 @@ namespace Tgs.GameRounds.Core.UnitTest
             var fakeGameRound = Substitute.For<IGameRound>();
             var fakeGameRoundConvert = Substitute.For<IGameRoundConvert>();
             var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
-            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+            var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
 
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
@@ -192,48 +163,18 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: command.AdditionalData);
             _ = fakeGameRound.AddRoundAsync(addRound).Returns(ValueTask.FromResult<Guid?>(expected));
 
-            var gameRound = new GameRoundInfo(
-                RoundId: expected,
-                ExternalRoundId: command.ExternalRoundId,
-                GameProviderId: command.GameProviderId,
-                PlayerCode: command.PlayerCode,
-                GameId: command.GameId,
-                CurrencyCode: command.CurrencyCode,
-                Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: command.GameProviderConfigurationId,
-                WalletId: command.WalletId,
-                CreatedOn: DateTimeOffset.UtcNow,
-                ClosedOn: null,
-                UpdatedOn: DateTimeOffset.UtcNow,
-                BrandId: command.BrandId,
-                ExternalCreatedOn: command.ExternalCreatedOn,
-                ExternalClosedOn: null,
-                BetAmount: gameRoundConvertResult.BetAmount,
-                ValidBetAmount: gameRoundConvertResult.ValidBetAmount,
-                SettleAmount: gameRoundConvertResult.SettleAmount,
-                Commission: gameRoundConvertResult.Commission,
-                Turnover: gameRoundConvertResult.Turnover,
-                CompanyWinLoss: -gameRoundConvertResult.PlayerWinLoss,
-                TieBetAdjustment: null,
-                ClientStatus: GameRoundClientStatus.Open,
-                ReopenTurnoverAdjustment: null,
-                ReopenedOn: null,
-                EffectiveBettingPercentage: null,
-                AdditionalData: string.Empty);
-            _ = fakeGameRound.GetAsync(expected).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
-
             var service = new AddRoundCommandService(
                 fakeLogger,
                 fakeGameRound,
                 fakeGameRoundConvert,
                 fakeGameRoundLocked,
-                fakeGameRoundRecord);
+                fakeGameRoundRecordMessage);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
 
-            _ = fakeGameRoundRecord
+            _ = fakeGameRoundRecordMessage
                 .Received(1)
-                .AddAsync(Arg.Is(gameRound));
+                .SenderGameRoundRecord(Arg.Is(expected));
 
             _ = fakeGameRoundLocked
                 .Received(1)
@@ -251,7 +192,7 @@ namespace Tgs.GameRounds.Core.UnitTest
             var fakeGameRound = Substitute.For<IGameRound>();
             var fakeGameRoundConvert = Substitute.For<IGameRoundConvert>();
             var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
-            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+            var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
 
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
@@ -281,36 +222,6 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: "{}");
 
             var expected = Guid.NewGuid();
-
-            var gameRound = new GameRoundInfo(
-                RoundId: expected,
-                ExternalRoundId: command.ExternalRoundId,
-                GameProviderId: command.GameProviderId,
-                PlayerCode: command.PlayerCode,
-                GameId: command.GameId,
-                CurrencyCode: command.CurrencyCode,
-                Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: command.GameProviderConfigurationId,
-                WalletId: command.WalletId,
-                CreatedOn: DateTimeOffset.UtcNow,
-                ClosedOn: null,
-                UpdatedOn: DateTimeOffset.UtcNow,
-                BrandId: command.BrandId,
-                ExternalCreatedOn: command.ExternalCreatedOn,
-                ExternalClosedOn: null,
-                BetAmount: null,
-                ValidBetAmount: null,
-                SettleAmount: null,
-                Commission: null,
-                Turnover: null,
-                CompanyWinLoss: null,
-                TieBetAdjustment: null,
-                ClientStatus: GameRoundClientStatus.Open,
-                ReopenTurnoverAdjustment: null,
-                ReopenedOn: null,
-                EffectiveBettingPercentage: null,
-                AdditionalData: string.Empty
-                );
 
             _ = fakeGameRoundLocked.LockingAsync(
                 Arg.Is(command.GameProviderId),
@@ -359,20 +270,18 @@ namespace Tgs.GameRounds.Core.UnitTest
                 AdditionalData: command.AdditionalData);
             _ = fakeGameRound.AddRoundAsync(addRound).Returns(ValueTask.FromResult<Guid?>(expected));
 
-            _ = fakeGameRound.GetAsync(expected).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
-
             var service = new AddRoundCommandService(
                 fakeLogger,
                 fakeGameRound,
                 fakeGameRoundConvert,
                 fakeGameRoundLocked,
-                fakeGameRoundRecord);
+                fakeGameRoundRecordMessage);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
 
-            _ = fakeGameRoundRecord
+            _ = fakeGameRoundRecordMessage
                 .Received(1)
-                .AddAsync(Arg.Is(gameRound));
+                .SenderGameRoundRecord(Arg.Is(expected));
 
             _ = fakeGameRoundLocked
                 .Received(1)

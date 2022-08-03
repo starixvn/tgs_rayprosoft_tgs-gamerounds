@@ -9,6 +9,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Prometheus;
 using Tgs.GameRounds;
+using Tgs.GameRounds.MessageHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,6 +109,21 @@ builder.Services
         var configuration = sp.GetRequiredService<IConfiguration>();
         configuration.GetSection("GameLocked").Bind(options);
     });
+
+builder.Services
+    .AddMessageQueue()
+     .AddNatsMessageQueue(natsConfig =>
+     {
+         _ = natsConfig
+         .ConfigQueueOptions((options, sp) =>
+         {
+             var configuration = sp.GetRequiredService<IConfiguration>();
+             options.Url = configuration.GetConnectionString("Nats");
+         })
+         .AddHandler<GameRoundRecordMessageHandler>("gp.gameround.gameroundrecord", "gp.gamerecord");
+     })
+     .ClearAllExchanges()
+     .AddNatsGlobPatternExchange("gp.gameround.gameroundrecord");
 
 builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
