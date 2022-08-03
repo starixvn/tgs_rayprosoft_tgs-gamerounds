@@ -102,11 +102,6 @@ builder.Services
     (options, sp) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        options.BaseUrl = configuration.GetValue<Uri>("GameRounds:GameCurrencyClientBaseUrl");
-    },
-    (options, sp) =>
-    {
-        var configuration = sp.GetRequiredService<IConfiguration>();
         configuration.GetSection("GameLocked").Bind(options);
     });
 

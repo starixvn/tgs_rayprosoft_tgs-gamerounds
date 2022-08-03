@@ -86,13 +86,6 @@ namespace Tgs.GameRounds.Repositories
                 walletId: walletId,
                 cancellationToken: cancellationToken);
 
-        public ValueTask<(Guid GameProviderId, string CurrencyCode)> GetByCurrencyInfoAsync(
-            Guid roundId,
-            CancellationToken cancellationToken = default)
-            => _gameRound.GetByCurrencyInfoAsync(
-                roundId: roundId,
-                cancellationToken: cancellationToken);
-
         public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
             Guid roundId,
             CancellationToken cancellationToken = default)
