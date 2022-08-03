@@ -109,7 +109,6 @@ namespace Tgs.GameRounds.Repositories
         {
             string key = string.Format(KeyRoundId, gameProviderId, externalRoundId, gameId, walletId).ToLower();
 
-
             if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
             {
                 var roundId = await _gameRound.GetRoundIdAsync(

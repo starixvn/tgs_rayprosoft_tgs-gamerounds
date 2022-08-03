@@ -14,7 +14,6 @@ namespace Tgs.GameRounds.Core.UnitTest
         [TestMethod]
         public async Task ExternalRoundId_Not_Exist()
         {
-            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
             var fakeGameRound = Substitute.For<IGameRound>();
             var fakeLogger = NullLogger<UpdateRoundDetailCommandService>.Instance;
 
@@ -30,12 +29,10 @@ namespace Tgs.GameRounds.Core.UnitTest
             _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
 
             var service = new UpdateRoundDetailCommandService(
-                fakeGameRound,
-                fakeLogger);
+                fakeLogger,
+                fakeGameRound);
 
             _ = await Assert.ThrowsExceptionAsync<GameRoundDoesNotExistException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
-
-            _ = fakeGameRoundRecord.Received(0).AddAsync(Arg.Any<GameRoundInfo>());
         }
 
         [TestMethod]
@@ -56,8 +53,8 @@ namespace Tgs.GameRounds.Core.UnitTest
             _ = fakeGameRound.UpdateRoundDetailAsync(command.RoundId, command.AdditionalData);
 
             var service = new UpdateRoundDetailCommandService(
-                fakeGameRound,
-                fakeLogger);
+                fakeLogger,
+                fakeGameRound);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
         }

@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddDbContext<BetContext>(configure)
                 .AddTransient<IGameRound, GameRoundRepository>()
                 .Decorate<IGameRound>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameRoundCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(30)))
-                .AddTransient<IGameRoundRecordRepository>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)));
+                .AddTransient<IGameRoundRecord>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)));
 
         public static IServiceCollection AddGameRoundRepositories(
             this IServiceCollection services,

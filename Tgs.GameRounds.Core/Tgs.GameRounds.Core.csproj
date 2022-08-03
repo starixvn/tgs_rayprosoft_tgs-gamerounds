@@ -12,6 +12,8 @@
     <PackageReference Include="Scrutor" Version="4.2.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
     <PackageReference Include="Tgs.GameCurrency.Client" Version="0.0.7" />
+    <PackageReference Include="Tgs.MessageQueue" Version="2.1.0" />
+    <PackageReference Include="Tgs.MessageQueue.Nats" Version="2.1.6" />
     <PackageReference Include="Tgs.SerialNumberGenerator" Version="0.0.3" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.1.0" />
   </ItemGroup>

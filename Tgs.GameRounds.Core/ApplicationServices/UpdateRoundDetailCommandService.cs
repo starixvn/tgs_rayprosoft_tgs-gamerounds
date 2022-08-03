@@ -10,8 +10,8 @@ namespace Tgs.GameRounds.Core.ApplicationServices
         private readonly ILogger<UpdateRoundDetailCommandService> _logger;
 
         public UpdateRoundDetailCommandService(
-          IGameRound gameRound,
-          ILogger<UpdateRoundDetailCommandService> logger)
+            ILogger<UpdateRoundDetailCommandService> logger,
+            IGameRound gameRound)
         {
             _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

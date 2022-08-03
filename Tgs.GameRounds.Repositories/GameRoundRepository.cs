@@ -191,8 +191,8 @@ namespace Tgs.GameRounds.Repositories
                 .Where(x => x.Id == roundId)
                 .Select(x => new
                 {
-                    GameProviderId = x.GameProviderId,
-                    CurrencyCode = x.CurrencyCode
+                    x.GameProviderId,
+                    x.CurrencyCode
                 })
                 .SingleAsync()
                 .ConfigureAwait(false);

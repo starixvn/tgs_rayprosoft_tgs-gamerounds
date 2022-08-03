@@ -405,6 +405,9 @@ namespace Tgs.GameRounds.IntegrationTests
                             {
                                 exporterOptions.TimeoutMilliseconds = 0;
                             }));
+
+                    _ = services.AddFakeNatsMessageQueue();
+
                     configureServices?.Invoke(services);
                 });
             });

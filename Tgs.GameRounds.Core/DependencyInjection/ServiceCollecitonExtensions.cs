@@ -19,6 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .Services
                 .AddSerialNumberGenerator()
                 .AddGameCurrencyClient(gameCurrencyClientOptions)
-                .AddTransient<IGameRoundConvert, GameRoundConvert>();
+                .AddTransient<IGameRoundConvert, GameRoundConvert>()
+                .AddTransient<IGameRoundRecordMessage, GameRoundRecordMessage>();
     }
 }

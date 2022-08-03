@@ -7,16 +7,16 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     internal class UpdateClientStatusCommandService : ICommandService<UpdateClientStatusCommand>
     {
         private readonly IGameRound _gameRound;
-        private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
         private readonly ILogger<UpdateClientStatusCommandService> _logger;
 
         public UpdateClientStatusCommandService(
-          IGameRoundRecordRepository gameRoundRecordRepository,
-          IGameRound gameRound,
-          ILogger<UpdateClientStatusCommandService> logger)
+            ILogger<UpdateClientStatusCommandService> logger,
+            IGameRound gameRound,
+            IGameRoundRecordMessage gameRoundRecordMessage)
         {
-            _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
             _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -35,16 +35,9 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 status: command.Status,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var round = await _gameRound.GetAsync(
+            await _gameRoundRecordMessage.SenderGameRoundRecord(
                 roundId: command.RoundId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            if (round is not null)
-            {
-                await _gameRoundRecordRepository.AddAsync(
-                    gameRound: round,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
-            }
         }
     }
 }
