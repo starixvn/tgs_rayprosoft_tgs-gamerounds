@@ -15,19 +15,8 @@ namespace Tgs.GameRounds.Repositories
         /// The round identifier
         /// </summary>
         [BsonElement("round_id")]
+        [BsonRepresentation(BsonType.String)]
         public Guid RoundId { get; set; }
-
-        /// <summary>
-        /// The game provider identifier
-        /// </summary>
-        [BsonElement("game_provider_id")]
-        public Guid GameProviderId { get; set; }
-
-        /// <summary>
-        /// The game provider configuration identifier
-        /// </summary>
-        [BsonElement("game_provider_configuration_id")]
-        public Guid GameProviderConfigurationId { get; set; }
 
         /// <summary>
         /// The external round identifier
@@ -37,9 +26,44 @@ namespace Tgs.GameRounds.Repositories
         public string ExternalRoundId { get; set; } = default!;
 
         /// <summary>
+        /// The external game identifier
+        /// </summary>
+        [BsonElement("external_game_id")]
+        [BsonRepresentation(BsonType.String)]
+        public string ExternalGameId { get; set; } = default!;
+
+        /// <summary>
+        /// The game provider identifier
+        /// </summary>
+        [BsonElement("game_provider_id")]
+        [BsonRepresentation(BsonType.String)]
+        public Guid GameProviderId { get; set; }
+
+        /// <summary>
+        /// The game provider code
+        /// </summary>
+        [BsonElement("game_provider_code")]
+        public string GameProviderCode { get; set; } = default!;
+
+        /// <summary>
+        /// The game provider configuration identifier
+        /// </summary>
+        [BsonElement("game_provider_configuration_id")]
+        [BsonRepresentation(BsonType.String)]
+        public Guid GameProviderConfigurationId { get; set; }
+
+        /// <summary>
+        /// The game identifier
+        /// </summary>
+        [BsonElement("game_id")]
+        [BsonRepresentation(BsonType.Int32)]
+        public int GameId { get; set; }
+
+        /// <summary>
         /// The brand identifier
         /// </summary>
         [BsonElement("brand_id")]
+        [BsonRepresentation(BsonType.String)]
         public Guid BrandId { get; set; }
 
         /// <summary>
@@ -53,14 +77,8 @@ namespace Tgs.GameRounds.Repositories
         /// The wallet identifier
         /// </summary>
         [BsonElement("wallet_id")]
+        [BsonRepresentation(BsonType.String)]
         public Guid WalletId { get; set; }
-
-        /// <summary>
-        /// The game identifier
-        /// </summary>
-        [BsonElement("game_id")]
-        [BsonRepresentation(BsonType.Int32)]
-        public int GameId { get; set; }
 
         /// <summary>
         /// The currency code
@@ -75,6 +93,13 @@ namespace Tgs.GameRounds.Repositories
         [BsonElement("status")]
         [BsonRepresentation(BsonType.Int32)]
         public int Status { get; set; }
+
+        /// <summary>
+        /// The client status
+        /// </summary>
+        [BsonElement("client_status")]
+        [BsonRepresentation(BsonType.Int32)]
+        public int ClientStatus { get; set; }
 
         /// <summary>
         /// The created on
@@ -175,13 +200,6 @@ namespace Tgs.GameRounds.Repositories
         [BsonElement("tie_bet_adjustment")]
         [BsonRepresentation(BsonType.String)]
         public decimal TieBetAdjustment { get; set; } = default!;
-
-        /// <summary>
-        /// The client status
-        /// </summary>
-        [BsonElement("client_status")]
-        [BsonRepresentation(BsonType.Int32)]
-        public int ClientStatus { get; set; }
 
         /// <summary>
         /// The reopen turnover adjustment

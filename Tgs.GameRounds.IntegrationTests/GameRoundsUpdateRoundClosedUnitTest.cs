@@ -70,7 +70,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 ClientStatus: GameRoundClientStatus.Loss,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
-            var fakeGameRoundRecord = Substitute.For<IGameRoundRecordRepository>();
+            var fakeGameRoundRecord = Substitute.For<IGameRoundRecord>();
 
             var web = CreateTestSettingSite(services =>
             {
