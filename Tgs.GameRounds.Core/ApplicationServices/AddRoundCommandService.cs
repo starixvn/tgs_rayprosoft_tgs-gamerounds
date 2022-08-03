@@ -45,7 +45,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                     walletId: command.WalletId,
                     cancellationToken: cancellationToken).ConfigureAwait(false))
             {
-                return;
+                throw new GameRoundCreationFailedException();
             }
 
             try

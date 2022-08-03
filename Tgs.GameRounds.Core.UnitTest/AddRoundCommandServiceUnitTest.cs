@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.Core.Exceptions;
 using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest
@@ -61,7 +62,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 fakeGameRoundLocked,
                 fakeGameRoundRecordMessage);
 
-            await service.ExecuteAsync(command).ConfigureAwait(false);
+            _ = await Assert.ThrowsExceptionAsync<GameRoundCreationFailedException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
 
             _ = fakeGameRoundRecordMessage
                 .Received(0)
