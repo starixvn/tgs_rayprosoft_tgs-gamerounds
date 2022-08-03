@@ -109,7 +109,7 @@ builder.Services
         var configuration = sp.GetRequiredService<IConfiguration>();
         configuration.GetSection("GameLocked").Bind(options);
     });
-
+/*
 builder.Services
     .AddMessageQueue()
      .AddNatsMessageQueue(natsConfig =>
@@ -124,7 +124,7 @@ builder.Services
      })
      .ClearAllExchanges()
      .AddNatsGlobPatternExchange("gp.gameround.gameroundrecord.add");
-
+*/
 builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
         sp => new ConfigureNamedOptions<OtlpExporterOptions>(
