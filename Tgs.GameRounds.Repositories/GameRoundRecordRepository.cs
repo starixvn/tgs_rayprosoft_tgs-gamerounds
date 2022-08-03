@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Tgs.GameRounds.Core;
@@ -229,7 +232,7 @@ namespace Tgs.GameRounds.Repositories
 
         private async Task<IMongoCollection<GameRoundRecord>> GetCollectionAsync(string gameProviderCode, CancellationToken cancellationToken = default)
         {
-            var collectionName = $"{gameProviderCode.ToUpper()}{typeof(GameRoundRecord).Name}";
+            var collectionName = $"{gameProviderCode.ToUpper()}_game_round_records".ToLower();
             var collection = _database.GetCollection<GameRoundRecord>(collectionName);
             if (collection.CollectionNamespace == null)
             {
