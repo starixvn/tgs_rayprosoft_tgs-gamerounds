@@ -24,7 +24,10 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 gameProviderId: query.GameProviderId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var gameId = await _game.GetGameIdAsync(query.GameProviderId, query.ExternalGameId).ConfigureAwait(false);
+            var gameId = await _game.GetGameIdAsync(
+               gameProviderId: query.GameProviderId,
+              externalGameId: query.ExternalGameId,
+              cancellationToken: cancellationToken).ConfigureAwait(false);
 
             var gameRoundInfo = await _gameRoundRepository.GetAsync(
                 gameProviderId: query.GameProviderId,

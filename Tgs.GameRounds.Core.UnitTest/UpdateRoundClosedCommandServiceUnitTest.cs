@@ -19,7 +19,6 @@ namespace Tgs.GameRounds.Core.UnitTest
         {
             var fakeGameRound = Substitute.For<IGameRound>();
             var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
-            var fakeGameRoundConvert = Substitute.For<IGameRoundConvert>();
             var fakeLogger = NullLogger<UpdateRoundClosedCommandService>.Instance;
 
             var roundId = Guid.NewGuid();
@@ -43,8 +42,7 @@ namespace Tgs.GameRounds.Core.UnitTest
             var service = new UpdateRoundClosedCommandService(
                 fakeLogger,
                 fakeGameRound,
-                fakeGameRoundRecordMessage,
-                fakeGameRoundConvert);
+                fakeGameRoundRecordMessage);
 
             _ = await Assert.ThrowsExceptionAsync<GameRoundDoesNotExistException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
 
@@ -54,91 +52,13 @@ namespace Tgs.GameRounds.Core.UnitTest
         }
 
         [TestMethod]
-        public async Task Game_Provider_Currency_IDRK_Is_Converted_Into_The_Platform_Currency_IDR()
-        {
-            var fakeGameRound = Substitute.For<IGameRound>();
-            var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
-            var fakeGameRoundConvert = Substitute.For<IGameRoundConvert>();
-            var fakeLogger = NullLogger<UpdateRoundClosedCommandService>.Instance;
-
-            var roundId = Guid.NewGuid();
-            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-            var currencyCode = "CNY";
-
-            var command = new UpdateRoundClosedCommand(
-                RoundId: roundId,
-                ExternalClosedOn: DateTimeOffset.UtcNow,
-                BetAmount: 1m,
-                ValidBetAmount: 1m,
-                SettleAmount: 0,
-                Commission: 0,
-                Turnover: 1m,
-                PlayerWinLoss: -1m,
-                ClientStatus: GameRoundClientStatus.Loss,
-                AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
-
-            _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(true));
-
-            _ = fakeGameRound
-                .GetByCurrencyInfoAsync(command.RoundId)
-                .Returns(ValueTask.FromResult<(Guid GameProviderId, string CurrencyCode)>(new(gameProviderId, currencyCode)));
-
-            var gameRoundConvertRequest = new GameRoundConvertRequest(
-                GameProviderId: gameProviderId,
-                CurrencyCode: currencyCode,
-                BetAmount: command.BetAmount,
-                ValidBetAmount: command.ValidBetAmount,
-                SettleAmount: command.SettleAmount,
-                Commission: command.Commission,
-                Turnover: command.Turnover,
-                PlayerWinLoss: command.PlayerWinLoss);
-            var gameRoundConvertResult = new GameRoundConvertResult(
-                BetAmount: 1000m,
-                ValidBetAmount: 1000m,
-                SettleAmount: 0,
-                Commission: 0,
-                Turnover: 1000m,
-                PlayerWinLoss: -1000m);
-            _ = fakeGameRoundConvert.ConvertPlatformRoundsAsync(
-                request: gameRoundConvertRequest).Returns(gameRoundConvertResult);
-
-            var updateRoundClosed = new UpdateRoundClosed(
-                    RoundId: command.RoundId,
-                    ExternalClosedOn: command.ExternalClosedOn,
-                    BetAmount: gameRoundConvertResult.BetAmount,
-                    ValidBetAmount: gameRoundConvertResult.ValidBetAmount,
-                    SettleAmount: gameRoundConvertResult.SettleAmount,
-                    Commission: gameRoundConvertResult.Commission,
-                    Turnover: gameRoundConvertResult.Turnover,
-                    PlayerWinLoss: gameRoundConvertResult.PlayerWinLoss,
-                    ClientStatus: command.ClientStatus,
-                    AdditionalData: command.AdditionalData);
-            _ = fakeGameRound.UpdateRoundClosedAsync(updateRoundClosed);
-
-            var service = new UpdateRoundClosedCommandService(
-                fakeLogger,
-                fakeGameRound,
-                fakeGameRoundRecordMessage,
-                fakeGameRoundConvert);
-
-            await service.ExecuteAsync(command).ConfigureAwait(false);
-
-            _ = fakeGameRoundRecordMessage
-                .Received(1)
-                .SenderGameRoundRecord(Arg.Is(command.RoundId));
-        }
-
-        [TestMethod]
         public async Task Normal_Process()
         {
             var fakeGameRound = Substitute.For<IGameRound>();
             var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
-            var fakeGameRoundConvert = Substitute.For<IGameRoundConvert>();
             var fakeLogger = NullLogger<UpdateRoundClosedCommandService>.Instance;
 
             var roundId = Guid.NewGuid();
-            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-            var currencyCode = "CNY";
 
             var command = new UpdateRoundClosedCommand(
                 RoundId: roundId,
@@ -154,38 +74,15 @@ namespace Tgs.GameRounds.Core.UnitTest
 
             _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
-            _ = fakeGameRound
-                .GetByCurrencyInfoAsync(command.RoundId)
-                .Returns(ValueTask.FromResult<(Guid GameProviderId, string CurrencyCode)>(new(gameProviderId, currencyCode)));
-
-            var gameRoundConvertRequest = new GameRoundConvertRequest(
-                GameProviderId: gameProviderId,
-                CurrencyCode: currencyCode,
-                BetAmount: command.BetAmount,
-                ValidBetAmount: command.ValidBetAmount,
-                SettleAmount: command.SettleAmount,
-                Commission: command.Commission,
-                Turnover: command.Turnover,
-                PlayerWinLoss: command.PlayerWinLoss);
-            var gameRoundConvertResult = new GameRoundConvertResult(
-                BetAmount: command.BetAmount,
-                ValidBetAmount: command.ValidBetAmount,
-                SettleAmount: command.SettleAmount,
-                Commission: command.Commission,
-                Turnover: command.Turnover,
-                PlayerWinLoss: command.PlayerWinLoss);
-            _ = fakeGameRoundConvert.ConvertPlatformRoundsAsync(
-                request: gameRoundConvertRequest).Returns(gameRoundConvertResult);
-
             var updateRoundClosed = new UpdateRoundClosed(
                     RoundId: command.RoundId,
                     ExternalClosedOn: command.ExternalClosedOn,
-                    BetAmount: gameRoundConvertResult.BetAmount,
-                    ValidBetAmount: gameRoundConvertResult.ValidBetAmount,
-                    SettleAmount: gameRoundConvertResult.SettleAmount,
-                    Commission: gameRoundConvertResult.Commission,
-                    Turnover: gameRoundConvertResult.Turnover,
-                    PlayerWinLoss: gameRoundConvertResult.PlayerWinLoss,
+                    BetAmount: command.BetAmount,
+                    ValidBetAmount: command.ValidBetAmount,
+                    SettleAmount: command.SettleAmount,
+                    Commission: command.Commission,
+                    Turnover: command.Turnover,
+                    PlayerWinLoss: command.PlayerWinLoss,
                     ClientStatus: command.ClientStatus,
                     AdditionalData: command.AdditionalData);
             _ = fakeGameRound.UpdateRoundClosedAsync(updateRoundClosed);
@@ -193,8 +90,7 @@ namespace Tgs.GameRounds.Core.UnitTest
             var service = new UpdateRoundClosedCommandService(
                 fakeLogger,
                 fakeGameRound,
-                fakeGameRoundRecordMessage,
-                fakeGameRoundConvert);
+                fakeGameRoundRecordMessage);
 
             await service.ExecuteAsync(command).ConfigureAwait(false);
 

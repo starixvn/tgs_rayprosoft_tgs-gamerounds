@@ -28,7 +28,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 RoundId: roundId);
 
             _ = fakeGameRound.GetAsync(
-                Arg.Is(roundId)).Returns(ValueTask.FromResult<GameRoundInfo>(null));
+                Arg.Is(roundId)).Returns(ValueTask.FromResult<GameRoundInfo?>(null));
 
             var service = new AddGameRoundRecordCommandService(
                 fakeLogger,

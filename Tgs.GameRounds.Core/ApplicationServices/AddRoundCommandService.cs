@@ -8,7 +8,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     internal class AddRoundCommandService : ICommandService<AddRoundCommand>
     {
         private readonly IGameRound _gameRound;
-        private readonly IGameRoundConvert _gameRoundConvert;
         private readonly IGameRoundLocked _gameRoundLocked;
         private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
         private readonly ILogger<AddRoundCommandService> _logger;
@@ -16,13 +15,11 @@ namespace Tgs.GameRounds.Core.ApplicationServices
         public AddRoundCommandService(
             ILogger<AddRoundCommandService> logger,
             IGameRound gameRound,
-            IGameRoundConvert gameRoundConvert,
             IGameRoundLocked gameRoundLocked,
             IGameRoundRecordMessage gameRoundRecordMessage)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
-            _gameRoundConvert = gameRoundConvert ?? throw new ArgumentNullException(nameof(gameRoundConvert));
             _gameRoundLocked = gameRoundLocked ?? throw new ArgumentNullException(nameof(gameRoundLocked));
             _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
         }
@@ -53,20 +50,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 
             try
             {
-                var gameRoundConvertRequest = new GameRoundConvertRequest(
-                     GameProviderId: command.GameProviderId,
-                     CurrencyCode: command.CurrencyCode,
-                     BetAmount: command.BetAmount,
-                     ValidBetAmount: command.ValidBetAmount,
-                     SettleAmount: command.SettleAmount.GetValueOrDefault(0),
-                     Commission: command.Commission,
-                     Turnover: command.Turnover,
-                     PlayerWinLoss: command.PlayerWinLoss.GetValueOrDefault(0));
-
-                var gameRoundConvertResult = await _gameRoundConvert.ConvertPlatformRoundsAsync(
-                    request: gameRoundConvertRequest,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
-
                 var addRound = new AddRound(
                     ExternalRoundId: command.ExternalRoundId,
                     GameProviderId: command.GameProviderId,
@@ -79,12 +62,12 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                     BrandId: command.BrandId,
                     ExternalCreatedOn: command.ExternalCreatedOn,
                     ExternalClosedOn: command.ExternalClosedOn,
-                    BetAmount: gameRoundConvertResult.BetAmount,
-                    ValidBetAmount: gameRoundConvertResult.ValidBetAmount,
-                    SettleAmount: gameRoundConvertResult.SettleAmount,
-                    Commission: gameRoundConvertResult.Commission,
-                    Turnover: gameRoundConvertResult.Turnover,
-                    PlayerWinLoss: gameRoundConvertResult.PlayerWinLoss,
+                    BetAmount: command.BetAmount,
+                    ValidBetAmount: command.ValidBetAmount,
+                    SettleAmount: command.SettleAmount,
+                    Commission: command.Commission,
+                    Turnover: command.Turnover,
+                    PlayerWinLoss: command.PlayerWinLoss,
                     ClientStatus: command.ClientStatus,
                     AdditionalData: command.AdditionalData);
 
