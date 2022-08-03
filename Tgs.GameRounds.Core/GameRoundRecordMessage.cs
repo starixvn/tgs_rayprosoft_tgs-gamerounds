@@ -15,7 +15,7 @@ namespace Tgs.GameRounds.Core
 
         public ValueTask SenderGameRoundRecord(Guid roundId, CancellationToken cancellationToken = default)
             => _messageSender.SendAsync(
-                subject: "gp.gameround.gameroundrecord",
+                subject: "gp.gameround.gameroundrecord.add",
                 data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { RoundId = roundId })),
                 cancellationToken: cancellationToken);
     }

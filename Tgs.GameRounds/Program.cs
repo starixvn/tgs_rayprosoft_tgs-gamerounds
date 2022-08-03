@@ -120,10 +120,10 @@ builder.Services
              var configuration = sp.GetRequiredService<IConfiguration>();
              options.Url = configuration.GetConnectionString("Nats");
          })
-         .AddHandler<GameRoundRecordMessageHandler>("gp.gameround.gameroundrecord", "gp.gamerecord");
+         .AddHandler<GameRoundRecordMessageHandler>("gp.gameround.gameroundrecord.add", "gp.gameround.gameroundrecord");
      })
      .ClearAllExchanges()
-     .AddNatsGlobPatternExchange("gp.gameround.gameroundrecord");
+     .AddNatsGlobPatternExchange("gp.gameround.gameroundrecord.add");
 
 builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
