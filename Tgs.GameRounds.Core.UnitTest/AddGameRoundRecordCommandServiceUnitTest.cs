@@ -25,7 +25,9 @@ namespace Tgs.GameRounds.Core.UnitTest
             var roundId = Guid.NewGuid();
 
             var command = new AddGameRoundRecordCommand(
-                RoundId: roundId);
+                RoundId: roundId,
+                SendOn: DateTimeOffset.UtcNow.AddSeconds(-1),
+                ReceiveOn: DateTimeOffset.UtcNow);
 
             _ = fakeGameRound.GetAsync(
                 Arg.Is(roundId)).Returns(ValueTask.FromResult<GameRoundInfo?>(null));
@@ -66,7 +68,9 @@ namespace Tgs.GameRounds.Core.UnitTest
             var roundId = Guid.NewGuid();
 
             var command = new AddGameRoundRecordCommand(
-                RoundId: roundId);
+                RoundId: roundId,
+                SendOn: DateTimeOffset.UtcNow.AddSeconds(-1),
+                ReceiveOn: DateTimeOffset.UtcNow);
 
             var gameRoundInfo = new GameRoundInfo(
                 RoundId: roundId,
@@ -145,7 +149,10 @@ namespace Tgs.GameRounds.Core.UnitTest
                 CompanyWinLoss: gameRoundInfo.CompanyWinLoss.GetValueOrDefault(0),
                 TieBetAdjustment: gameRoundInfo.TieBetAdjustment.GetValueOrDefault(0),
                 ReopenTurnoverAdjustment: gameRoundInfo.ReopenTurnoverAdjustment.GetValueOrDefault(0),
-                ReopenedOn: gameRoundInfo.ReopenedOn);
+                ReopenedOn: gameRoundInfo.ReopenedOn,
+                SendOn: command.SendOn,
+                ReceiveOn: command.ReceiveOn);
+
             _ = fakeGameRoundRecord
                 .Received(1)
                 .AddAsync(Arg.Is(gameRoundRecordAdd));

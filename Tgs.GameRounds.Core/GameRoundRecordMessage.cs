@@ -22,7 +22,8 @@ namespace Tgs.GameRounds.Core
         {
             var request = new
             {
-                RoundId = roundId
+                RoundId = roundId,
+                SendOn = DateTimeOffset.UtcNow
             };
 
             try

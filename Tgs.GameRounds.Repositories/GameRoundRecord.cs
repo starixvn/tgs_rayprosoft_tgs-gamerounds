@@ -220,6 +220,20 @@ namespace Tgs.GameRounds.Repositories
         public DateTimeOffset? ReopenedOn { get; set; }
 
         /// <summary>
+        /// The send on
+        /// </summary>
+        [BsonElement("send_on")]
+        [BsonRepresentation(BsonType.String)]
+        public DateTimeOffset SendOn { get; set; } = default!;
+
+        /// <summary>
+        /// The receive on
+        /// </summary>
+        [BsonElement("receive_on")]
+        [BsonRepresentation(BsonType.String)]
+        public DateTimeOffset ReceiveOn { get; set; } = default!;
+
+        /// <summary>
         /// The record on
         /// </summary>
         [BsonElement("record_on")]

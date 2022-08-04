@@ -66,6 +66,8 @@ namespace Tgs.GameRounds.Repositories
                     TieBetAdjustment = add.TieBetAdjustment,
                     ReopenTurnoverAdjustment = add.ReopenTurnoverAdjustment,
                     ReopenedOn = add.ReopenedOn,
+                    SendOn = add.SendOn,
+                    ReceiveOn = add.ReceiveOn,
                     RecordOn = DateTime.UtcNow
                 };
 
@@ -164,7 +166,7 @@ namespace Tgs.GameRounds.Repositories
             CancellationToken cancellationToken = default)
         {
             var index = Builders<GameRoundRecord>.IndexKeys
-               .Ascending(m => m.GameRoundRecordId);
+               .Descending(m => m.GameRoundRecordId);
 
             var createIndexOptions = new CreateIndexOptions
             {
@@ -177,12 +179,30 @@ namespace Tgs.GameRounds.Repositories
                 cancellationToken: cancellationToken);
         }
 
-        private static Task RecordOn_IndexAsync(
-                                                    IMongoCollection<GameRoundRecord> collection,
+        private static Task ReceiveOn_IndexAsync(
+            IMongoCollection<GameRoundRecord> collection,
             CancellationToken cancellationToken = default)
         {
             var index = Builders<GameRoundRecord>.IndexKeys
-                .Ascending(m => m.RecordOn);
+                .Descending(m => m.ReceiveOn);
+
+            var createIndexOptions = new CreateIndexOptions
+            {
+                Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_receive_on"
+            };
+            var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
+
+            return collection.Indexes.CreateOneAsync(
+                model: createIndexModel,
+                cancellationToken: cancellationToken);
+        }
+
+        private static Task RecordOn_IndexAsync(
+                    IMongoCollection<GameRoundRecord> collection,
+            CancellationToken cancellationToken = default)
+        {
+            var index = Builders<GameRoundRecord>.IndexKeys
+                .Descending(m => m.RecordOn);
 
             var createIndexOptions = new CreateIndexOptions
             {
@@ -205,6 +225,24 @@ namespace Tgs.GameRounds.Repositories
             var createIndexOptions = new CreateIndexOptions
             {
                 Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_round_id"
+            };
+            var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
+
+            return collection.Indexes.CreateOneAsync(
+                model: createIndexModel,
+                cancellationToken: cancellationToken);
+        }
+
+        private static Task SendOn_IndexAsync(
+                    IMongoCollection<GameRoundRecord> collection,
+            CancellationToken cancellationToken = default)
+        {
+            var index = Builders<GameRoundRecord>.IndexKeys
+                .Descending(m => m.SendOn);
+
+            var createIndexOptions = new CreateIndexOptions
+            {
+                Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_send_on"
             };
             var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -245,6 +283,14 @@ namespace Tgs.GameRounds.Repositories
                     cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 await RecordOn_IndexAsync(
+                    collection: collection,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                await ReceiveOn_IndexAsync(
+                    collection: collection,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                await SendOn_IndexAsync(
                     collection: collection,
                     cancellationToken: cancellationToken).ConfigureAwait(false);
 

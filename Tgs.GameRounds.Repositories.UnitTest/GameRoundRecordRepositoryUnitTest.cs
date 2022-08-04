@@ -47,7 +47,9 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 CompanyWinLoss: 0,
                 TieBetAdjustment: 0,
                 ReopenTurnoverAdjustment: 0,
-                ReopenedOn: null);
+                ReopenedOn: null,
+                SendOn: DateTimeOffset.UtcNow.AddSeconds(-1),
+                ReceiveOn: DateTimeOffset.UtcNow);
 
             var expected = Guid.NewGuid();
 

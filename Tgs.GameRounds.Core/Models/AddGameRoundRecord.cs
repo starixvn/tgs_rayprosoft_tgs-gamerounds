@@ -29,5 +29,7 @@ namespace Tgs.GameRounds.Core.Models
         decimal CompanyWinLoss,
         decimal TieBetAdjustment,
         decimal ReopenTurnoverAdjustment,
-        DateTimeOffset? ReopenedOn);
+        DateTimeOffset? ReopenedOn,
+        DateTimeOffset SendOn,
+        DateTimeOffset ReceiveOn);
 }

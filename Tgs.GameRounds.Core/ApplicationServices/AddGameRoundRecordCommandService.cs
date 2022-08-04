@@ -73,7 +73,9 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 CompanyWinLoss: round.CompanyWinLoss.GetValueOrDefault(0),
                 TieBetAdjustment: round.TieBetAdjustment.GetValueOrDefault(0),
                 ReopenTurnoverAdjustment: round.ReopenTurnoverAdjustment.GetValueOrDefault(0),
-                ReopenedOn: round.ReopenedOn);
+                ReopenedOn: round.ReopenedOn,
+                SendOn: command.SendOn,
+                ReceiveOn: command.ReceiveOn);
 
             await _gameRoundRecord.AddAsync(
                 add: gameRoundRecordAdd,

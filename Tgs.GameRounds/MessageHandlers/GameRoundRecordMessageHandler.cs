@@ -24,18 +24,20 @@ namespace Tgs.GameRounds.MessageHandlers
             CancellationToken cancellationToken)
         {
             var json = Encoding.UTF8.GetString(data.Span);
-            var model = JsonSerializer.Deserialize<GameRoundRecordMessageModel>(json);
+            var receive = JsonSerializer.Deserialize<GameRoundRecordReceive>(json);
 
-            if (model == null)
+            if (receive == null)
             {
-                _logger.LogError("LogOn:{logOn} Information Received:{model}", DateTime.Now.ToString("o"), model);
+                _logger.LogError("LogOn:{logOn} Information Received:{receive}", DateTime.Now.ToString("o"), receive);
                 return ValueTask.CompletedTask;
             }
 
-            _logger.LogInformation("LogOn:{logOn} Information Received:{model}", DateTime.Now.ToString("o"), model);
+            _logger.LogInformation("LogOn:{logOn} Information Received:{receive}", DateTime.Now.ToString("o"), receive);
 
             var command = new AddGameRoundRecordCommand(
-                RoundId: model.RoundId);
+                RoundId: receive.RoundId,
+                SendOn: receive.SendOn,
+                ReceiveOn: DateTimeOffset.UtcNow);
 
             return _service.ExecuteAsync(
                 command: command,
