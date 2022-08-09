@@ -77,7 +77,6 @@ namespace Tgs.GameRounds.Repositories.UnitTest
 
             var fakeRoundRepository = new GameRoundRepository(
                 context,
-                fakeGameRound,
                 fakeLogger,
                 fakeSerialNumberGenerator);
 
@@ -139,7 +138,6 @@ namespace Tgs.GameRounds.Repositories.UnitTest
 
             var fakeRoundRepository = new GameRoundRepository(
                 context,
-                fakeGameRound,
                 fakeLogger,
                 fakeSerialNumberGenerator);
 

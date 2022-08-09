@@ -8,29 +8,49 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     internal class AddRoundCommandService : ICommandService<AddRoundCommand>
     {
         private readonly IGameRound _gameRound;
-        private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly IGameRoundLocked _gameRoundLocked;
+        private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
         private readonly ILogger<AddRoundCommandService> _logger;
 
         public AddRoundCommandService(
-            IGameRoundRecordRepository gameRoundRecordRepository,
+            ILogger<AddRoundCommandService> logger,
             IGameRound gameRound,
-            ILogger<AddRoundCommandService> logger)
+            IGameRoundLocked gameRoundLocked,
+            IGameRoundRecordMessage gameRoundRecordMessage)
         {
-            _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
-            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _gameRoundLocked = gameRoundLocked ?? throw new ArgumentNullException(nameof(gameRoundLocked));
+            _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
         }
 
         public async ValueTask ExecuteAsync(AddRoundCommand command, CancellationToken cancellationToken = default)
         {
-            var roundId = await _gameRound.GetRoundIdAsync(command.GameProviderId, command.ExternalRoundId, command.GameId, command.WalletId).ConfigureAwait(false);
+            var roundId = await _gameRound.GetRoundIdAsync(
+                    gameProviderId: command.GameProviderId,
+                    externalRoundId: command.ExternalRoundId,
+                    gameId: command.GameId,
+                    walletId: command.WalletId,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
             if (roundId.HasValue)
             {
                 return;
             }
 
-            var newRoundId = await _gameRound.AddRoundAsync(
-                new AddRound(
+            if (!await _gameRoundLocked.LockingAsync(
+                    gameProviderId: command.GameProviderId,
+                    externalRoundId: command.ExternalRoundId,
+                    gameId: command.GameId,
+                    walletId: command.WalletId,
+                    cancellationToken: cancellationToken).ConfigureAwait(false))
+            {
+                throw new GameRoundCreationFailedException();
+            }
+
+            try
+            {
+                var addRound = new AddRound(
                     ExternalRoundId: command.ExternalRoundId,
                     GameProviderId: command.GameProviderId,
                     PlayerCode: command.PlayerCode,
@@ -49,21 +69,32 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                     Turnover: command.Turnover,
                     PlayerWinLoss: command.PlayerWinLoss,
                     ClientStatus: command.ClientStatus,
-                    AdditionalData: command.AdditionalData)).ConfigureAwait(false);
+                    AdditionalData: command.AdditionalData);
 
-            if (!newRoundId.HasValue)
-            {
-                _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundCreationFailedException", DateTime.Now.ToString("o"), command);
-                throw new GameRoundCreationFailedException();
-            }
-            else
-            {
-                var round = await _gameRound.GetAsync(newRoundId.Value).ConfigureAwait(false);
+                var newRoundId = await _gameRound.AddRoundAsync(
+                    source: addRound,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
 
-                if (round is not null)
+                if (!newRoundId.HasValue)
                 {
-                    await _gameRoundRecordRepository.AddAsync(round).ConfigureAwait(false);
+                    _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundCreationFailedException", DateTime.Now.ToString("o"), command);
+                    throw new GameRoundCreationFailedException();
                 }
+                else
+                {
+                    await _gameRoundRecordMessage.SenderGameRoundRecord(
+                        roundId: newRoundId.Value,
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                await _gameRoundLocked.UnlockAsync(
+                        gameProviderId: command.GameProviderId,
+                        externalRoundId: command.ExternalRoundId,
+                        gameId: command.GameId,
+                        walletId: command.WalletId,
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
             }
         }
     }

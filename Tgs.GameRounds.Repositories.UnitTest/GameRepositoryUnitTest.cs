@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
-using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Repositories.Entities;
 
 namespace Tgs.GameRounds.Repositories.UnitTest
@@ -15,7 +13,6 @@ namespace Tgs.GameRounds.Repositories.UnitTest
         [TestMethod]
         public async Task Get_ExternalGameId()
         {
-            var fakeGame = Substitute.For<IGame>();
             var options = new DbContextOptionsBuilder<TgsContext>()
                .UseInMemoryDatabase(databaseName: "dbo")
                .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -49,7 +46,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             _ = await context.Games.AddAsync(game).ConfigureAwait(false);
             _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
-            var fakeRoundRepository = new GameRepository(fakeGame, context);
+            var fakeRoundRepository = new GameRepository(context);
 
             var actual = await fakeRoundRepository.GetExternalGameIdAsync(gameId).ConfigureAwait(false);
 
@@ -60,11 +57,10 @@ namespace Tgs.GameRounds.Repositories.UnitTest
         [TestMethod]
         public async Task Get_GameId()
         {
-            var fakeGame = Substitute.For<IGame>();
             var options = new DbContextOptionsBuilder<TgsContext>()
-               .UseInMemoryDatabase(databaseName: "dbo")
-               .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-               .Options;
+                .UseInMemoryDatabase(databaseName: "dbo")
+                .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                .Options;
             var context = new TgsContext(options);
             _ = context.Database.EnsureDeleted();
 
@@ -94,7 +90,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             _ = await context.Games.AddAsync(game).ConfigureAwait(false);
             _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
-            var fakeRoundRepository = new GameRepository(fakeGame, context);
+            var fakeRoundRepository = new GameRepository(context);
 
             var actual = await fakeRoundRepository.GetGameIdAsync(gameProviderId, externalGameId).ConfigureAwait(false);
 

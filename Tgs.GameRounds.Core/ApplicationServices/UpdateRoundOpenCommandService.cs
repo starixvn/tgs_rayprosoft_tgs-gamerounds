@@ -8,40 +8,43 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     internal class UpdateRoundOpenCommandService : ICommandService<UpdateRoundOpenCommand>
     {
         private readonly IGameRound _gameRound;
-        private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
         private readonly ILogger<UpdateRoundOpenCommandService> _logger;
 
         public UpdateRoundOpenCommandService(
-          IGameRoundRecordRepository gameRoundRecordRepository,
-          IGameRound gameRound,
-           ILogger<UpdateRoundOpenCommandService> logger)
+            ILogger<UpdateRoundOpenCommandService> logger,
+            IGameRound gameRound,
+            IGameRoundRecordMessage gameRoundRecordMessage)
         {
-            _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
-            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
         }
 
         public async ValueTask ExecuteAsync(UpdateRoundOpenCommand command, CancellationToken cancellationToken = default)
         {
-            if (!await _gameRound.ExistAsync(command.RoundId).ConfigureAwait(false))
+            if (!await _gameRound.ExistAsync(
+                roundId: command.RoundId,
+                cancellationToken: cancellationToken).ConfigureAwait(false))
             {
                 _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
                 throw new GameRoundDoesNotExistException();
             }
 
-            await _gameRound.UpdateRoundOpenAsync(new UpdateRoundOpen(
+            var updateRoundOpen = new UpdateRoundOpen(
                 RoundId: command.RoundId,
                 BetAmount: command.BetAmount,
                 ValidBetAmount: command.ValidBetAmount,
                 Commission: command.Commission,
-                Turnover: command.Turnover)).ConfigureAwait(false);
+                Turnover: command.Turnover);
 
-            var round = await _gameRound.GetAsync(command.RoundId).ConfigureAwait(false);
+            await _gameRound.UpdateRoundOpenAsync(
+                source: updateRoundOpen,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            if (round is not null)
-            {
-                await _gameRoundRecordRepository.AddAsync(round).ConfigureAwait(false);
-            }
+            await _gameRoundRecordMessage.SenderGameRoundRecord(
+                roundId: command.RoundId,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }
 }

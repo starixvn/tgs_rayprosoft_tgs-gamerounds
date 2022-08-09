@@ -107,6 +107,7 @@ pipeline {
                         println resources
                         println dedicated
                         println node_selector
+                        println autoscaling
 
                         sh """
                             cat << EOF | yq e -P | helm template deployment/k8s/game-gamerounds \

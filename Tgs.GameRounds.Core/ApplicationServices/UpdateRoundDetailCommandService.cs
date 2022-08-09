@@ -10,8 +10,8 @@ namespace Tgs.GameRounds.Core.ApplicationServices
         private readonly ILogger<UpdateRoundDetailCommandService> _logger;
 
         public UpdateRoundDetailCommandService(
-          IGameRound gameRound,
-          ILogger<UpdateRoundDetailCommandService> logger)
+            ILogger<UpdateRoundDetailCommandService> logger,
+            IGameRound gameRound)
         {
             _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -19,15 +19,18 @@ namespace Tgs.GameRounds.Core.ApplicationServices
 
         public async ValueTask ExecuteAsync(UpdateRoundDetailCommand command, CancellationToken cancellationToken = default)
         {
-            if (!await _gameRound.ExistAsync(command.RoundId).ConfigureAwait(false))
+            if (!await _gameRound.ExistAsync(
+                roundId: command.RoundId,
+                cancellationToken: cancellationToken).ConfigureAwait(false))
             {
                 _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
                 throw new GameRoundDoesNotExistException();
             }
 
             await _gameRound.UpdateRoundDetailAsync(
-                command.RoundId,
-                command.AdditionalData).ConfigureAwait(false);
+                roundId: command.RoundId,
+                additionalData: command.AdditionalData,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }
 }

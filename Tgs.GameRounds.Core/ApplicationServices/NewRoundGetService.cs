@@ -8,55 +8,92 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     internal class NewRoundGetService : IGetService<NewRoundQuery, Guid>
     {
         private readonly IGameRound _gameRound;
-        private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly IGameRoundLocked _gameRoundLocked;
+        private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
         private readonly ILogger<NewRoundGetService> _logger;
 
         public NewRoundGetService(
-            IGameRoundRecordRepository gameRoundRecordRepository,
+            ILogger<NewRoundGetService> logger,
             IGameRound gameRound,
-            ILogger<NewRoundGetService> logger)
+            IGameRoundLocked gameRoundLocked,
+            IGameRoundRecordMessage gameRoundRecordMessage)
         {
-            _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
-            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _gameRoundLocked = gameRoundLocked ?? throw new ArgumentNullException(nameof(gameRoundLocked));
+            _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
         }
 
         public async ValueTask<Guid> GetAsync(NewRoundQuery query, CancellationToken cancellationToken = default)
         {
-            var roundId = await _gameRound.GetRoundIdAsync(query.GameProviderId, query.ExternalRoundId, query.GameId, query.WalletId).ConfigureAwait(false);
+            var roundId = await _gameRound.GetRoundIdAsync(
+                    gameProviderId: query.GameProviderId,
+                    externalRoundId: query.ExternalRoundId,
+                    gameId: query.GameId,
+                    walletId: query.WalletId,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
             if (roundId.HasValue)
             {
                 return roundId.Value;
             }
 
-            var newRoundId = await _gameRound.NewRoundAsync(
-                new NewRound(
-                    query.ExternalRoundId,
-                    query.GameProviderId,
-                    query.PlayerCode,
-                    query.GameId,
-                    query.CurrencyCode,
-                    query.GameProviderConfigurationId,
-                    query.WalletId,
-                    query.BrandId,
-                    query.ExternalCreatedOn)).ConfigureAwait(false);
-
-            if (!newRoundId.HasValue)
+            if (!await _gameRoundLocked.LockingAsync(
+                    gameProviderId: query.GameProviderId,
+                    externalRoundId: query.ExternalRoundId,
+                    gameId: query.GameId,
+                    walletId: query.WalletId,
+                    cancellationToken: cancellationToken).ConfigureAwait(false))
             {
-                _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundCreationFailedException", DateTime.Now.ToString("o"), query);
-                throw new GameRoundCreationFailedException();
+                roundId = await _gameRound.GetRoundIdAsync(
+                    gameProviderId: query.GameProviderId,
+                    externalRoundId: query.ExternalRoundId,
+                    gameId: query.GameId,
+                    walletId: query.WalletId,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                return roundId ?? throw new GameRoundCreationFailedException();
             }
-            else
-            {
-                var round = await _gameRound.GetAsync(newRoundId.Value).ConfigureAwait(false);
 
-                if (round is not null)
+            try
+            {
+                var newRound = new NewRound(
+                        query.ExternalRoundId,
+                        query.GameProviderId,
+                        query.PlayerCode,
+                        query.GameId,
+                        query.CurrencyCode,
+                        query.GameProviderConfigurationId,
+                        query.WalletId,
+                        query.BrandId,
+                        query.ExternalCreatedOn);
+
+                var newRoundId = await _gameRound.NewRoundAsync(
+                    source: newRound,
+                    cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                if (!newRoundId.HasValue)
                 {
-                    await _gameRoundRecordRepository.AddAsync(round).ConfigureAwait(false);
+                    _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundCreationFailedException", DateTime.Now.ToString("o"), query);
+                    throw new GameRoundCreationFailedException();
                 }
+                else
+                {
+                    await _gameRoundRecordMessage.SenderGameRoundRecord(
+                        roundId: newRoundId.Value,
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
+                }
+                return newRoundId.Value;
             }
-
-            return newRoundId.Value;
+            finally
+            {
+                await _gameRoundLocked.UnlockAsync(
+                        gameProviderId: query.GameProviderId,
+                        externalRoundId: query.ExternalRoundId,
+                        gameId: query.GameId,
+                        walletId: query.WalletId,
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 }

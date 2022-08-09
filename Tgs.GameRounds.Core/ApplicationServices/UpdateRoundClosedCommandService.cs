@@ -8,28 +8,30 @@ namespace Tgs.GameRounds.Core.ApplicationServices
     internal class UpdateRoundClosedCommandService : ICommandService<UpdateRoundClosedCommand>
     {
         private readonly IGameRound _gameRound;
-        private readonly IGameRoundRecordRepository _gameRoundRecordRepository;
+        private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
         private readonly ILogger<UpdateRoundClosedCommandService> _logger;
 
         public UpdateRoundClosedCommandService(
-            IGameRoundRecordRepository gameRoundRecordRepository,
+            ILogger<UpdateRoundClosedCommandService> logger,
             IGameRound gameRound,
-            ILogger<UpdateRoundClosedCommandService> logger)
+            IGameRoundRecordMessage gameRoundRecordMessage)
         {
-            _gameRoundRecordRepository = gameRoundRecordRepository ?? throw new ArgumentNullException(nameof(gameRoundRecordRepository));
-            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+            _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
         }
 
         public async ValueTask ExecuteAsync(UpdateRoundClosedCommand command, CancellationToken cancellationToken = default)
         {
-            if (!await _gameRound.ExistAsync(command.RoundId).ConfigureAwait(false))
+            if (!await _gameRound.ExistAsync(
+                roundId: command.RoundId,
+                cancellationToken: cancellationToken).ConfigureAwait(false))
             {
                 _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
                 throw new GameRoundDoesNotExistException();
             }
 
-            await _gameRound.UpdateRoundClosedAsync(new UpdateRoundClosed(
+            var updateRoundClosed = new UpdateRoundClosed(
                 RoundId: command.RoundId,
                 ExternalClosedOn: command.ExternalClosedOn,
                 BetAmount: command.BetAmount,
@@ -39,14 +41,15 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 Turnover: command.Turnover,
                 PlayerWinLoss: command.PlayerWinLoss,
                 ClientStatus: command.ClientStatus,
-                AdditionalData: command.AdditionalData)).ConfigureAwait(false);
+                AdditionalData: command.AdditionalData);
 
-            var round = await _gameRound.GetAsync(command.RoundId).ConfigureAwait(false);
+            await _gameRound.UpdateRoundClosedAsync(
+                source: updateRoundClosed,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            if (round is not null)
-            {
-                await _gameRoundRecordRepository.AddAsync(round).ConfigureAwait(false);
-            }
+            await _gameRoundRecordMessage.SenderGameRoundRecord(
+                roundId: command.RoundId,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }
 }
