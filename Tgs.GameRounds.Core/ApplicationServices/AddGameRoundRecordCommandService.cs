@@ -64,7 +64,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 ClosedOn: round.ClosedOn,
                 UpdatedOn: round.UpdatedOn,
                 ExternalCreatedOn: round.ExternalCreatedOn,
-                ExternalClosedOn: round.ClosedOn,
+                ExternalClosedOn: round.ExternalClosedOn,
                 Bet: round.BetAmount.GetValueOrDefault(0),
                 ValidBet: round.ValidBetAmount.GetValueOrDefault(0),
                 Settle: round.SettleAmount.GetValueOrDefault(0),

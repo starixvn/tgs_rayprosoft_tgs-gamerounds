@@ -9,6 +9,10 @@ namespace Tgs.GameRounds.Core
             AddRound source,
             CancellationToken cancellationToken = default);
 
+        ValueTask<IEnumerable<Guid>> AddRoundBatchAsync(
+            IEnumerable<AddRoundBatch> sources,
+            CancellationToken cancellationToken = default);
+
         ValueTask<bool> ExistAsync(
             Guid roundId,
             CancellationToken cancellationToken = default);

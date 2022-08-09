@@ -44,6 +44,30 @@ namespace Tgs.GameRounds.Client
                     HttpStatusCode: response.StatusCode);
         }
 
+        public async ValueTask<GameRoundBatchResponse> AddRoundBatchAsync(AddRoundBatchsViewModel model, CancellationToken cancellationToken = default)
+        {
+            var requestContent = new StringContent(
+                content: JsonSerializer.Serialize(model, _SerializerOptions),
+                encoding: Encoding.UTF8,
+                mediaType: MediaTypeNames.Application.Json);
+
+            var response = await _httpClient
+               .PostAsync(
+                   requestUri: "gamerounds/batch",
+                   content: requestContent,
+                   cancellationToken: cancellationToken)
+               .ConfigureAwait(false);
+
+            var RoundIds = await GetResultAsync<IEnumerable<Guid>>(
+                        responseMessage: response,
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
+
+            return new GameRoundBatchResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode,
+                    RoundIds: RoundIds ?? Enumerable.Empty<Guid>());
+        }
+
         public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid roundId, CancellationToken cancellationToken = default)
         {
             var response = await _httpClient

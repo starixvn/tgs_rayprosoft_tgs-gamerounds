@@ -20,16 +20,27 @@ namespace Tgs.GameRounds.Repositories.Entities.Configurations
             entity.HasIndex(e => e.ClosedOn, "ix_rounds_closed_on")
                 .HasMethod("brin");
 
+            entity.HasIndex(e => new { e.ClosedOn, e.BrandId }, "ix_rounds_closed_on_brand_id");
+
             entity.HasIndex(e => e.CreatedOn, "ix_rounds_created_on")
                 .HasMethod("brin");
+
+            entity.HasIndex(e => e.ExternalClosedOn, "ix_rounds_external_closed_on")
+                .HasMethod("brin");
+
+            entity.HasIndex(e => new { e.ExternalClosedOn, e.GameProviderId }, "ix_rounds_external_closed_on_game_provider_id");
 
             entity.HasIndex(e => new { e.ExternalRoundId, e.PlayerCode, e.GameProviderId, e.GameId }, "ix_rounds_external_round_id_composite");
 
             entity.HasIndex(e => e.GameId, "ix_rounds_game_id");
 
+            entity.HasIndex(e => new { e.GameProviderConfigurationId, e.WalletId, e.GameId, e.ExternalRoundId }, "ix_rounds_game_provider_configuration_id_composite");
+
             entity.HasIndex(e => e.GameProviderId, "ix_rounds_game_provider_id");
 
             entity.HasIndex(e => e.PlayerCode, "ix_rounds_player_code");
+
+            entity.HasIndex(e => new { e.ExternalRoundId, e.GameProviderId, e.GameId, e.WalletId }, "ix_rounds_wallet_id_composite");
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()

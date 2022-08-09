@@ -58,7 +58,11 @@ namespace Tgs.GameRounds.Repositories
             using var transaction = _context.Database.BeginTransaction();
             try
             {
-                _ = _context.Rounds.Add(round);
+                _ = await _context.Rounds
+                            .AddAsync(
+                                entity: round,
+                                cancellationToken: cancellationToken)
+                            .ConfigureAwait(false);
 
                 _ = await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -66,11 +70,17 @@ namespace Tgs.GameRounds.Repositories
                     x => x.Id == roundId,
                     cancellationToken: cancellationToken).ConfigureAwait(false);
 
-                _ = _context.RoundDetails.Add(new()
+                var roundDetail = new RoundDetail()
                 {
                     RoundId = getRound.Id,
                     AdditionalData = source.AdditionalData ?? string.Empty,
-                });
+                };
+
+                _ = await _context.RoundDetails
+                            .AddAsync(
+                                entity: roundDetail,
+                                cancellationToken: cancellationToken)
+                            .ConfigureAwait(false);
 
                 _ = await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -83,6 +93,99 @@ namespace Tgs.GameRounds.Repositories
                 await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
                 return null;
             }
+        }
+
+        public async ValueTask<IEnumerable<Guid>> AddRoundBatchAsync(
+            IEnumerable<AddRoundBatch> sources,
+            CancellationToken cancellationToken = default)
+        {
+            var addDatas = from source in sources
+                           join round in _context.Rounds.AsQueryable()
+                           on new { source.ExternalRoundId, source.GameProviderId, source.GameId, source.WalletId }
+                           equals new { round.ExternalRoundId, round.GameProviderId, round.GameId, round.WalletId }
+                           into addRounds
+                           from addRound in addRounds.DefaultIfEmpty()
+                           where addRound is null
+                           select source;
+
+            if (!addDatas.Any())
+            {
+                return Enumerable.Empty<Guid>();
+            }
+
+            var rounds = new List<Round>();
+            var roundDetails = new List<RoundDetail>();
+
+            foreach (var addData in addDatas)
+            {
+                var roundId = await _serialNumberGenerator
+                                    .GenerateAsync(
+                                        cancellationToken: cancellationToken)
+                                    .ConfigureAwait(false);
+
+                rounds.Add(new Round()
+                {
+                    Id = roundId,
+                    ExternalRoundId = addData.ExternalRoundId,
+                    GameProviderId = addData.GameProviderId,
+                    PlayerCode = addData.PlayerCode,
+                    GameId = addData.GameId,
+                    CurrencyCode = addData.CurrencyCode,
+                    Status = (short)addData.Status,
+                    GameProviderConfigurationId = addData.GameProviderConfigurationId,
+                    WalletId = addData.WalletId,
+                    CreatedOn = DateTime.UtcNow,
+                    ClosedOn = (addData.Status is GameRoundStatus.Closed) ? DateTime.UtcNow : null,
+                    UpdatedOn = DateTime.UtcNow,
+                    BrandId = addData.BrandId,
+                    ExternalCreatedOn = DateTime.SpecifyKind(addData.ExternalCreatedOn.UtcDateTime, DateTimeKind.Utc),
+                    ExternalClosedOn = (addData.ExternalClosedOn.HasValue) ? DateTime.SpecifyKind(addData.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null,
+                    BetAmount = addData.BetAmount,
+                    ValidBetAmount = addData.ValidBetAmount,
+                    SettleAmount = addData.SettleAmount,
+                    Commission = addData.Commission,
+                    Turnover = addData.Turnover,
+                    WinLoss = addData.PlayerWinLoss.HasValue ? -(addData.PlayerWinLoss) : null,
+                    ClientStatus = (short)addData.ClientStatus
+                });
+
+                roundDetails.Add(new RoundDetail()
+                {
+                    RoundId = roundId,
+                    AdditionalData = addData.AdditionalData ?? string.Empty,
+                });
+            }
+
+            try
+            {
+                await _context.Rounds
+                    .AddRangeAsync(
+                        entities: rounds,
+                        cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+
+                _ = await _context
+                    .SaveChangesAsync(
+                        cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+
+                await _context.RoundDetails
+                    .AddRangeAsync(
+                        entities: roundDetails,
+                        cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+
+                _ = await _context
+                    .SaveChangesAsync(
+                        cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "LogOn:{DateTime.Now.ToString(\"o\")} Data: {round} Message:批此新增新局出現例外", DateTime.Now.ToString("o"));
+            }
+
+            return rounds.Select(x => x.Id).AsEnumerable();
         }
 
         public async ValueTask<bool> ExistAsync(
