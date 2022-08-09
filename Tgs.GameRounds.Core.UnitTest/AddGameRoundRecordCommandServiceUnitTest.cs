@@ -140,7 +140,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 ClosedOn: gameRoundInfo.ClosedOn,
                 UpdatedOn: gameRoundInfo.UpdatedOn,
                 ExternalCreatedOn: gameRoundInfo.ExternalCreatedOn,
-                ExternalClosedOn: gameRoundInfo.ClosedOn,
+                ExternalClosedOn: gameRoundInfo.ExternalClosedOn,
                 Bet: gameRoundInfo.BetAmount.GetValueOrDefault(0),
                 ValidBet: gameRoundInfo.ValidBetAmount.GetValueOrDefault(0),
                 Settle: gameRoundInfo.SettleAmount.GetValueOrDefault(0),

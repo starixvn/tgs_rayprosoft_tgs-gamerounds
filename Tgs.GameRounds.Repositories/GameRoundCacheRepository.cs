@@ -31,6 +31,13 @@ namespace Tgs.GameRounds.Repositories
                 source,
                 cancellationToken);
 
+        public ValueTask<IEnumerable<Guid>> AddRoundBatchAsync(
+            IEnumerable<AddRoundBatch> sources,
+            CancellationToken cancellationToken = default)
+            => _gameRound.AddRoundBatchAsync(
+                sources,
+                cancellationToken);
+
         public async ValueTask<bool> ExistAsync(
             Guid roundId,
             CancellationToken cancellationToken = default)

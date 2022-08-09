@@ -3,6 +3,7 @@ using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.ViewModels;
 using Tgs.ServiceUtility;
 
@@ -18,7 +19,7 @@ namespace Tgs.GameRounds.Controllers
         /// <param name="service">The service.</param>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        [HttpPost(Name = "Add")]
+        [HttpPost(Name = "AddRound")]
         public async ValueTask AddRoundAsync(
             [FromServices] ICommandService<AddRoundCommand> service,
             AddRoundViewModel model)
@@ -42,6 +43,42 @@ namespace Tgs.GameRounds.Controllers
                 PlayerWinLoss: model.PlayerWinLoss,
                 ClientStatus: model.ClientStatus,
                 AdditionalData: model.AdditionalData)).ConfigureAwait(false);
+
+        /// <summary>
+        /// Adds the round batch asynchronous.
+        /// </summary>
+        /// <param name="service">The service.</param>
+        /// <param name="model">The model.</param>
+        /// <returns></returns>
+        [HttpPost("batch", Name = "AddRoundBatch")]
+        public async ValueTask<IEnumerable<Guid>> AddRoundBatchAsync(
+            [FromServices] IGetService<AddRoundBatchCommand, IEnumerable<Guid>> service,
+            AddRoundBatchsViewModel model)
+        {
+            var addRoundBatches = model.AddRoundBatches.Select(data => new AddRoundBatch(
+                ExternalRoundId: data.ExternalRoundId,
+                GameProviderId: data.GameProviderId,
+                PlayerCode: data.PlayerCode,
+                GameId: data.GameId,
+                CurrencyCode: data.CurrencyCode,
+                Status: data.Status,
+                GameProviderConfigurationId: data.GameProviderConfigurationId,
+                WalletId: data.WalletId,
+                BrandId: data.BrandId,
+                ExternalCreatedOn: data.ExternalCreatedOn,
+                ExternalClosedOn: data.ExternalClosedOn,
+                BetAmount: data.BetAmount,
+                ValidBetAmount: data.ValidBetAmount,
+                SettleAmount: data.SettleAmount,
+                Commission: data.Commission,
+                Turnover: data.Turnover,
+                PlayerWinLoss: data.PlayerWinLoss,
+                ClientStatus: data.ClientStatus,
+                AdditionalData: data.AdditionalData)).AsEnumerable();
+
+            return await service.GetAsync(new AddRoundBatchCommand(
+                   AddRoundBatches: addRoundBatches)).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Gets the game round asynchronous.
