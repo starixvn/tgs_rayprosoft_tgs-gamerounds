@@ -82,12 +82,20 @@ builder.Services
     (sp, dbBuilder) =>
     {
         var config = sp.GetRequiredService<IConfiguration>();
-        _ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"));
+        _ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"),
+            serverOption =>
+            {
+                _ = serverOption.CommandTimeout(180);
+            });
     },
     (sp, dbBuilder) =>
     {
         var config = sp.GetRequiredService<IConfiguration>();
-        _ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"));
+        _ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"),
+            serverOption =>
+            {
+                _ = serverOption.CommandTimeout(180);
+            });
     },
     (options, sp) =>
     {
