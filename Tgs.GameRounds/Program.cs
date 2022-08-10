@@ -81,23 +81,13 @@ builder.Services
     },
     (sp, dbBuilder) =>
     {
-        var configuration = sp.GetRequiredService<IConfiguration>();
-        _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
-            serverOption =>
-            {
-                _ = serverOption.SetPostgresVersion(12, 5);
-                _ = serverOption.CommandTimeout(180);
-            });
+        var config = sp.GetRequiredService<IConfiguration>();
+        _ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"));
     },
     (sp, dbBuilder) =>
     {
-        var configuration = sp.GetRequiredService<IConfiguration>();
-        _ = dbBuilder.UseNpgsql(configuration.GetConnectionString("Tgs"),
-            serverOption =>
-            {
-                _ = serverOption.SetPostgresVersion(12, 5);
-                _ = serverOption.CommandTimeout(180);
-            });
+        var config = sp.GetRequiredService<IConfiguration>();
+        _ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"));
     },
     (options, sp) =>
     {
