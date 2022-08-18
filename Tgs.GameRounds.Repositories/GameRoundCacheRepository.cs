@@ -4,242 +4,243 @@ using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
 
-namespace Tgs.GameRounds.Repositories
+namespace Tgs.GameRounds.Repositories;
+
+internal class GameRoundCacheRepository : IGameRound
 {
-    internal class GameRoundCacheRepository : IGameRound
-    {
-        private const string KeyExist = "gameround:exist:{0}";
-        private const string KeyRoundId = "gameround:roundid:{0}:{1}:{2}:{3}";
-        private readonly IDatabase _database;
-        private readonly TimeSpan _expiry;
-        private readonly IGameRound _gameRound;
+	private const string KeyExist = "gameround:exist:{0}";
+	private const string KeyRoundId = "gameround:roundid:{0}:{1}:{2}:{3}";
+	private readonly IDatabase _database;
+	private readonly TimeSpan _expiry;
+	private readonly IGameRound _gameRound;
 
-        public GameRoundCacheRepository(
-            IGameRound gameRound,
-            IDatabase database,
-            TimeSpan expiry)
-        {
-            _database = database ?? throw new ArgumentNullException(nameof(database));
-            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
-            _expiry = expiry;
-        }
+	public GameRoundCacheRepository(
+		IGameRound gameRound,
+		IDatabase database,
+		TimeSpan expiry)
+	{
+		_database = database ?? throw new ArgumentNullException(nameof(database));
+		_gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+		_expiry = expiry;
+	}
 
-        public ValueTask<Guid?> AddCompanyRoundAsync(
-            AddCompanyRound source,
-            CancellationToken cancellationToken = default)
-            => _gameRound.AddCompanyRoundAsync(
-                source,
-                cancellationToken);
+	public ValueTask<Guid?> AddCompanyRoundAsync(
+		AddCompanyRound source,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.AddCompanyRoundAsync(
+			source,
+			cancellationToken);
 
-        public ValueTask<Guid?> AddRoundAsync(
-            AddRound source,
-            CancellationToken cancellationToken = default)
-            => _gameRound.AddRoundAsync(
-                source,
-                cancellationToken);
+	public ValueTask<Guid?> AddRoundAsync(
+		AddRound source,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.AddRoundAsync(
+			source,
+			cancellationToken);
 
-        public ValueTask<IEnumerable<Guid>> AddRoundBatchAsync(
-            IEnumerable<AddRoundBatch> sources,
-            CancellationToken cancellationToken = default)
-            => _gameRound.AddRoundBatchAsync(
-                sources,
-                cancellationToken);
+	public IAsyncEnumerable<Guid> AddRoundBatchAsync(
+		IEnumerable<AddRoundBatch> sources,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.AddRoundBatchAsync(
+			sources,
+			cancellationToken);
 
-        public ValueTask AdjustClosedRoundAsync(
-            Guid roundId,
-            AdjustClosedRound source,
-            CancellationToken cancellationToken = default)
-            => _gameRound.AdjustClosedRoundAsync(
-                roundId: roundId,
-                source: source,
-                cancellationToken: cancellationToken);
+	IAsyncEnumerable<Guid> IGameRound.AddRoundBatchAsync(IEnumerable<AddRoundBatch> sources, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        public async ValueTask<bool> ExistAsync(
-            Guid roundId,
-            CancellationToken cancellationToken = default)
-        {
-            string key = string.Format(KeyExist, roundId).ToLower();
+	public ValueTask AdjustClosedRoundAsync(
+				Guid roundId,
+		AdjustClosedRound source,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.AdjustClosedRoundAsync(
+			roundId: roundId,
+			source: source,
+			cancellationToken: cancellationToken);
 
-            if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
-            {
-                var round = await _gameRound.GetAsync(
-                    roundId: roundId,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
+	public async ValueTask<bool> ExistAsync(
+		Guid roundId,
+		CancellationToken cancellationToken = default)
+	{
+		string key = string.Format(KeyExist, roundId).ToLower();
 
-                if (round == null)
-                {
-                    return false;
-                }
+		if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
+		{
+			var round = await _gameRound.GetAsync(
+				roundId: roundId,
+				cancellationToken: cancellationToken).ConfigureAwait(false);
 
-                var value = JsonSerializer.Serialize(new
-                {
-                    round.RoundId,
-                    LogOn = DateTimeOffset.UtcNow.ToString("O")
-                });
+			if (round == null)
+			{
+				return false;
+			}
 
-                _ = await _database.StringSetAsync(
-                    key: key,
-                    value: value,
-                    expiry: _expiry,
-                    when: When.Always,
-                    flags: CommandFlags.None).ConfigureAwait(false);
+			var value = JsonSerializer.Serialize(new
+			{
+				round.RoundId,
+				LogOn = DateTimeOffset.UtcNow.ToString("O")
+			});
 
-                return true;
-            }
-            return true;
-        }
+			_ = await _database.StringSetAsync(
+				key: key,
+				value: value,
+				expiry: _expiry,
+				when: When.Always,
+				flags: CommandFlags.None).ConfigureAwait(false);
 
-        public ValueTask<GameRoundInfo?> GetAsync(
-            Guid roundId,
-            CancellationToken cancellationToken = default)
-            => _gameRound.GetAsync(
-                roundId,
-                cancellationToken: cancellationToken);
+			return true;
+		}
+		return true;
+	}
 
-        public ValueTask<GameRoundInfo?> GetAsync(
-            Guid gameProviderId,
-            string externalRoundId,
-            int gameId,
-            Guid walletId,
-            CancellationToken cancellationToken = default)
-            => _gameRound.GetAsync(
-                gameProviderId: gameProviderId,
-                externalRoundId: externalRoundId,
-                gameId: gameId,
-                walletId: walletId,
-                cancellationToken: cancellationToken);
+	public ValueTask<GameRoundInfo?> GetAsync(
+		Guid roundId,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.GetAsync(
+			roundId,
+			cancellationToken: cancellationToken);
 
-        public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
-            Guid roundId,
-            CancellationToken cancellationToken = default)
-            => _gameRound.GetRoundDetailAsync(
-                roundId: roundId,
-                cancellationToken: cancellationToken);
+	public ValueTask<GameRoundInfo?> GetAsync(
+		Guid gameProviderId,
+		string externalRoundId,
+		int gameId,
+		Guid walletId,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.GetAsync(
+			gameProviderId: gameProviderId,
+			externalRoundId: externalRoundId,
+			gameId: gameId,
+			walletId: walletId,
+			cancellationToken: cancellationToken);
 
-        public async ValueTask<Guid?> GetRoundIdAsync(
-            Guid gameProviderId,
-            string externalRoundId,
-            int gameId,
-            Guid walletId,
-            CancellationToken cancellationToken = default)
-        {
-            string key = string.Format(KeyRoundId, gameProviderId, externalRoundId, gameId, walletId).ToLower();
+	public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
+		Guid roundId,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.GetRoundDetailAsync(
+			roundId: roundId,
+			cancellationToken: cancellationToken);
 
-            if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
-            {
-                var roundId = await _gameRound.GetRoundIdAsync(
-                                    gameProviderId: gameProviderId,
-                                    externalRoundId: externalRoundId,
-                                    gameId: gameId,
-                                    walletId: walletId,
-                                    cancellationToken: cancellationToken).ConfigureAwait(false);
+	public async ValueTask<Guid?> GetRoundIdAsync(
+		Guid gameProviderId,
+		string externalRoundId,
+		int gameId,
+		Guid walletId,
+		CancellationToken cancellationToken = default)
+	{
+		string key = string.Format(KeyRoundId, gameProviderId, externalRoundId, gameId, walletId).ToLower();
 
-                if (!roundId.HasValue)
-                {
-                    return roundId;
-                }
+		if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
+		{
+			var roundId = await _gameRound.GetRoundIdAsync(
+								gameProviderId: gameProviderId,
+								externalRoundId: externalRoundId,
+								gameId: gameId,
+								walletId: walletId,
+								cancellationToken: cancellationToken).ConfigureAwait(false);
 
-                _ = await _database.StringSetAsync(
-                    key: key,
-                    value: roundId.Value.ToString(),
-                    expiry: _expiry,
-                    when: When.Always,
-                    flags: CommandFlags.None).ConfigureAwait(false);
+			if (!roundId.HasValue)
+			{
+				return roundId;
+			}
 
-                return roundId;
-            }
+			_ = await _database.StringSetAsync(
+				key: key,
+				value: roundId.Value.ToString(),
+				expiry: _expiry,
+				when: When.Always,
+				flags: CommandFlags.None).ConfigureAwait(false);
 
-            return Guid.TryParse(await _database.StringGetAsync(key).ConfigureAwait(false), out var tempRoundId)
-                ? tempRoundId
-                : null;
-        }
+			return roundId;
+		}
 
-        public ValueTask<GameRoundStatus> GetStatusAsync(
-            Guid roundId,
-            CancellationToken cancellationToken = default)
-            => _gameRound.GetStatusAsync(
-                roundId: roundId,
-                cancellationToken: cancellationToken);
+		return Guid.TryParse(await _database.StringGetAsync(key).ConfigureAwait(false), out var tempRoundId)
+			? tempRoundId
+			: null;
+	}
 
-        public ValueTask ManualCloseRoundAsync(
-            Guid roundId,
-            ManualCloseRound source,
-            CancellationToken cancellationToken = default)
-            => _gameRound.ManualCloseRoundAsync(
-                roundId: roundId,
-                source: source,
-                cancellationToken: cancellationToken);
+	public ValueTask<GameRoundStatus> GetStatusAsync(
+		Guid roundId,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.GetStatusAsync(
+			roundId: roundId,
+			cancellationToken: cancellationToken);
 
-        public ValueTask<Guid?> NewRoundAsync(
-            NewRound source,
-            CancellationToken cancellationToken = default)
-            => _gameRound.NewRoundAsync(
-                source: source,
-                cancellationToken: cancellationToken);
+	public ValueTask ManualCloseRoundAsync(
+		Guid roundId,
+		ManualCloseRound source,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.ManualCloseRoundAsync(
+			roundId: roundId,
+			source: source,
+			cancellationToken: cancellationToken);
 
-        public ValueTask UpdateClientStatusAsync(
-            Guid roundId,
-            GameRoundClientStatus status,
-            CancellationToken cancellationToken = default)
-            => _gameRound.UpdateClientStatusAsync(
-                roundId: roundId,
-                status: status,
-                cancellationToken: cancellationToken);
+	public ValueTask<Guid?> NewRoundAsync(
+		NewRound source,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.NewRoundAsync(
+			source: source,
+			cancellationToken: cancellationToken);
 
-        public ValueTask UpdateRoundClosedAsync(
-            Guid roundId,
-            UpdateRoundClosed source,
-            CancellationToken cancellationToken = default)
-            => _gameRound.UpdateRoundClosedAsync(
-                roundId: roundId,
-                source: source,
-                cancellationToken: cancellationToken);
+	public ValueTask UpdateClientStatusAsync(
+		Guid roundId,
+		GameRoundClientStatus status,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.UpdateClientStatusAsync(
+			roundId: roundId,
+			status: status,
+			cancellationToken: cancellationToken);
 
-        public ValueTask UpdateRoundDetailAsync(
-            Guid roundId,
-            string additionalData,
-            CancellationToken cancellationToken = default)
-            => _gameRound.UpdateRoundDetailAsync(
-                roundId: roundId,
-                additionalData: additionalData,
-                cancellationToken: cancellationToken);
+	public ValueTask UpdateRoundClosedAsync(
+		Guid roundId,
+		UpdateRoundClosed source,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.UpdateRoundClosedAsync(
+			roundId: roundId,
+			source: source,
+			cancellationToken: cancellationToken);
 
-        public ValueTask UpdateRoundOpenAsync(
-            Guid roundId,
-            UpdateRoundOpen source,
-            CancellationToken cancellationToken = default)
-             => _gameRound.UpdateRoundOpenAsync(
-                 roundId: roundId,
-                 source: source,
-                 cancellationToken: cancellationToken);
+	public ValueTask UpdateRoundDetailAsync(
+		Guid roundId,
+		string additionalData,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.UpdateRoundDetailAsync(
+			roundId: roundId,
+			additionalData: additionalData,
+			cancellationToken: cancellationToken);
 
-        public ValueTask UpdateRoundOpenSettleAsync(
-            Guid roundId,
-            UpdateRoundOpenSettle source,
-            CancellationToken cancellationToken = default)
-             => _gameRound.UpdateRoundOpenSettleAsync(
-                 roundId: roundId,
-                 source: source,
-                cancellationToken: cancellationToken);
+	public ValueTask UpdateRoundOpenAsync(
+		Guid roundId,
+		UpdateRoundOpen source,
+		CancellationToken cancellationToken = default)
+		 => _gameRound.UpdateRoundOpenAsync(
+			 roundId: roundId,
+			 source: source,
+			 cancellationToken: cancellationToken);
 
-        public ValueTask UpdateRoundReopenAsync(
-            Guid roundId,
-            UpdateRoundReopen source,
-            CancellationToken cancellationToken = default)
-            => _gameRound.UpdateRoundReopenAsync(
-                roundId: roundId,
-                source: source,
-                cancellationToken: cancellationToken);
+	public ValueTask UpdateRoundOpenSettleAsync(
+		Guid roundId,
+		UpdateRoundOpenSettle source,
+		CancellationToken cancellationToken = default)
+		 => _gameRound.UpdateRoundOpenSettleAsync(
+			 roundId: roundId,
+			 source: source,
+			cancellationToken: cancellationToken);
 
-        public ValueTask UpdateStatusAsync(
-            Guid roundId,
-            GameRoundStatus status,
-            DateTimeOffset? externalClosedOn = null,
-            CancellationToken cancellationToken = default)
-            => _gameRound.UpdateStatusAsync(
-                roundId: roundId,
-                status: status,
-                externalClosedOn: externalClosedOn,
-                cancellationToken: cancellationToken);
-    }
+	public ValueTask UpdateRoundReopenAsync(
+		Guid roundId,
+		UpdateRoundReopen source,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.UpdateRoundReopenAsync(
+			roundId: roundId,
+			source: source,
+			cancellationToken: cancellationToken);
+
+	public ValueTask UpdateStatusAsync(
+		Guid roundId,
+		GameRoundStatus status,
+		DateTimeOffset? externalClosedOn = null,
+		CancellationToken cancellationToken = default)
+		=> _gameRound.UpdateStatusAsync(
+			roundId: roundId,
+			status: status,
+			externalClosedOn: externalClosedOn,
+			cancellationToken: cancellationToken);
 }

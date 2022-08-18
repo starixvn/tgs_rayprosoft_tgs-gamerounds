@@ -1,7 +1,6 @@
-﻿namespace Tgs.GameRounds
+﻿namespace Tgs.GameRounds;
+
+public record RedisOptions
 {
-    public record RedisOptions
-    {
-        public string ConnectionString { get; set; } = "localhost";
-    }
+	public string ConnectionString { get; set; } = "localhost";
 }

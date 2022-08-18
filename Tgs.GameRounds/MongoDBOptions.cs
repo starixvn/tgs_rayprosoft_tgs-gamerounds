@@ -1,7 +1,6 @@
-﻿namespace Tgs.GameRounds
+﻿namespace Tgs.GameRounds;
+
+public record MongoDBOptions
 {
-    public record MongoDBOptions
-    {
-        public string ConnectionString { get; set; } = "mongodb://localhost";
-    }
+	public string ConnectionString { get; set; } = "mongodb://localhost";
 }
