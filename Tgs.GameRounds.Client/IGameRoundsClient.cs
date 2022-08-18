@@ -19,6 +19,8 @@ public interface IGameRoundsClient
 
 	ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId, CancellationToken cancellationToken = default);
 
+	IAsyncEnumerable<Guid> GetListByRoundIdAsync(Guid gameProviderId, string externalRoundId, string externalGameId, CancellationToken cancellationToken = default);
+
 	ValueTask<GameRoundDetailDataResponse> GetRoundDetailAsync(Guid roundId, CancellationToken cancellationToken = default);
 
 	ValueTask<GameRoundIdResponse> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId, CancellationToken cancellationToken = default);

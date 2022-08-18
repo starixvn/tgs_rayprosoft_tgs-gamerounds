@@ -347,6 +347,26 @@ public class GameRoundsController : ControllerBase
 			.GetStatusAsync(roundid);
 
 	/// <summary>
+	/// Queries the by round identifier asynchronous.
+	/// </summary>
+	/// <param name="service">The service.</param>
+	/// <param name="gameProviderId">The game provider identifier.</param>
+	/// <param name="externalRoundId">The external round identifier.</param>
+	/// <param name="externalGameId">The external game identifier.</param>
+	/// <returns></returns>
+	[HttpGet("{gameProviderId}/{externalRoundId}/{externalGameId}/roundids", Name = "GetListByRoundIdQuery")]
+	public IAsyncEnumerable<Guid> GetListByRoundIdQueryAsync(
+		[FromServices] IQueryService<GetListByRoundIdQuery, Guid> service,
+		 Guid gameProviderId,
+		 string externalRoundId,
+		 string externalGameId)
+		=> service
+			.QueryAsync(new GetListByRoundIdQuery(
+				gameProviderId,
+				externalRoundId,
+				externalGameId));
+
+	/// <summary>
 	/// Manuals the close round asynchronous.
 	/// </summary>
 	/// <param name="service">The service.</param>

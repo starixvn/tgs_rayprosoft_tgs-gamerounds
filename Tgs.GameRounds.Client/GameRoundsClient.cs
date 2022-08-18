@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mime;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -77,14 +78,14 @@ internal class GameRoundsClient : IGameRoundsClient
 			   cancellationToken: cancellationToken)
 		   .ConfigureAwait(false);
 
-		var RoundIds = await GetResultAsync<IEnumerable<Guid>>(
+		var roundIds = await GetResultAsync<IEnumerable<Guid>>(
 					responseMessage: response,
 					cancellationToken: cancellationToken).ConfigureAwait(false);
 
 		return new GameRoundBatchResponse(
 				Success: response.IsSuccessStatusCode,
 				HttpStatusCode: response.StatusCode,
-				RoundIds: RoundIds ?? Enumerable.Empty<Guid>());
+				RoundIds: roundIds ?? Enumerable.Empty<Guid>());
 	}
 
 	public async ValueTask<GameRoundResponse> AdjustClosedRoundAsync(Guid roundId, AdjustClosedRoundViewModel model, CancellationToken cancellationToken = default)
@@ -168,6 +169,31 @@ internal class GameRoundsClient : IGameRoundsClient
 				Data: await GetResultAsync<GameRoundViewModel>(
 					responseMessage: response,
 					cancellationToken: cancellationToken).ConfigureAwait(false));
+	}
+
+	public async IAsyncEnumerable<Guid> GetListByRoundIdAsync(Guid gameProviderId, string externalRoundId, string externalGameId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		var response = await _httpClient
+		   .GetAsync(
+			   requestUri: $"gamerounds/{gameProviderId}/{externalRoundId}/{externalGameId}/roundids",
+			   cancellationToken: cancellationToken)
+		   .ConfigureAwait(false);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var roundIds = await GetResultAsync<IEnumerable<Guid>>(
+					responseMessage: response,
+					cancellationToken: cancellationToken).ConfigureAwait(false);
+
+		if (roundIds is null || !roundIds.Any())
+		{
+			yield break;
+		}
+
+		foreach (var roundId in roundIds)
+		{
+			yield return roundId;
+		}
 	}
 
 	public async ValueTask<GameRoundDetailDataResponse> GetRoundDetailAsync(Guid roundId, CancellationToken cancellationToken = default)
@@ -431,7 +457,7 @@ internal class GameRoundsClient : IGameRoundsClient
 			return JsonSerializer.Deserialize<TResult?>(content, _SerializerOptions);
 		}
 
-		if (responseMessage.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+		if (responseMessage.StatusCode == HttpStatusCode.InternalServerError)
 		{
 			try
 			{
@@ -442,6 +468,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				return default;
 			}
 		}
+
 		return default;
 	}
 }
