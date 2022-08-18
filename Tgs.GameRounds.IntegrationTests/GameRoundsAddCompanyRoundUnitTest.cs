@@ -13,273 +13,272 @@ using Tgs.GameRounds.Core.ApplicationServices;
 using Tgs.GameRounds.Core.Exceptions;
 using Tgs.ServiceUtility;
 
-namespace Tgs.GameRounds.IntegrationTests
+namespace Tgs.GameRounds.IntegrationTests;
+
+public partial class GameRoundsClientUnitTest
 {
-    public partial class GameRoundsClientUnitTest
-    {
-        [TestMethod]
-        public async Task GameRounds_AddCompanyRound_ExternalRoundId_Exist()
-        {
-            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-            var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
-            var gameId = 500001;
-            var playerCode = "4ues8xikza7o";
-            var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddCompanyRoundViewModel
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = walletId,
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow,
-                ExternalClosedOn = DateTimeOffset.UtcNow,
-                BetAmount = 10m,
-                ValidBetAmount = 10m,
-                SettleAmount = 20m,
-                Commission = 0,
-                Turnover = 10m,
-                CompanyWinLoss = -10m,
-                ClientStatus = GameRoundClientStatus.Win,
-                OperatorId = Guid.NewGuid(),
-                Remark = "test"
-            };
+	[TestMethod]
+	public async Task GameRounds_AddCompanyRound_ExternalRoundId_Exist()
+	{
+		var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+		var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+		var gameId = 500001;
+		var playerCode = "4ues8xikza7o";
+		var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+		var model = new AddCompanyRoundViewModel
+		{
+			ExternalRoundId = externalRoundId,
+			GameProviderId = gameProviderId,
+			PlayerCode = playerCode,
+			GameId = gameId,
+			CurrencyCode = "CNY",
+			GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+			WalletId = walletId,
+			BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+			ExternalCreatedOn = DateTimeOffset.UtcNow,
+			ExternalClosedOn = DateTimeOffset.UtcNow,
+			BetAmount = 10m,
+			ValidBetAmount = 10m,
+			SettleAmount = 20m,
+			Commission = 0,
+			Turnover = 10m,
+			CompanyWinLoss = -10m,
+			ClientStatus = GameRoundClientStatus.Win,
+			OperatorId = Guid.NewGuid(),
+			Remark = "test"
+		};
 
-            var web = CreateTestSettingSite(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
+		var web = CreateTestSettingSite(services =>
+		{
+			var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
 
-                _ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Returns(ValueTask.CompletedTask);
+			_ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Returns(ValueTask.CompletedTask);
 
-                _ = services.AddSingleton(fakeService);
-            });
+			_ = services.AddSingleton(fakeService);
+		});
 
-            var httpClient = web.CreateClient();
+		var httpClient = web.CreateClient();
 
-            var sut = new GameRoundsClient(httpClient);
+		var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
+		var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(true, actual.Success);
-            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
-        }
+		Assert.IsNotNull(actual);
+		Assert.AreEqual(true, actual.Success);
+		Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+	}
 
-        [TestMethod]
-        public async Task GameRounds_AddCompanyRound_GameRound_Company_Order_Duplicate_Exception()
-        {
-            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-            var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
-            var gameId = 500001;
-            var playerCode = "4ues8xikza7o";
-            var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddCompanyRoundViewModel
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = walletId,
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow,
-                ExternalClosedOn = DateTimeOffset.UtcNow,
-                BetAmount = 10m,
-                ValidBetAmount = 10m,
-                SettleAmount = 20m,
-                Commission = 0,
-                Turnover = 10m,
-                CompanyWinLoss = -10m,
-                ClientStatus = GameRoundClientStatus.Win,
-                OperatorId = Guid.NewGuid(),
-                Remark = "test"
-            };
+	[TestMethod]
+	public async Task GameRounds_AddCompanyRound_GameRound_Company_Order_Duplicate_Exception()
+	{
+		var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+		var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+		var gameId = 500001;
+		var playerCode = "4ues8xikza7o";
+		var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+		var model = new AddCompanyRoundViewModel
+		{
+			ExternalRoundId = externalRoundId,
+			GameProviderId = gameProviderId,
+			PlayerCode = playerCode,
+			GameId = gameId,
+			CurrencyCode = "CNY",
+			GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+			WalletId = walletId,
+			BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+			ExternalCreatedOn = DateTimeOffset.UtcNow,
+			ExternalClosedOn = DateTimeOffset.UtcNow,
+			BetAmount = 10m,
+			ValidBetAmount = 10m,
+			SettleAmount = 20m,
+			Commission = 0,
+			Turnover = 10m,
+			CompanyWinLoss = -10m,
+			ClientStatus = GameRoundClientStatus.Win,
+			OperatorId = Guid.NewGuid(),
+			Remark = "test"
+		};
 
-            var web = CreateTestSettingSite(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
+		var web = CreateTestSettingSite(services =>
+		{
+			var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
 
-                _ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Throws<GameRoundCompanyOrderDuplicateException>();
+			_ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Throws<GameRoundCompanyOrderDuplicateException>();
 
-                _ = services.AddSingleton(fakeService);
-            });
+			_ = services.AddSingleton(fakeService);
+		});
 
-            var httpClient = web.CreateClient();
+		var httpClient = web.CreateClient();
 
-            var sut = new GameRoundsClient(httpClient);
+		var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
+		var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(false, actual.Success);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
-        }
+		Assert.IsNotNull(actual);
+		Assert.AreEqual(false, actual.Success);
+		Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+	}
 
-        [TestMethod]
-        public async Task GameRounds_AddCompanyRound_GameRound_Failed_To_Create_An_Order()
-        {
-            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-            var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
-            var gameId = 500001;
-            var playerCode = "4ues8xikza7o";
-            var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddCompanyRoundViewModel
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = walletId,
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow,
-                ExternalClosedOn = DateTimeOffset.UtcNow,
-                BetAmount = 10m,
-                ValidBetAmount = 10m,
-                SettleAmount = 20m,
-                Commission = 0,
-                Turnover = 10m,
-                CompanyWinLoss = -10m,
-                ClientStatus = GameRoundClientStatus.Win,
-                OperatorId = Guid.NewGuid(),
-                Remark = "test"
-            };
+	[TestMethod]
+	public async Task GameRounds_AddCompanyRound_GameRound_Failed_To_Create_An_Order()
+	{
+		var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+		var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+		var gameId = 500001;
+		var playerCode = "4ues8xikza7o";
+		var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+		var model = new AddCompanyRoundViewModel
+		{
+			ExternalRoundId = externalRoundId,
+			GameProviderId = gameProviderId,
+			PlayerCode = playerCode,
+			GameId = gameId,
+			CurrencyCode = "CNY",
+			GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+			WalletId = walletId,
+			BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+			ExternalCreatedOn = DateTimeOffset.UtcNow,
+			ExternalClosedOn = DateTimeOffset.UtcNow,
+			BetAmount = 10m,
+			ValidBetAmount = 10m,
+			SettleAmount = 20m,
+			Commission = 0,
+			Turnover = 10m,
+			CompanyWinLoss = -10m,
+			ClientStatus = GameRoundClientStatus.Win,
+			OperatorId = Guid.NewGuid(),
+			Remark = "test"
+		};
 
-            var web = CreateTestSettingSite(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
+		var web = CreateTestSettingSite(services =>
+		{
+			var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
 
-                _ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Throws<GameRoundCreationFailedException>();
+			_ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Throws<GameRoundCreationFailedException>();
 
-                _ = services.AddSingleton(fakeService);
-            });
+			_ = services.AddSingleton(fakeService);
+		});
 
-            var httpClient = web.CreateClient();
+		var httpClient = web.CreateClient();
 
-            var sut = new GameRoundsClient(httpClient);
+		var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
+		var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(false, actual.Success);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
-        }
+		Assert.IsNotNull(actual);
+		Assert.AreEqual(false, actual.Success);
+		Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+	}
 
-        [TestMethod]
-        public async Task GameRounds_AddCompanyRound_GameRound_Generated_Order_Is_Currently_Locked()
-        {
-            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-            var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
-            var gameId = 500001;
-            var playerCode = "4ues8xikza7o";
-            var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddCompanyRoundViewModel
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = walletId,
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow,
-                ExternalClosedOn = DateTimeOffset.UtcNow,
-                BetAmount = 10m,
-                ValidBetAmount = 10m,
-                SettleAmount = 20m,
-                Commission = 0,
-                Turnover = 10m,
-                CompanyWinLoss = -10m,
-                ClientStatus = GameRoundClientStatus.Win,
-                OperatorId = Guid.NewGuid(),
-                Remark = "test"
-            };
+	[TestMethod]
+	public async Task GameRounds_AddCompanyRound_GameRound_Generated_Order_Is_Currently_Locked()
+	{
+		var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+		var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+		var gameId = 500001;
+		var playerCode = "4ues8xikza7o";
+		var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+		var model = new AddCompanyRoundViewModel
+		{
+			ExternalRoundId = externalRoundId,
+			GameProviderId = gameProviderId,
+			PlayerCode = playerCode,
+			GameId = gameId,
+			CurrencyCode = "CNY",
+			GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+			WalletId = walletId,
+			BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+			ExternalCreatedOn = DateTimeOffset.UtcNow,
+			ExternalClosedOn = DateTimeOffset.UtcNow,
+			BetAmount = 10m,
+			ValidBetAmount = 10m,
+			SettleAmount = 20m,
+			Commission = 0,
+			Turnover = 10m,
+			CompanyWinLoss = -10m,
+			ClientStatus = GameRoundClientStatus.Win,
+			OperatorId = Guid.NewGuid(),
+			Remark = "test"
+		};
 
-            var web = CreateTestSettingSite(services =>
-            {
-                var fakeGameRound = Substitute.For<IGameRound>();
+		var web = CreateTestSettingSite(services =>
+		{
+			var fakeGameRound = Substitute.For<IGameRound>();
 
-                _ = fakeGameRound.GetRoundIdAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
+			_ = fakeGameRound.GetRoundIdAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
 
-                _ = services.AddSingleton(fakeGameRound);
+			_ = services.AddSingleton(fakeGameRound);
 
-                var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
+			var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
 
-                _ = fakeGameRoundLocked.LockingAsync(
-                    gameProviderId: model.GameProviderId,
-                    externalRoundId: model.ExternalRoundId,
-                    gameId: model.GameId,
-                    walletId: model.WalletId).Returns(false);
+			_ = fakeGameRoundLocked.LockingAsync(
+				gameProviderId: model.GameProviderId,
+				externalRoundId: model.ExternalRoundId,
+				gameId: model.GameId,
+				walletId: model.WalletId).Returns(false);
 
-                _ = services.AddSingleton(fakeGameRoundLocked);
-            });
+			_ = services.AddSingleton(fakeGameRoundLocked);
+		});
 
-            var httpClient = web.CreateClient();
+		var httpClient = web.CreateClient();
 
-            var sut = new GameRoundsClient(httpClient);
+		var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
+		var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(false, actual.Success);
-            Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
-        }
+		Assert.IsNotNull(actual);
+		Assert.AreEqual(false, actual.Success);
+		Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+	}
 
-        [TestMethod]
-        public async Task GameRounds_AddCompanyRound_Normal_Process()
-        {
-            var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-            var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
-            var gameId = 500001;
-            var playerCode = "4ues8xikza7o";
-            var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddCompanyRoundViewModel
-            {
-                ExternalRoundId = externalRoundId,
-                GameProviderId = gameProviderId,
-                PlayerCode = playerCode,
-                GameId = gameId,
-                CurrencyCode = "CNY",
-                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId = walletId,
-                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn = DateTimeOffset.UtcNow,
-                ExternalClosedOn = DateTimeOffset.UtcNow,
-                BetAmount = 10m,
-                ValidBetAmount = 10m,
-                SettleAmount = 20m,
-                Commission = 0,
-                Turnover = 10m,
-                CompanyWinLoss = -10m,
-                ClientStatus = GameRoundClientStatus.Win,
-                OperatorId = Guid.NewGuid(),
-                Remark = "test"
-            };
+	[TestMethod]
+	public async Task GameRounds_AddCompanyRound_Normal_Process()
+	{
+		var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+		var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+		var gameId = 500001;
+		var playerCode = "4ues8xikza7o";
+		var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+		var model = new AddCompanyRoundViewModel
+		{
+			ExternalRoundId = externalRoundId,
+			GameProviderId = gameProviderId,
+			PlayerCode = playerCode,
+			GameId = gameId,
+			CurrencyCode = "CNY",
+			GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+			WalletId = walletId,
+			BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+			ExternalCreatedOn = DateTimeOffset.UtcNow,
+			ExternalClosedOn = DateTimeOffset.UtcNow,
+			BetAmount = 10m,
+			ValidBetAmount = 10m,
+			SettleAmount = 20m,
+			Commission = 0,
+			Turnover = 10m,
+			CompanyWinLoss = -10m,
+			ClientStatus = GameRoundClientStatus.Win,
+			OperatorId = Guid.NewGuid(),
+			Remark = "test"
+		};
 
-            var web = CreateTestSettingSite(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
+		var web = CreateTestSettingSite(services =>
+		{
+			var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
 
-                _ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Returns(ValueTask.CompletedTask);
+			_ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Returns(ValueTask.CompletedTask);
 
-                _ = services.AddSingleton(fakeService);
-            });
+			_ = services.AddSingleton(fakeService);
+		});
 
-            var httpClient = web.CreateClient();
+		var httpClient = web.CreateClient();
 
-            var sut = new GameRoundsClient(httpClient);
+		var sut = new GameRoundsClient(httpClient);
 
-            var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
+		var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
 
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(true, actual.Success);
-            Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
-        }
-    }
+		Assert.IsNotNull(actual);
+		Assert.AreEqual(true, actual.Success);
+		Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+	}
 }
