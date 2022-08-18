@@ -25,6 +25,25 @@ namespace Tgs.GameRounds.Client
         public GameRoundsClient(HttpClient httpClient)
            => _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
+        public async ValueTask<GameRoundResponse> AddCompanyRoundAsync(AddCompanyRoundViewModel model, CancellationToken cancellationToken = default)
+        {
+            var requestContent = new StringContent(
+                content: JsonSerializer.Serialize(model, _SerializerOptions),
+                encoding: Encoding.UTF8,
+                mediaType: MediaTypeNames.Application.Json);
+
+            var response = await _httpClient
+               .PostAsync(
+                   requestUri: "gamerounds/company",
+                   content: requestContent,
+                   cancellationToken: cancellationToken)
+               .ConfigureAwait(false);
+
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
+        }
+
         public async ValueTask<GameRoundResponse> AddRoundAsync(AddRoundViewModel model, CancellationToken cancellationToken = default)
         {
             var requestContent = new StringContent(
@@ -66,6 +85,25 @@ namespace Tgs.GameRounds.Client
                     Success: response.IsSuccessStatusCode,
                     HttpStatusCode: response.StatusCode,
                     RoundIds: RoundIds ?? Enumerable.Empty<Guid>());
+        }
+
+        public async ValueTask<GameRoundResponse> AdjustClosedRoundAsync(Guid roundId, AdjustClosedRoundViewModel model, CancellationToken cancellationToken = default)
+        {
+            var requestContent = new StringContent(
+                content: JsonSerializer.Serialize(model, _SerializerOptions),
+                encoding: Encoding.UTF8,
+                mediaType: MediaTypeNames.Application.Json);
+
+            var response = await _httpClient
+               .PutAsync(
+                  requestUri: $"gamerounds/{roundId}/adjust/closed",
+                  content: requestContent,
+                  cancellationToken: cancellationToken)
+               .ConfigureAwait(false);
+
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
         public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid roundId, CancellationToken cancellationToken = default)
@@ -186,6 +224,25 @@ namespace Tgs.GameRounds.Client
                     RoundStatus: await GetResultAsync<GameRoundStatus>(
                         responseMessage: response,
                         cancellationToken: cancellationToken).ConfigureAwait(false));
+        }
+
+        public async ValueTask<GameRoundResponse> ManualCloseRoundAsync(Guid roundId, ManualCloseRoundViewModel model, CancellationToken cancellationToken = default)
+        {
+            var requestContent = new StringContent(
+                content: JsonSerializer.Serialize(model, _SerializerOptions),
+                encoding: Encoding.UTF8,
+                mediaType: MediaTypeNames.Application.Json);
+
+            var response = await _httpClient
+               .PutAsync(
+                  requestUri: $"gamerounds/{roundId}/manual/closed",
+                  content: requestContent,
+                  cancellationToken: cancellationToken)
+               .ConfigureAwait(false);
+
+            return new GameRoundResponse(
+                    Success: response.IsSuccessStatusCode,
+                    HttpStatusCode: response.StatusCode);
         }
 
         public async ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundQueryViewModel model, CancellationToken cancellationToken = default)

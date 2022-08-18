@@ -67,14 +67,13 @@ namespace Tgs.GameRounds.Core.UnitTest
             _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
             var updateRoundOpenSettle = new UpdateRoundOpenSettle(
-                RoundId: command.RoundId,
                 BetAmount: command.BetAmount,
                 ValidBetAmount: command.ValidBetAmount,
                 SettleAmount: command.SettleAmount,
                 Commission: command.Commission,
                 Turnover: command.Turnover,
                 PlayerWinLoss: command.PlayerWinLoss);
-            _ = fakeGameRound.UpdateRoundOpenSettleAsync(updateRoundOpenSettle);
+            _ = fakeGameRound.UpdateRoundOpenSettleAsync(roundId, updateRoundOpenSettle);
 
             var service = new UpdateRoundOpenSettleCommandService(
                 fakeLogger,

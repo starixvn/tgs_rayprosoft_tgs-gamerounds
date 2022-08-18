@@ -77,7 +77,6 @@ namespace Tgs.GameRounds.Core.UnitTest
             _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
             var updateRoundReopen = new UpdateRoundReopen(
-                RoundId: command.RoundId,
                 Status: command.Status,
                 ExternalClosedOn: command.ExternalClosedOn,
                 BetAmount: command.BetAmount,
@@ -88,7 +87,7 @@ namespace Tgs.GameRounds.Core.UnitTest
                 PlayerWinLoss: command.PlayerWinLoss,
                 ClientStatus: command.ClientStatus,
                 AdditionalData: command.AdditionalData);
-            _ = fakeGameRound.UpdateRoundReopenAsync(updateRoundReopen);
+            _ = fakeGameRound.UpdateRoundReopenAsync(roundId, updateRoundReopen);
 
             var service = new UpdateRoundReopenCommandService(
                 fakeLogger,

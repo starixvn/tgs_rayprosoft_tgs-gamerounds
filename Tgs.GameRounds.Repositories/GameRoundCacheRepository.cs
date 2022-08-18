@@ -24,6 +24,13 @@ namespace Tgs.GameRounds.Repositories
             _expiry = expiry;
         }
 
+        public ValueTask<Guid?> AddCompanyRoundAsync(
+            AddCompanyRound source,
+            CancellationToken cancellationToken = default)
+            => _gameRound.AddCompanyRoundAsync(
+                source,
+                cancellationToken);
+
         public ValueTask<Guid?> AddRoundAsync(
             AddRound source,
             CancellationToken cancellationToken = default)
@@ -37,6 +44,15 @@ namespace Tgs.GameRounds.Repositories
             => _gameRound.AddRoundBatchAsync(
                 sources,
                 cancellationToken);
+
+        public ValueTask AdjustClosedRoundAsync(
+            Guid roundId,
+            AdjustClosedRound source,
+            CancellationToken cancellationToken = default)
+            => _gameRound.AdjustClosedRoundAsync(
+                roundId: roundId,
+                source: source,
+                cancellationToken: cancellationToken);
 
         public async ValueTask<bool> ExistAsync(
             Guid roundId,
@@ -138,6 +154,22 @@ namespace Tgs.GameRounds.Repositories
                 : null;
         }
 
+        public ValueTask<GameRoundStatus> GetStatusAsync(
+            Guid roundId,
+            CancellationToken cancellationToken = default)
+            => _gameRound.GetStatusAsync(
+                roundId: roundId,
+                cancellationToken: cancellationToken);
+
+        public ValueTask ManualCloseRoundAsync(
+            Guid roundId,
+            ManualCloseRound source,
+            CancellationToken cancellationToken = default)
+            => _gameRound.ManualCloseRoundAsync(
+                roundId: roundId,
+                source: source,
+                cancellationToken: cancellationToken);
+
         public ValueTask<Guid?> NewRoundAsync(
             NewRound source,
             CancellationToken cancellationToken = default)
@@ -155,9 +187,11 @@ namespace Tgs.GameRounds.Repositories
                 cancellationToken: cancellationToken);
 
         public ValueTask UpdateRoundClosedAsync(
+            Guid roundId,
             UpdateRoundClosed source,
             CancellationToken cancellationToken = default)
             => _gameRound.UpdateRoundClosedAsync(
+                roundId: roundId,
                 source: source,
                 cancellationToken: cancellationToken);
 
@@ -171,23 +205,29 @@ namespace Tgs.GameRounds.Repositories
                 cancellationToken: cancellationToken);
 
         public ValueTask UpdateRoundOpenAsync(
+            Guid roundId,
             UpdateRoundOpen source,
             CancellationToken cancellationToken = default)
              => _gameRound.UpdateRoundOpenAsync(
+                 roundId: roundId,
                  source: source,
-                cancellationToken: cancellationToken);
+                 cancellationToken: cancellationToken);
 
         public ValueTask UpdateRoundOpenSettleAsync(
+            Guid roundId,
             UpdateRoundOpenSettle source,
             CancellationToken cancellationToken = default)
              => _gameRound.UpdateRoundOpenSettleAsync(
+                 roundId: roundId,
                  source: source,
                 cancellationToken: cancellationToken);
 
         public ValueTask UpdateRoundReopenAsync(
+            Guid roundId,
             UpdateRoundReopen source,
             CancellationToken cancellationToken = default)
             => _gameRound.UpdateRoundReopenAsync(
+                roundId: roundId,
                 source: source,
                 cancellationToken: cancellationToken);
 

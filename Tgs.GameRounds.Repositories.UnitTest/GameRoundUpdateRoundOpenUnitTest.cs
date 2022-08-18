@@ -81,13 +81,12 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 fakeSerialNumberGenerator);
 
             var data = new UpdateRoundOpen(
-                RoundId: roundId,
                 BetAmount: 20m,
                 ValidBetAmount: 20m,
                 Commission: 0,
                 Turnover: 20m);
 
-            await fakeRoundRepository.UpdateRoundOpenAsync(data).ConfigureAwait(false);
+            await fakeRoundRepository.UpdateRoundOpenAsync(roundId, data).ConfigureAwait(false);
 
             var actual = await fakeRoundRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
             Assert.IsNotNull(actual);
@@ -121,13 +120,12 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 fakeSerialNumberGenerator);
 
             var data = new UpdateRoundOpen(
-                RoundId: roundId,
                 BetAmount: 20m,
                 ValidBetAmount: 20m,
                 Commission: 0,
                 Turnover: 20m);
 
-            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundOpenAsync(data).AsTask()).ConfigureAwait(false);
+            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundOpenAsync(roundId, data).AsTask()).ConfigureAwait(false);
         }
     }
 }

@@ -20,11 +20,13 @@ namespace Tgs.GameRounds.IntegrationTests
         {
             var roundId = Guid.NewGuid();
 
-            var model = new UpdateRoundOpenViewModel(
-                BetAmount: 10m,
-                ValidBetAmount: 10m,
-                Commission: 0,
-                Turnover: 10m);
+            var model = new UpdateRoundOpenViewModel()
+            {
+                BetAmount = 10m,
+                ValidBetAmount = 10m,
+                Commission = 0,
+                Turnover = 10m
+            };
 
             var web = CreateTestSettingSite(services =>
             {
@@ -52,11 +54,13 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
             var roundId = Guid.NewGuid();
 
-            var model = new UpdateRoundOpenViewModel(
-                BetAmount: 10m,
-                ValidBetAmount: 10m,
-                Commission: 0,
-                Turnover: 10m);
+            var model = new UpdateRoundOpenViewModel()
+            {
+                BetAmount = 10m,
+                ValidBetAmount = 10m,
+                Commission = 0,
+                Turnover = 10m
+            };
 
             var web = CreateTestSettingSite(services =>
             {
