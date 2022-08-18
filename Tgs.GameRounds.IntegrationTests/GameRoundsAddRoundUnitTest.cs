@@ -25,26 +25,28 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddRoundViewModel(
-                ExternalRoundId: externalRoundId,
-                GameProviderId: gameProviderId,
-                PlayerCode: playerCode,
-                GameId: gameId,
-                CurrencyCode: "CNY",
-                Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId: walletId,
-                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn: DateTimeOffset.UtcNow,
-                ExternalClosedOn: null,
-                BetAmount: 10m,
-                ValidBetAmount: 10m,
-                SettleAmount: null,
-                Commission: 0,
-                Turnover: 10m,
-                PlayerWinLoss: null,
-                ClientStatus: GameRoundClientStatus.Open,
-                AdditionalData: "{}");
+            var model = new AddRoundViewModel()
+            {
+                ExternalRoundId = externalRoundId,
+                GameProviderId = gameProviderId,
+                PlayerCode = playerCode,
+                GameId = gameId,
+                CurrencyCode = "CNY",
+                Status = GameRoundStatus.Open,
+                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId = walletId,
+                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn = DateTimeOffset.UtcNow,
+                ExternalClosedOn = null,
+                BetAmount = 10m,
+                ValidBetAmount = 10m,
+                SettleAmount = null,
+                Commission = 0,
+                Turnover = 10m,
+                PlayerWinLoss = null,
+                ClientStatus = GameRoundClientStatus.Open,
+                AdditionalData = "{}"
+            };
 
             var web = CreateTestSettingSite(services =>
             {
@@ -93,26 +95,28 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddRoundViewModel(
-                ExternalRoundId: externalRoundId,
-                GameProviderId: gameProviderId,
-                PlayerCode: playerCode,
-                GameId: gameId,
-                CurrencyCode: "CNY",
-                Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId: walletId,
-                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn: DateTimeOffset.UtcNow,
-                ExternalClosedOn: null,
-                BetAmount: 10m,
-                ValidBetAmount: 10m,
-                SettleAmount: null,
-                Commission: 0,
-                Turnover: 10m,
-                PlayerWinLoss: null,
-                ClientStatus: GameRoundClientStatus.Open,
-                AdditionalData: "{}");
+            var model = new AddRoundViewModel()
+            {
+                ExternalRoundId = externalRoundId,
+                GameProviderId = gameProviderId,
+                PlayerCode = playerCode,
+                GameId = gameId,
+                CurrencyCode = "CNY",
+                Status = GameRoundStatus.Open,
+                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId = walletId,
+                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn = DateTimeOffset.UtcNow,
+                ExternalClosedOn = null,
+                BetAmount = 10m,
+                ValidBetAmount = 10m,
+                SettleAmount = null,
+                Commission = 0,
+                Turnover = 10m,
+                PlayerWinLoss = null,
+                ClientStatus = GameRoundClientStatus.Open,
+                AdditionalData = "{}"
+            };
 
             var web = CreateTestSettingSite(services =>
             {
@@ -142,26 +146,28 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddRoundViewModel(
-                ExternalRoundId: externalRoundId,
-                GameProviderId: gameProviderId,
-                PlayerCode: playerCode,
-                GameId: gameId,
-                CurrencyCode: "CNY",
-                Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId: walletId,
-                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn: DateTimeOffset.UtcNow,
-                ExternalClosedOn: null,
-                BetAmount: 10m,
-                ValidBetAmount: 10m,
-                SettleAmount: null,
-                Commission: 0,
-                Turnover: 10m,
-                PlayerWinLoss: null,
-                ClientStatus: GameRoundClientStatus.Open,
-                AdditionalData: "{}");
+            var model = new AddRoundViewModel()
+            {
+                ExternalRoundId = externalRoundId,
+                GameProviderId = gameProviderId,
+                PlayerCode = playerCode,
+                GameId = gameId,
+                CurrencyCode = "CNY",
+                Status = GameRoundStatus.Open,
+                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId = walletId,
+                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn = DateTimeOffset.UtcNow,
+                ExternalClosedOn = null,
+                BetAmount = 10m,
+                ValidBetAmount = 10m,
+                SettleAmount = null,
+                Commission = 0,
+                Turnover = 10m,
+                PlayerWinLoss = null,
+                ClientStatus = GameRoundClientStatus.Open,
+                AdditionalData = "{}"
+            };
 
             var web = CreateTestSettingSite(services =>
             {
@@ -201,26 +207,28 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-            var model = new AddRoundViewModel(
-                ExternalRoundId: externalRoundId,
-                GameProviderId: gameProviderId,
-                PlayerCode: playerCode,
-                GameId: gameId,
-                CurrencyCode: "CNY",
-                Status: GameRoundStatus.Open,
-                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId: walletId,
-                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn: DateTimeOffset.UtcNow,
-                ExternalClosedOn: null,
-                BetAmount: 10m,
-                ValidBetAmount: 10m,
-                SettleAmount: null,
-                Commission: 0,
-                Turnover: 10m,
-                PlayerWinLoss: null,
-                ClientStatus: GameRoundClientStatus.Open,
-                AdditionalData: "{}");
+            var model = new AddRoundViewModel()
+            {
+                ExternalRoundId = externalRoundId,
+                GameProviderId = gameProviderId,
+                PlayerCode = playerCode,
+                GameId = gameId,
+                CurrencyCode = "CNY",
+                Status = GameRoundStatus.Open,
+                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId = walletId,
+                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn = DateTimeOffset.UtcNow,
+                ExternalClosedOn = null,
+                BetAmount = 10m,
+                ValidBetAmount = 10m,
+                SettleAmount = null,
+                Commission = 0,
+                Turnover = 10m,
+                PlayerWinLoss = null,
+                ClientStatus = GameRoundClientStatus.Open,
+                AdditionalData = "{}"
+            };
 
             var web = CreateTestSettingSite(services =>
             {

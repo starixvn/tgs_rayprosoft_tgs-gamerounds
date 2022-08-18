@@ -23,16 +23,18 @@ namespace Tgs.GameRounds.IntegrationTests
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
-            var model = new NewRoundQueryViewModel(
-                ExternalRoundId: externalRoundId,
-                GameProviderId: gameProviderId,
-                PlayerCode: playerCode,
-                GameId: gameId,
-                CurrencyCode: "CNY",
-                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId: new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
-                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn: DateTimeOffset.UtcNow);
+            var model = new NewRoundQueryViewModel()
+            {
+                ExternalRoundId = externalRoundId,
+                GameProviderId = gameProviderId,
+                PlayerCode = playerCode,
+                GameId = gameId,
+                CurrencyCode = "CNY",
+                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn = DateTimeOffset.UtcNow
+            };
 
             var web = CreateTestSettingSite(services =>
             {
@@ -62,16 +64,18 @@ namespace Tgs.GameRounds.IntegrationTests
             var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
-            var model = new NewRoundQueryViewModel(
-                ExternalRoundId: externalRoundId,
-                GameProviderId: gameProviderId,
-                PlayerCode: playerCode,
-                GameId: gameId,
-                CurrencyCode: "CNY",
-                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId: new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
-                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn: DateTimeOffset.UtcNow);
+            var model = new NewRoundQueryViewModel()
+            {
+                ExternalRoundId = externalRoundId,
+                GameProviderId = gameProviderId,
+                PlayerCode = playerCode,
+                GameId = gameId,
+                CurrencyCode = "CNY",
+                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn = DateTimeOffset.UtcNow
+            };
 
             var web = CreateTestSettingSite(services =>
             {
@@ -112,16 +116,18 @@ namespace Tgs.GameRounds.IntegrationTests
             var gameId = 500001;
             var playerCode = "4ues8xikza7o";
             var expected = Guid.NewGuid();
-            var model = new NewRoundQueryViewModel(
-                ExternalRoundId: externalRoundId,
-                GameProviderId: gameProviderId,
-                PlayerCode: playerCode,
-                GameId: gameId,
-                CurrencyCode: "CNY",
-                GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-                WalletId: new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
-                BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-                ExternalCreatedOn: DateTimeOffset.UtcNow);
+            var model = new NewRoundQueryViewModel()
+            {
+                ExternalRoundId = externalRoundId,
+                GameProviderId = gameProviderId,
+                PlayerCode = playerCode,
+                GameId = gameId,
+                CurrencyCode = "CNY",
+                GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+                WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+                BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+                ExternalCreatedOn = DateTimeOffset.UtcNow
+            };
 
             var web = CreateTestSettingSite(services =>
             {

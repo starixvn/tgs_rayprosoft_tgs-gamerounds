@@ -21,6 +21,5 @@ namespace Tgs.GameRounds.Core.ApplicationServices
         decimal CompanyWinLoss,
         GameRoundClientStatus ClientStatus,
         Guid OperatorId,
-        string Remark,
-        string? AdditionalData = null);
+        string Remark);
 }

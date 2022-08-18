@@ -45,8 +45,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 CompanyWinLoss = -10m,
                 ClientStatus = GameRoundClientStatus.Win,
                 OperatorId = Guid.NewGuid(),
-                Remark = "test",
-                AdditionalData = "{}"
+                Remark = "test"
             };
 
             var web = CreateTestSettingSite(services =>
@@ -97,8 +96,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 CompanyWinLoss = -10m,
                 ClientStatus = GameRoundClientStatus.Win,
                 OperatorId = Guid.NewGuid(),
-                Remark = "test",
-                AdditionalData = "{}"
+                Remark = "test"
             };
 
             var web = CreateTestSettingSite(services =>
@@ -149,8 +147,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 CompanyWinLoss = -10m,
                 ClientStatus = GameRoundClientStatus.Win,
                 OperatorId = Guid.NewGuid(),
-                Remark = "test",
-                AdditionalData = "{}"
+                Remark = "test"
             };
 
             var web = CreateTestSettingSite(services =>
@@ -201,8 +198,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 CompanyWinLoss = -10m,
                 ClientStatus = GameRoundClientStatus.Win,
                 OperatorId = Guid.NewGuid(),
-                Remark = "test",
-                AdditionalData = "{}"
+                Remark = "test"
             };
 
             var web = CreateTestSettingSite(services =>
@@ -263,8 +259,7 @@ namespace Tgs.GameRounds.IntegrationTests
                 CompanyWinLoss = -10m,
                 ClientStatus = GameRoundClientStatus.Win,
                 OperatorId = Guid.NewGuid(),
-                Remark = "test",
-                AdditionalData = "{}"
+                Remark = "test"
             };
 
             var web = CreateTestSettingSite(services =>

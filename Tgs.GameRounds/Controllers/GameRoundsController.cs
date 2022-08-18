@@ -42,8 +42,7 @@ namespace Tgs.GameRounds.Controllers
                 CompanyWinLoss: model.CompanyWinLoss,
                 ClientStatus: model.ClientStatus,
                 OperatorId: model.OperatorId,
-                Remark: model.Remark,
-                AdditionalData: model.AdditionalData));
+                Remark: model.Remark));
 
         /// <summary>
         /// Adds the round asynchronous.

@@ -22,17 +22,19 @@ namespace Tgs.GameRounds.IntegrationTests
         {
             var roundId = Guid.NewGuid();
 
-            var model = new UpdateRoundReopenViewModel(
-                Status: GameRoundStatus.Closed,
-                ExternalClosedOn: DateTimeOffset.UtcNow,
-                BetAmount: 10m,
-                ValidBetAmount: 10m,
-                SettleAmount: 20m,
-                Commission: 0,
-                Turnover: 10m,
-                PlayerWinLoss: 10m,
-                ClientStatus: GameRoundClientStatus.Win,
-                AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
+            var model = new UpdateRoundReopenViewModel()
+            {
+                Status = GameRoundStatus.Closed,
+                ExternalClosedOn = DateTimeOffset.UtcNow,
+                BetAmount = 10m,
+                ValidBetAmount = 10m,
+                SettleAmount = 20m,
+                Commission = 0,
+                Turnover = 10m,
+                PlayerWinLoss = 10m,
+                ClientStatus = GameRoundClientStatus.Win,
+                AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
+            };
 
             var web = CreateTestSettingSite(services =>
             {
@@ -58,17 +60,19 @@ namespace Tgs.GameRounds.IntegrationTests
         public async Task GameRounds_UpdateRoundReopen_Normal_Process()
         {
             var roundId = Guid.NewGuid();
-            var model = new UpdateRoundReopenViewModel(
-                Status: GameRoundStatus.Closed,
-                ExternalClosedOn: DateTimeOffset.UtcNow,
-                BetAmount: 10m,
-                ValidBetAmount: 10m,
-                SettleAmount: 20m,
-                Commission: 0,
-                Turnover: 10m,
-                PlayerWinLoss: 10m,
-                ClientStatus: GameRoundClientStatus.Win,
-                AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
+            var model = new UpdateRoundReopenViewModel()
+            {
+                Status = GameRoundStatus.Closed,
+                ExternalClosedOn = DateTimeOffset.UtcNow,
+                BetAmount = 10m,
+                ValidBetAmount = 10m,
+                SettleAmount = 20m,
+                Commission = 0,
+                Turnover = 10m,
+                PlayerWinLoss = 10m,
+                ClientStatus = GameRoundClientStatus.Win,
+                AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
+            };
 
             var web = CreateTestSettingSite(services =>
             {
