@@ -370,7 +370,7 @@ namespace Tgs.GameRounds.IntegrationTests
             {
                 var fakeRepository = Substitute.For<IGameRound>();
 
-                _ = fakeRepository.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
+                _ = fakeRepository.GetStatusAsync(roundId).Returns(ValueTask.FromResult(GameRoundStatus.Open));
 
                 _ = services.AddSingleton(fakeRepository);
             });

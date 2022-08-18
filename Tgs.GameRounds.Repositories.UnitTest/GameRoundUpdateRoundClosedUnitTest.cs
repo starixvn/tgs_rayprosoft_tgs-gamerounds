@@ -91,7 +91,6 @@ namespace Tgs.GameRounds.Repositories.UnitTest
             Assert.AreEqual(GameRoundClientStatus.Open, oldActual.ClientStatus);
 
             var data = new UpdateRoundClosed(
-                RoundId: roundId,
                 ExternalClosedOn: DateTimeOffset.UtcNow,
                 BetAmount: 10m,
                 ValidBetAmount: 10m,
@@ -102,7 +101,9 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 ClientStatus: GameRoundClientStatus.Loss,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
-            await fakeRoundRepository.UpdateRoundClosedAsync(data).ConfigureAwait(false);
+            await fakeRoundRepository.UpdateRoundClosedAsync(
+                roundId,
+                data).ConfigureAwait(false);
 
             var actual = await fakeRoundRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
             Assert.IsNotNull(actual);
@@ -138,7 +139,6 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 fakeSerialNumberGenerator);
 
             var data = new UpdateRoundClosed(
-                RoundId: roundId,
                 ExternalClosedOn: DateTimeOffset.UtcNow,
                 BetAmount: 10m,
                 ValidBetAmount: 10m,
@@ -149,7 +149,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest
                 ClientStatus: GameRoundClientStatus.Loss,
                 AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
-            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundClosedAsync(data).AsTask()).ConfigureAwait(false);
+            _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundClosedAsync(roundId, data).AsTask()).ConfigureAwait(false);
         }
     }
 }

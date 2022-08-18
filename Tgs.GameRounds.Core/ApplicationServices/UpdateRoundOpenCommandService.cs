@@ -32,13 +32,13 @@ namespace Tgs.GameRounds.Core.ApplicationServices
             }
 
             var updateRoundOpen = new UpdateRoundOpen(
-                RoundId: command.RoundId,
                 BetAmount: command.BetAmount,
                 ValidBetAmount: command.ValidBetAmount,
                 Commission: command.Commission,
                 Turnover: command.Turnover);
 
             await _gameRound.UpdateRoundOpenAsync(
+                roundId: command.RoundId,
                 source: updateRoundOpen,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 

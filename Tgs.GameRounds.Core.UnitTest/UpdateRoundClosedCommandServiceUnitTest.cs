@@ -75,7 +75,6 @@ namespace Tgs.GameRounds.Core.UnitTest
             _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
             var updateRoundClosed = new UpdateRoundClosed(
-                    RoundId: command.RoundId,
                     ExternalClosedOn: command.ExternalClosedOn,
                     BetAmount: command.BetAmount,
                     ValidBetAmount: command.ValidBetAmount,
@@ -85,7 +84,11 @@ namespace Tgs.GameRounds.Core.UnitTest
                     PlayerWinLoss: command.PlayerWinLoss,
                     ClientStatus: command.ClientStatus,
                     AdditionalData: command.AdditionalData);
-            _ = fakeGameRound.UpdateRoundClosedAsync(updateRoundClosed);
+
+            _ = fakeGameRound
+                    .UpdateRoundClosedAsync(
+                        command.RoundId,
+                        updateRoundClosed);
 
             var service = new UpdateRoundClosedCommandService(
                 fakeLogger,

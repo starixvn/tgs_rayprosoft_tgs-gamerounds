@@ -1,5 +1,5 @@
 ﻿{
-  "CodeGenerationMode": 0,
+  "CodeGenerationMode": 2,
   "ContextClassName": "BetContext",
   "ContextNamespace": "Entities",
   "DefaultDacpacSchema": null,
@@ -23,6 +23,10 @@
     },
     {
       "Name": "bet.round_details",
+      "ObjectType": 0
+    },
+    {
+      "Name": "bet.round_operation_records",
       "ObjectType": 0
     }
   ],

@@ -5,9 +5,13 @@ namespace Tgs.GameRounds.Client
 {
     public interface IGameRoundsClient
     {
+        ValueTask<GameRoundResponse> AddCompanyRoundAsync(AddCompanyRoundViewModel model, CancellationToken cancellationToken = default);
+
         ValueTask<GameRoundResponse> AddRoundAsync(AddRoundViewModel model, CancellationToken cancellationToken = default);
 
         ValueTask<GameRoundBatchResponse> AddRoundBatchAsync(AddRoundBatchsViewModel model, CancellationToken cancellationToken = default);
+
+        ValueTask<GameRoundResponse> AdjustClosedRoundAsync(Guid roundId, AdjustClosedRoundViewModel model, CancellationToken cancellationToken = default);
 
         ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid roundId, CancellationToken cancellationToken = default);
 
@@ -20,6 +24,8 @@ namespace Tgs.GameRounds.Client
         ValueTask<GameRoundIdResponse> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId, CancellationToken cancellationToken = default);
 
         ValueTask<GameRoundRoundStatusResponse> GetStatusAsync(Guid roundId, CancellationToken cancellationToken = default);
+
+        ValueTask<GameRoundResponse> ManualCloseRoundAsync(Guid roundId, ManualCloseRoundViewModel model, CancellationToken cancellationToken = default);
 
         ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundQueryViewModel model, CancellationToken cancellationToken = default);
 

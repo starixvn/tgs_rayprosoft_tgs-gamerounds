@@ -32,7 +32,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
             }
 
             var updateRoundOpenSettle = new UpdateRoundOpenSettle(
-                RoundId: command.RoundId,
                 BetAmount: command.BetAmount,
                 ValidBetAmount: command.ValidBetAmount,
                 SettleAmount: command.SettleAmount,
@@ -41,6 +40,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 PlayerWinLoss: command.PlayerWinLoss);
 
             await _gameRound.UpdateRoundOpenSettleAsync(
+                roundId: command.RoundId,
                 source: updateRoundOpenSettle,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 

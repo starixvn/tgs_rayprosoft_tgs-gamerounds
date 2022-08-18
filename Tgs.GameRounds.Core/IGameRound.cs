@@ -5,12 +5,21 @@ namespace Tgs.GameRounds.Core
 {
     public interface IGameRound
     {
+        ValueTask<Guid?> AddCompanyRoundAsync(
+            AddCompanyRound source,
+            CancellationToken cancellationToken = default);
+
         ValueTask<Guid?> AddRoundAsync(
             AddRound source,
             CancellationToken cancellationToken = default);
 
         ValueTask<IEnumerable<Guid>> AddRoundBatchAsync(
             IEnumerable<AddRoundBatch> sources,
+            CancellationToken cancellationToken = default);
+
+        ValueTask AdjustClosedRoundAsync(
+            Guid roundId,
+            AdjustClosedRound source,
             CancellationToken cancellationToken = default);
 
         ValueTask<bool> ExistAsync(
@@ -39,6 +48,15 @@ namespace Tgs.GameRounds.Core
             Guid walletId,
             CancellationToken cancellationToken = default);
 
+        ValueTask<GameRoundStatus> GetStatusAsync(
+            Guid roundId,
+            CancellationToken cancellationToken = default);
+
+        ValueTask ManualCloseRoundAsync(
+            Guid roundId,
+            ManualCloseRound source,
+            CancellationToken cancellationToken = default);
+
         ValueTask<Guid?> NewRoundAsync(
             NewRound source,
             CancellationToken cancellationToken = default);
@@ -49,6 +67,7 @@ namespace Tgs.GameRounds.Core
             CancellationToken cancellationToken = default);
 
         ValueTask UpdateRoundClosedAsync(
+            Guid roundId,
             UpdateRoundClosed source,
             CancellationToken cancellationToken = default);
 
@@ -58,14 +77,17 @@ namespace Tgs.GameRounds.Core
             CancellationToken cancellationToken = default);
 
         ValueTask UpdateRoundOpenAsync(
+            Guid roundId,
             UpdateRoundOpen source,
             CancellationToken cancellationToken = default);
 
         ValueTask UpdateRoundOpenSettleAsync(
+            Guid roundId,
             UpdateRoundOpenSettle source,
             CancellationToken cancellationToken = default);
 
         ValueTask UpdateRoundReopenAsync(
+            Guid roundId,
             UpdateRoundReopen source,
             CancellationToken cancellationToken = default);
 

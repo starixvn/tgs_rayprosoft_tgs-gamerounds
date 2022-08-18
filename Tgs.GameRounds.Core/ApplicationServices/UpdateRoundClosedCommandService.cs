@@ -32,7 +32,6 @@ namespace Tgs.GameRounds.Core.ApplicationServices
             }
 
             var updateRoundClosed = new UpdateRoundClosed(
-                RoundId: command.RoundId,
                 ExternalClosedOn: command.ExternalClosedOn,
                 BetAmount: command.BetAmount,
                 ValidBetAmount: command.ValidBetAmount,
@@ -44,6 +43,7 @@ namespace Tgs.GameRounds.Core.ApplicationServices
                 AdditionalData: command.AdditionalData);
 
             await _gameRound.UpdateRoundClosedAsync(
+                roundId: command.RoundId,
                 source: updateRoundClosed,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
