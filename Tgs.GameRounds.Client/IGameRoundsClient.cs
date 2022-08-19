@@ -29,7 +29,7 @@ public interface IGameRoundsClient
 
 	ValueTask<GameRoundResponse> ManualCloseRoundAsync(Guid roundId, ManualCloseRoundViewModel model, CancellationToken cancellationToken = default);
 
-	ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundQueryViewModel model, CancellationToken cancellationToken = default);
+	ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundViewModel model, CancellationToken cancellationToken = default);
 
 	ValueTask<GameRoundResponse> UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status, CancellationToken cancellationToken = default);
 
