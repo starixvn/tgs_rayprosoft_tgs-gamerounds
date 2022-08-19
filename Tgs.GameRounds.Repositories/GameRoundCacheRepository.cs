@@ -45,8 +45,6 @@ internal class GameRoundCacheRepository : IGameRound
 			sources,
 			cancellationToken);
 
-	IAsyncEnumerable<Guid> IGameRound.AddRoundBatchAsync(IEnumerable<AddRoundBatch> sources, CancellationToken cancellationToken) => throw new NotImplementedException();
-
 	public ValueTask AdjustClosedRoundAsync(
 				Guid roundId,
 		AdjustClosedRound source,
@@ -85,9 +83,8 @@ internal class GameRoundCacheRepository : IGameRound
 				expiry: _expiry,
 				when: When.Always,
 				flags: CommandFlags.None).ConfigureAwait(false);
-
-			return true;
 		}
+
 		return true;
 	}
 
@@ -178,7 +175,14 @@ internal class GameRoundCacheRepository : IGameRound
 		=> _gameRound.NewRoundAsync(
 			source: source,
 			cancellationToken: cancellationToken);
-
+	public IAsyncEnumerable<Guid> GetListByRoundIdAsync(
+		Guid gameProviderId,
+		string externalRoundId,
+		int gameId)
+		=> _gameRound.GetListByRoundIdAsync(
+			gameProviderId: gameProviderId,
+			externalRoundId: externalRoundId,
+			gameId: gameId);
 	public ValueTask UpdateClientStatusAsync(
 		Guid roundId,
 		GameRoundClientStatus status,

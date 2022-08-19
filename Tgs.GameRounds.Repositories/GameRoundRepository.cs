@@ -650,6 +650,18 @@ internal class GameRoundRepository : IGameRound
 		}
 	}
 
+	public IAsyncEnumerable<Guid> GetListByRoundIdAsync(
+		Guid gameProviderId,
+		string externalRoundId,
+		int gameId)
+		=> _context.Rounds
+			.AsQueryable()
+			.Where(x => x.ExternalRoundId == externalRoundId
+					&& x.GameProviderId == gameProviderId
+					&& x.GameId == gameId)
+			.Select(x => x.Id)
+			.ToAsyncEnumerable();
+
 	public async ValueTask UpdateClientStatusAsync(
 		Guid roundId,
 		GameRoundClientStatus status,
