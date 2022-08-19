@@ -271,7 +271,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
-	public async ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundQueryViewModel model, CancellationToken cancellationToken = default)
+	public async ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundViewModel model, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
 			content: JsonSerializer.Serialize(model, _SerializerOptions),

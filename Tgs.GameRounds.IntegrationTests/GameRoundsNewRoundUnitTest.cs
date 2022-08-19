@@ -23,7 +23,7 @@ public partial class GameRoundsClientUnitTest
 		var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
 		var gameId = 500001;
 		var playerCode = "4ues8xikza7o";
-		var model = new NewRoundQueryViewModel()
+		var model = new NewRoundViewModel()
 		{
 			ExternalRoundId = externalRoundId,
 			GameProviderId = gameProviderId,
@@ -64,7 +64,7 @@ public partial class GameRoundsClientUnitTest
 		var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
 		var gameId = 500001;
 		var playerCode = "4ues8xikza7o";
-		var model = new NewRoundQueryViewModel()
+		var model = new NewRoundViewModel()
 		{
 			ExternalRoundId = externalRoundId,
 			GameProviderId = gameProviderId,
@@ -116,7 +116,7 @@ public partial class GameRoundsClientUnitTest
 		var gameId = 500001;
 		var playerCode = "4ues8xikza7o";
 		var expected = Guid.NewGuid();
-		var model = new NewRoundQueryViewModel()
+		var model = new NewRoundViewModel()
 		{
 			ExternalRoundId = externalRoundId,
 			GameProviderId = gameProviderId,

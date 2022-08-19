@@ -2,7 +2,7 @@
 
 namespace Tgs.GameRounds.Common.ViewModels;
 
-public record NewRoundQueryViewModel
+public record NewRoundViewModel
 {
 	[Required]
 	public string ExternalRoundId { get; init; } = default!;

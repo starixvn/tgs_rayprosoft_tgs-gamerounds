@@ -400,7 +400,7 @@ public class GameRoundsController : ControllerBase
 	[HttpPost("new", Name = "NewRound")]
 	public ValueTask<Guid> NewRoundAsync(
 		[FromServices] IGetService<NewRoundQuery, Guid> service,
-		NewRoundQueryViewModel model)
+		NewRoundViewModel model)
 		=> service.GetAsync(new NewRoundQuery(
 			model.ExternalRoundId,
 			model.GameProviderId,

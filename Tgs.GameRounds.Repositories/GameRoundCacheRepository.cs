@@ -175,6 +175,7 @@ internal class GameRoundCacheRepository : IGameRound
 		=> _gameRound.NewRoundAsync(
 			source: source,
 			cancellationToken: cancellationToken);
+
 	public IAsyncEnumerable<Guid> GetListByRoundIdAsync(
 		Guid gameProviderId,
 		string externalRoundId,
@@ -183,6 +184,7 @@ internal class GameRoundCacheRepository : IGameRound
 			gameProviderId: gameProviderId,
 			externalRoundId: externalRoundId,
 			gameId: gameId);
+
 	public ValueTask UpdateClientStatusAsync(
 		Guid roundId,
 		GameRoundClientStatus status,
