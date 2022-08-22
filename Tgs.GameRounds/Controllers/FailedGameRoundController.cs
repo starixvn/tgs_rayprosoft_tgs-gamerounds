@@ -13,15 +13,13 @@ public class FailedGameRoundController : ControllerBase
 	/// <summary>
 	/// Adds the asynchronous.
 	/// </summary>
-	/// <param name="failedGameRound">The repository.</param>
+	/// <param name="failedGameRound">The failed game round.</param>
 	/// <param name="model">The model.</param>
-	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns></returns>
 	[HttpPost(Name = "FailedGameRound_Add")]
 	public async ValueTask AddAsync(
 		[FromServices] IFailedGameRound failedGameRound,
-		AddFailedGameRoundViewModel model,
-		CancellationToken cancellationToken)
+		AddFailedGameRoundViewModel model)
 	{
 		var add = new AddFailedGameRound(
 			model.GameProviderId,
@@ -37,19 +35,18 @@ public class FailedGameRoundController : ControllerBase
 		await failedGameRound
 				.AddAsync(
 					add,
-					cancellationToken)
+					HttpContext.RequestAborted)
 			   .ConfigureAwait(false);
 	}
 
 	/// <summary>
 	/// Gets the asynchronous.
 	/// </summary>
-	/// <param name="failedGameRound">The repository.</param>
+	/// <param name="failedGameRound">The failed game round.</param>
 	/// <param name="gameProviderId">The game provider identifier.</param>
 	/// <param name="externalRoundId">The external round identifier.</param>
 	/// <param name="gameId">The game identifier.</param>
 	/// <param name="playerCode">The player code.</param>
-	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns></returns>
 	[HttpGet("external", Name = "FailedGameRound_Get")]
 	public async ValueTask<FailedGameRoundInfoViewModel?> GetAsync(
@@ -57,8 +54,7 @@ public class FailedGameRoundController : ControllerBase
 		Guid gameProviderId,
 		string externalRoundId,
 		int gameId,
-		string playerCode,
-		CancellationToken cancellationToken)
+		string playerCode)
 	{
 		var info = await failedGameRound
 				.GetAsync(
@@ -66,7 +62,7 @@ public class FailedGameRoundController : ControllerBase
 					externalRoundId,
 					gameId,
 					playerCode,
-					cancellationToken).ConfigureAwait(false);
+					HttpContext.RequestAborted).ConfigureAwait(false);
 
 		var result = default(FailedGameRoundInfoViewModel);
 
