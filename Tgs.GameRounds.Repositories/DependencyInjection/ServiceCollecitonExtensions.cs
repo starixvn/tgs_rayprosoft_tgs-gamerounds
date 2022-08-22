@@ -18,7 +18,8 @@ public static class ServiceCollecitonExtensions
 			.AddDbContext<BetContext>(configure)
 			.AddTransient<IGameRound, GameRoundRepository>()
 			.Decorate<IGameRound>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameRoundCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(30)))
-			.AddTransient<IGameRoundRecord>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)));
+			.AddTransient<IGameRoundRecord>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)))
+			.AddTransient<IFailedGameRound, FailedGameRoundRepository>();
 
 	public static IServiceCollection AddGameRoundRepositories(
 		this IServiceCollection services,

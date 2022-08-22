@@ -19,6 +19,7 @@ namespace Tgs.GameRounds.Repositories.Entities
         {
         }
 
+        public virtual DbSet<FailedGameRecordOperation> FailedGameRecordOperations { get; set; } = null!;
         public virtual DbSet<Round> Rounds { get; set; } = null!;
         public virtual DbSet<RoundDetail> RoundDetails { get; set; } = null!;
         public virtual DbSet<RoundOperationRecord> RoundOperationRecords { get; set; } = null!;
@@ -28,6 +29,7 @@ namespace Tgs.GameRounds.Repositories.Entities
             modelBuilder.HasPostgresExtension("ltree")
                 .HasPostgresExtension("pg_trgm");
 
+            modelBuilder.ApplyConfiguration(new Configurations.FailedGameRecordOperationConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.RoundConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.RoundDetailConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.RoundOperationRecordConfiguration());
