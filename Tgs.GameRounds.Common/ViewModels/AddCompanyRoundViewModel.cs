@@ -45,6 +45,5 @@ public record AddCompanyRoundViewModel
 	public GameRoundClientStatus ClientStatus { get; init; }
 	[Required]
 	public Guid OperatorId { get; init; }
-	[Required]
-	public string Remark { get; init; } = default!;
+	public string? Remark { get; init; }
 }

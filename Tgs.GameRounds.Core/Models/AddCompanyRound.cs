@@ -21,4 +21,4 @@ public record AddCompanyRound(
 	decimal CompanyWinLoss,
 	GameRoundClientStatus ClientStatus,
 	Guid OperatorId,
-	string Remark);
+	string? Remark);
