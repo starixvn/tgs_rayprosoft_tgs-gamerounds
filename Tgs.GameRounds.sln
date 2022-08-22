@@ -21,9 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.Common", "Tg
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.Core.UnitTest", "Tgs.GameRounds.Core.UnitTest\Tgs.GameRounds.Core.UnitTest.csproj", "{B118ED75-65F4-4703-9DA1-7D4F1FE6E34A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRounds.Client", "Tgs.GameRounds.Client\Tgs.GameRounds.Client.csproj", "{C6703726-8D32-4588-823A-6A4F950E1D9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.Client", "Tgs.GameRounds.Client\Tgs.GameRounds.Client.csproj", "{C6703726-8D32-4588-823A-6A4F950E1D9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRounds.IntegrationTests", "Tgs.GameRounds.IntegrationTests\Tgs.GameRounds.IntegrationTests.csproj", "{EA8CD2B2-C159-4C5B-ABDB-4C93C7D2D814}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.IntegrationTests", "Tgs.GameRounds.IntegrationTests\Tgs.GameRounds.IntegrationTests.csproj", "{EA8CD2B2-C159-4C5B-ABDB-4C93C7D2D814}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -25,14 +25,15 @@ public partial class GameRoundsClientUnitTest
 	{
 		var roundId = Guid.NewGuid();
 		var expected = GameRoundStatus.Open;
-		var externalGameId = "Bacc";
-		var gameProviderCode = "DG";
-		var data = new GameRoundInfo(
+
+		var data = new GameRoundResult(
 		   RoundId: roundId,
 		   ExternalRoundId: Guid.NewGuid().ToString("N"),
 		   GameProviderId: Guid.NewGuid(),
+		   GameProviderCode: "DG",
 		   PlayerCode: "test",
 		   GameId: 1,
+		   ExternalGameId: "Bacc",
 		   CurrencyCode: "CNY",
 		   Status: expected,
 		   GameProviderConfigurationId: Guid.NewGuid(),
@@ -58,23 +59,14 @@ public partial class GameRoundsClientUnitTest
 
 		var web = CreateTestSettingSite(services =>
 		{
-			var fakeGameRound = Substitute.For<IGameRound>();
+			var fakeService = Substitute.For<IGetService<GetGameRoundQuery, GameRoundResult>>();
 
-			_ = fakeGameRound.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
+			_ = fakeService
+				.GetAsync(
+					Arg.Any<GetGameRoundQuery>())
+				.Returns(ValueTask.FromResult(data));
 
-			_ = services.AddSingleton(fakeGameRound);
-
-			var fakeGame = Substitute.For<IGame>();
-
-			_ = fakeGame.GetExternalGameIdAsync(data.GameId).Returns(ValueTask.FromResult(externalGameId));
-
-			_ = services.AddSingleton(fakeGame);
-
-			var fakeGameProvider = Substitute.For<IGameProvider>();
-
-			_ = fakeGameProvider.GetGameProviderCodeAsync(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
-
-			_ = services.AddSingleton(fakeGameProvider);
+			_ = services.AddSingleton(fakeService);
 		});
 
 		var httpClient = web.CreateClient();
@@ -87,9 +79,6 @@ public partial class GameRoundsClientUnitTest
 		Assert.AreEqual(true, actual.Success);
 		Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
 		Assert.IsNotNull(actual.Data);
-		Assert.AreEqual(roundId, actual.Data.RoundId);
-		Assert.AreEqual(externalGameId, actual.Data.ExternalGameId);
-		Assert.AreEqual(gameProviderCode, actual.Data.GameProviderCode);
 	}
 
 	[TestMethod]
@@ -428,27 +417,18 @@ public partial class GameRoundsClientUnitTest
 	}
 
 	private static WebApplicationFactory<Program> CreateTestSettingSite(Action<IServiceCollection>? configureServices = null)
-		=> new GameRoundsApplicationUnitTest(hostBuilder =>
-		{
-			_ = hostBuilder
-			.ConfigureAppConfiguration((_, configBuilder) =>
-			{
-				configBuilder.Sources.Clear();
-			})
+		=> new GameRoundsApplicationUnitTest(hostBuilder => _ = hostBuilder
+			.ConfigureAppConfiguration((_, configBuilder) => configBuilder.Sources.Clear())
 			.ConfigureServices(services =>
 			{
 				_ = services
 				.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
 					sp => new ConfigureNamedOptions<OtlpExporterOptions>(
 						Options.DefaultName,
-						exporterOptions =>
-						{
-							exporterOptions.TimeoutMilliseconds = 0;
-						}));
+						exporterOptions => exporterOptions.TimeoutMilliseconds = 0));
 
 				_ = services.AddFakeNatsMessageQueue();
 
 				configureServices?.Invoke(services);
-			});
-		});
+			}));
 }

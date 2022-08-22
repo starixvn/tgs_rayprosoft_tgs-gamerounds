@@ -154,13 +154,13 @@ internal class GameRoundRepository : IGameRound
 			UpdatedOn = DateTime.UtcNow,
 			BrandId = source.BrandId,
 			ExternalCreatedOn = DateTime.SpecifyKind(source.ExternalCreatedOn.UtcDateTime, DateTimeKind.Utc),
-			ExternalClosedOn = (source.ExternalClosedOn.HasValue) ? DateTime.SpecifyKind(source.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null,
+			ExternalClosedOn = source.ExternalClosedOn.HasValue ? DateTime.SpecifyKind(source.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null,
 			BetAmount = source.BetAmount,
 			ValidBetAmount = source.ValidBetAmount,
 			SettleAmount = source.SettleAmount,
 			Commission = source.Commission,
 			Turnover = source.Turnover,
-			WinLoss = source.PlayerWinLoss.HasValue ? -(source.PlayerWinLoss) : null,
+			WinLoss = source.PlayerWinLoss.HasValue ? -source.PlayerWinLoss : null,
 			ClientStatus = (short)source.ClientStatus
 		};
 		using var transaction = _context.Database.BeginTransaction();
@@ -247,13 +247,13 @@ internal class GameRoundRepository : IGameRound
 				UpdatedOn = DateTime.UtcNow,
 				BrandId = addData.BrandId,
 				ExternalCreatedOn = DateTime.SpecifyKind(addData.ExternalCreatedOn.UtcDateTime, DateTimeKind.Utc),
-				ExternalClosedOn = (addData.ExternalClosedOn.HasValue) ? DateTime.SpecifyKind(addData.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null,
+				ExternalClosedOn = addData.ExternalClosedOn.HasValue ? DateTime.SpecifyKind(addData.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null,
 				BetAmount = addData.BetAmount,
 				ValidBetAmount = addData.ValidBetAmount,
 				SettleAmount = addData.SettleAmount,
 				Commission = addData.Commission,
 				Turnover = addData.Turnover,
-				WinLoss = addData.PlayerWinLoss.HasValue ? -(addData.PlayerWinLoss) : null,
+				WinLoss = addData.PlayerWinLoss.HasValue ? -addData.PlayerWinLoss : null,
 				ClientStatus = (short)addData.ClientStatus
 			});
 
@@ -814,7 +814,7 @@ internal class GameRoundRepository : IGameRound
 
 		data.UpdatedOn = DateTime.UtcNow;
 		data.Status = (short)status;
-		data.ExternalClosedOn = (externalClosedOn.HasValue) ? externalClosedOn.Value.UtcDateTime : data.ExternalClosedOn;
+		data.ExternalClosedOn = externalClosedOn.HasValue ? externalClosedOn.Value.UtcDateTime : data.ExternalClosedOn;
 		_ = _context.Rounds.Update(data);
 
 		_ = await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
