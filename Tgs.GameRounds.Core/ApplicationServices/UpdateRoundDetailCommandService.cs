@@ -2,35 +2,34 @@
 using Tgs.GameRounds.Core.Exceptions;
 using Tgs.ServiceUtility;
 
-namespace Tgs.GameRounds.Core.ApplicationServices
+namespace Tgs.GameRounds.Core.ApplicationServices;
+
+internal class UpdateRoundDetailCommandService : ICommandService<UpdateRoundDetailCommand>
 {
-    internal class UpdateRoundDetailCommandService : ICommandService<UpdateRoundDetailCommand>
-    {
-        private readonly IGameRound _gameRound;
-        private readonly ILogger<UpdateRoundDetailCommandService> _logger;
+	private readonly IGameRound _gameRound;
+	private readonly ILogger<UpdateRoundDetailCommandService> _logger;
 
-        public UpdateRoundDetailCommandService(
-            ILogger<UpdateRoundDetailCommandService> logger,
-            IGameRound gameRound)
-        {
-            _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+	public UpdateRoundDetailCommandService(
+		ILogger<UpdateRoundDetailCommandService> logger,
+		IGameRound gameRound)
+	{
+		_gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+	}
 
-        public async ValueTask ExecuteAsync(UpdateRoundDetailCommand command, CancellationToken cancellationToken = default)
-        {
-            if (!await _gameRound.ExistAsync(
-                roundId: command.RoundId,
-                cancellationToken: cancellationToken).ConfigureAwait(false))
-            {
-                _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
-                throw new GameRoundDoesNotExistException();
-            }
+	public async ValueTask ExecuteAsync(UpdateRoundDetailCommand command, CancellationToken cancellationToken = default)
+	{
+		if (!await _gameRound.ExistAsync(
+			roundId: command.RoundId,
+			cancellationToken: cancellationToken).ConfigureAwait(false))
+		{
+			_logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
+			throw new GameRoundDoesNotExistException();
+		}
 
-            await _gameRound.UpdateRoundDetailAsync(
-                roundId: command.RoundId,
-                additionalData: command.AdditionalData,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
-        }
-    }
+		await _gameRound.UpdateRoundDetailAsync(
+			roundId: command.RoundId,
+			additionalData: command.AdditionalData,
+			cancellationToken: cancellationToken).ConfigureAwait(false);
+	}
 }

@@ -7,8 +7,25 @@ metadata:
 data:
   appsettings.json: |
     {
-      "GameLocked": {
-        "LocksRedisKey": "gameroundlock:{0}:{1}:{2}:{3}",
-        "LockSeconds": "60"
+        "GameLocked": {
+          "LocksRedisKey": "gameroundlock:{0}:{1}:{2}:{3}",
+           "LockSeconds": "60"
+        }
+    }
+  monitor.settings.json: |
+    {
+      "Metrics": {
+        "MetricCount": "1"
+      },
+      "Logging":{
+        "Console": {
+          "FormatterName": "json"
+        },
+        "LogLevel": {
+          "Default": "Warning",
+          "Microsoft": "Warning",
+          "Microsoft.Diagnostics": "Warning",
+          "Microsoft.Hosting.Lifetime": "Information"
+        }
       }
     }
