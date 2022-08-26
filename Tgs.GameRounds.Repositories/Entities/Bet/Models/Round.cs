@@ -8,11 +8,11 @@ namespace Tgs.GameRounds.Repositories.Entities
     public partial class Round
     {
         public Guid Id { get; set; }
-        public string ExternalRoundId { get; set; } = default!;
+        public string ExternalRoundId { get; set; } = null!;
         public Guid GameProviderId { get; set; }
-        public string PlayerCode { get; set; } = default!;
+        public string PlayerCode { get; set; } = null!;
         public int GameId { get; set; }
-        public string CurrencyCode { get; set; } = default!;
+        public string CurrencyCode { get; set; } = null!;
         public short Status { get; set; }
         public Guid GameProviderConfigurationId { get; set; }
         public Guid WalletId { get; set; }

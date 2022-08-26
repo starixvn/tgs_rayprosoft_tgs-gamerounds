@@ -3,13 +3,12 @@
 namespace Tgs.GameRounds.Core.Models;
 
 public record UpdateRoundClosed(
-    Guid RoundId,
-    DateTimeOffset ExternalClosedOn,
-    decimal BetAmount,
-    decimal ValidBetAmount,
-    decimal SettleAmount,
-    decimal Commission,
-    decimal Turnover,
-    decimal PlayerWinLoss,
-    GameRoundClientStatus ClientStatus,
-    string AdditionalData);
+	DateTimeOffset ExternalClosedOn,
+	decimal BetAmount,
+	decimal ValidBetAmount,
+	decimal SettleAmount,
+	decimal Commission,
+	decimal Turnover,
+	decimal PlayerWinLoss,
+	GameRoundClientStatus ClientStatus,
+	string AdditionalData);

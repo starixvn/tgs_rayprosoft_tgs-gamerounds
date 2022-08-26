@@ -1,14 +1,27 @@
-﻿namespace Tgs.GameRounds.Common.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Tgs.GameRounds.Common.ViewModels;
+
+public record UpdateRoundReopenViewModel
 {
-    public record UpdateRoundReopenViewModel(
-        GameRoundStatus Status,
-        DateTimeOffset? ExternalClosedOn,
-        decimal BetAmount,
-        decimal ValidBetAmount,
-        decimal SettleAmount,
-        decimal Commission,
-        decimal Turnover,
-        decimal PlayerWinLoss,
-        GameRoundClientStatus ClientStatus,
-        string AdditionalData);
+	public GameRoundStatus Status { get; init; }
+	public DateTimeOffset? ExternalClosedOn { get; init; }
+	[Required]
+	[Range(minimum: 0, maximum: int.MaxValue)]
+	public decimal BetAmount { get; init; }
+	[Required]
+	[Range(minimum: 0, maximum: int.MaxValue)]
+	public decimal ValidBetAmount { get; init; }
+	[Required]
+	[Range(minimum: 0, maximum: int.MaxValue)]
+	public decimal SettleAmount { get; init; }
+	[Required]
+	[Range(minimum: 0, maximum: int.MaxValue)]
+	public decimal Commission { get; init; }
+	[Required]
+	[Range(minimum: 0, maximum: int.MaxValue)]
+	public decimal Turnover { get; init; }
+	public decimal PlayerWinLoss { get; init; }
+	public GameRoundClientStatus ClientStatus { get; init; }
+	public string AdditionalData { get; init; } = default!;
 }
