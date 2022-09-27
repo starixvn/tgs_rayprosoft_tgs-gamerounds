@@ -125,16 +125,17 @@ internal class GameRoundWorkHandleService : ICommandService<GameRoundWorkCommand
 				}
 				else
 				{
-					if (gameRound.BetAmount.GetValueOrDefault(0) != command.BetAmount ||
+					if (gameRound.Status == GameRoundStatus.Closed && command.Status == GameRoundStatus.Closed)
+					{
+						if (gameRound.BetAmount.GetValueOrDefault(0) != command.BetAmount ||
 						gameRound.ValidBetAmount.GetValueOrDefault(0) != command.ValidBetAmount ||
 						gameRound.SettleAmount.GetValueOrDefault(0) != command.SettleAmount ||
 						gameRound.Commission.GetValueOrDefault(0) != command.Commission ||
 						gameRound.Turnover.GetValueOrDefault(0) != command.Turnover ||
 						gameRound.CompanyWinLoss.GetValueOrDefault(0) != -command.PlayerWinLoss ||
 						gameRound.ClientStatus != command.ClientStatus)
-					{
-						if (gameRound.Status == GameRoundStatus.Closed && command.Status == GameRoundStatus.Closed)
 						{
+
 							var updateRoundReopen = new UpdateRoundReopenCommand(
 								RoundId: gameRound.RoundId,
 								Status: command.Status,
