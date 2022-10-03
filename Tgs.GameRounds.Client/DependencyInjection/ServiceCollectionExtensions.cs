@@ -28,5 +28,13 @@ public static class ServiceCollectionExtensions
 			})
 			.AddHttpMessageHandler<LoggingHandler>()
 			.Services
+			.AddHttpClient<IGameRoundsWorkClient, GameRoundsWorkClient>()
+			.ConfigureHttpClient((sp, httpClient) =>
+			{
+				var options = sp.GetRequiredService<IOptions<GameRoundsClientOptions>>().Value;
+				httpClient.BaseAddress = options.BaseUrl;
+			})
+			.AddHttpMessageHandler<LoggingHandler>()
+			.Services
 			.AddTransient<LoggingHandler>();
 }

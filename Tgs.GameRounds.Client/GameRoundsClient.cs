@@ -45,6 +45,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundResponse> AddRoundAsync(AddRoundViewModel model, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
@@ -64,6 +65,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundBatchResponse> AddRoundBatchAsync(AddRoundBatchsViewModel model, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
@@ -271,6 +273,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundRoundIdResponse> NewRoundAsync(NewRoundViewModel model, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
@@ -293,6 +296,7 @@ internal class GameRoundsClient : IGameRoundsClient
 					cancellationToken: cancellationToken).ConfigureAwait(false));
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundResponse> UpdateClientStatusAsync(Guid roundId, GameRoundClientStatus status, CancellationToken cancellationToken = default)
 	{
 		var request = new
@@ -317,6 +321,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundResponse> UpdateRoundClosedAsync(Guid roundId, UpdateRoundClosedViewModel model, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
@@ -360,6 +365,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundResponse> UpdateRoundOpenAsync(Guid roundId, UpdateRoundOpenViewModel model, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
@@ -379,6 +385,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundResponse> UpdateRoundOpenSettleAsync(Guid roundId, UpdateRoundOpenSettleViewModel model, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
@@ -398,6 +405,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundResponse> UpdateRoundReopenAsync(Guid roundId, UpdateRoundReopenViewModel model, CancellationToken cancellationToken = default)
 	{
 		var requestContent = new StringContent(
@@ -417,6 +425,7 @@ internal class GameRoundsClient : IGameRoundsClient
 				HttpStatusCode: response.StatusCode);
 	}
 
+	[Obsolete("Please use IGameRoundsWorkClient.ExecuteAsync instead", false)]
 	public async ValueTask<GameRoundResponse> UpdateStatusAsync(Guid roundId, GameRoundStatus status, DateTimeOffset? externalClosedOn = null, CancellationToken cancellationToken = default)
 	{
 		var request = new
