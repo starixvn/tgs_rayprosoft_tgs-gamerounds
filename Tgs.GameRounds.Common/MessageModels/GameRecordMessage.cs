@@ -1,5 +1,5 @@
 ﻿namespace Tgs.GameRounds.Common.MessageModels;
-public record GameRoundMessage(
+public record GameRecordMessage(
 	string ExternalRoundId,
 	Guid GameProviderId,
 	string GameProviderCode,
