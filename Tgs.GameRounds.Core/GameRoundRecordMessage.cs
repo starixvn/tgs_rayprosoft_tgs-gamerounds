@@ -28,11 +28,12 @@ internal class GameRoundRecordMessage : IGameRoundRecordMessage
 
 		try
 		{
+			/*
 			await _messageSender.PublishAsync(
 				subject: "gp.gameround.gameroundrecord.add",
 				data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(request)),
 				cancellationToken: cancellationToken);
-
+			*/
 			_logger.LogInformation("LogOn:{logOn} Information Sending:{request}", DateTime.Now.ToString("o"), request);
 		}
 		catch (Exception ex)
