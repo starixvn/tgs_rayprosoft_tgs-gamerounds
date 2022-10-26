@@ -135,7 +135,6 @@ internal class GameRoundWorkHandleService : ICommandService<GameRoundWorkCommand
 						gameRound.CompanyWinLoss.GetValueOrDefault(0) != -command.PlayerWinLoss ||
 						gameRound.ClientStatus != command.ClientStatus)
 						{
-
 							var updateRoundReopen = new UpdateRoundReopenCommand(
 								RoundId: gameRound.RoundId,
 								Status: command.Status,

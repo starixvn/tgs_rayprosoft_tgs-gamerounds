@@ -52,11 +52,11 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 				CurrencyCode = add.CurrencyCode,
 				Status = (int)add.Status,
 				ClientStatus = (int)add.ClientStatus,
-				CreatedOn = add.CreatedOn,
-				ClosedOn = add.ClosedOn,
-				UpdatedOn = add.UpdatedOn,
-				ExternalCreatedOn = add.ExternalCreatedOn,
-				ExternalClosedOn = add.ExternalClosedOn,
+				CreatedOn = add.CreatedOn.UtcDateTime,
+				ClosedOn = add.ClosedOn.HasValue ? add.ClosedOn.Value.UtcDateTime : null,
+				UpdatedOn = add.UpdatedOn.UtcDateTime,
+				ExternalCreatedOn = add.ExternalCreatedOn.HasValue ? add.ExternalCreatedOn.Value.UtcDateTime : null,
+				ExternalClosedOn = add.ExternalClosedOn.HasValue ? add.ExternalClosedOn.Value.UtcDateTime : null,
 				Bet = add.Bet,
 				ValidBet = add.ValidBet,
 				Settle = add.Settle,
@@ -65,10 +65,11 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 				CompanyWinLoss = add.CompanyWinLoss,
 				TieBetAdjustment = add.TieBetAdjustment,
 				ReopenTurnoverAdjustment = add.ReopenTurnoverAdjustment,
-				ReopenedOn = add.ReopenedOn,
-				SendOn = add.SendOn,
-				ReceiveOn = add.ReceiveOn,
-				RecordOn = DateTime.UtcNow
+				ReopenedOn = add.ReopenedOn.HasValue ? add.ReopenedOn.Value.UtcDateTime : null,
+				SendOn = add.SendOn.UtcDateTime,
+				ReceiveOn = add.ReceiveOn.UtcDateTime,
+				RecordOn = DateTime.UtcNow,
+				ExpireOn = DateTime.UtcNow.AddDays(+7)
 			};
 
 			await collection.InsertOneAsync(
@@ -92,7 +93,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
 		var createIndexOptions = new CreateIndexOptions
 		{
-			Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_external_round_id_external_game_id_player_code"
+			Name = $"ix__external_round_id_external_game_id_player_code"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -112,7 +113,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
 		var createIndexOptions = new CreateIndexOptions
 		{
-			Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_external_round_id_external_game_id_wallet_id"
+			Name = $"ix_external_round_id_external_game_id_wallet_id"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -132,7 +133,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
 		var createIndexOptions = new CreateIndexOptions
 		{
-			Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_external_round_id_game_id_player_code"
+			Name = $"ix_external_round_id_game_id_player_code"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -152,7 +153,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
 		var createIndexOptions = new CreateIndexOptions
 		{
-			Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_external_round_id_game_id_wallet_id"
+			Name = $"ix_external_round_id_game_id_wallet_id"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -188,7 +189,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
 		var createIndexOptions = new CreateIndexOptions
 		{
-			Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_receive_on"
+			Name = $"ix_receive_on"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -206,7 +207,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
 		var createIndexOptions = new CreateIndexOptions
 		{
-			Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_record_on"
+			Name = $"ix_record_on"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -224,7 +225,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
 		var createIndexOptions = new CreateIndexOptions
 		{
-			Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_round_id"
+			Name = $"ix_round_id"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -242,7 +243,62 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
 		var createIndexOptions = new CreateIndexOptions
 		{
-			Name = $"ix_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}_send_on"
+			Name = $"ix_send_on"
+		};
+		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
+
+		return collection.Indexes.CreateOneAsync(
+			model: createIndexModel,
+			cancellationToken: cancellationToken);
+	}
+
+	private static Task ExternalRoundId_IndexAsync(
+		IMongoCollection<GameRoundRecord> collection,
+		CancellationToken cancellationToken = default)
+	{
+		var index = Builders<GameRoundRecord>.IndexKeys
+			.Ascending(m => m.ExternalRoundId);
+
+		var createIndexOptions = new CreateIndexOptions
+		{
+			Name = $"ix_external_round_id"
+		};
+		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
+
+		return collection.Indexes.CreateOneAsync(
+			model: createIndexModel,
+			cancellationToken: cancellationToken);
+	}
+
+	private static Task PlayerCode_IndexAsync(
+		IMongoCollection<GameRoundRecord> collection,
+		CancellationToken cancellationToken = default)
+	{
+		var index = Builders<GameRoundRecord>.IndexKeys
+			.Ascending(m => m.PlayerCode);
+
+		var createIndexOptions = new CreateIndexOptions
+		{
+			Name = $"ix_player_code"
+		};
+		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
+
+		return collection.Indexes.CreateOneAsync(
+			model: createIndexModel,
+			cancellationToken: cancellationToken);
+	}
+
+	private static Task ExpireOn_IndexAsync(
+		IMongoCollection<GameRoundRecord> collection,
+		CancellationToken cancellationToken = default)
+	{
+		var index = Builders<GameRoundRecord>.IndexKeys
+			.Ascending(m => m.ExpireOn);
+
+		var createIndexOptions = new CreateIndexOptions
+		{
+			ExpireAfter = TimeSpan.FromSeconds(1),
+			Name = $"ix_expire_on"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -311,6 +367,18 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 
 			await ExternalRoundId_GameId_PlayerCode_IndexAsync(
+				collection: collection,
+				cancellationToken: cancellationToken).ConfigureAwait(false);
+
+			await ExternalRoundId_IndexAsync(
+				collection: collection,
+				cancellationToken: cancellationToken).ConfigureAwait(false);
+
+			await PlayerCode_IndexAsync(
+				collection: collection,
+				cancellationToken: cancellationToken).ConfigureAwait(false);
+
+			await ExpireOn_IndexAsync(
 				collection: collection,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 		}

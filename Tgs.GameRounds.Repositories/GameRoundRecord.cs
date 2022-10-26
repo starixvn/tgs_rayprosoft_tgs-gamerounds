@@ -105,39 +105,34 @@ public record GameRoundRecord
 	/// The created on
 	/// </summary>
 	[BsonElement("created_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset CreatedOn { get; set; }
+	public DateTime CreatedOn { get; set; }
 
 	/// <summary>
 	/// The closed on
 	/// </summary>
 	[BsonIgnoreIfNull]
 	[BsonElement("closed_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset? ClosedOn { get; set; }
+	public DateTime? ClosedOn { get; set; }
 
 	/// <summary>
 	/// The updated on
 	/// </summary>
 	[BsonElement("updated_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset UpdatedOn { get; set; }
+	public DateTime UpdatedOn { get; set; }
 
 	/// <summary>
 	/// The external created on
 	/// </summary>
 	[BsonIgnoreIfNull]
 	[BsonElement("external_created_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset? ExternalCreatedOn { get; set; }
+	public DateTime? ExternalCreatedOn { get; set; }
 
 	/// <summary>
 	/// The external closed on
 	/// </summary>
 	[BsonIgnoreIfNull]
 	[BsonElement("external_closed_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset? ExternalClosedOn { get; set; }
+	public DateTime? ExternalClosedOn { get; set; }
 
 	/// <summary>
 	/// The bet
@@ -216,27 +211,29 @@ public record GameRoundRecord
 	/// </summary>
 	[BsonIgnoreIfNull]
 	[BsonElement("reopened_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset? ReopenedOn { get; set; }
+	public DateTime? ReopenedOn { get; set; }
 
 	/// <summary>
 	/// The send on
 	/// </summary>
 	[BsonElement("send_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset SendOn { get; set; } = default!;
+	public DateTime SendOn { get; set; } = default!;
 
 	/// <summary>
 	/// The receive on
 	/// </summary>
 	[BsonElement("receive_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset ReceiveOn { get; set; } = default!;
+	public DateTime ReceiveOn { get; set; } = default!;
 
 	/// <summary>
 	/// The record on
 	/// </summary>
 	[BsonElement("record_on")]
-	[BsonRepresentation(BsonType.String)]
-	public DateTimeOffset RecordOn { get; set; } = default!;
+	public DateTime RecordOn { get; set; } = default!;
+
+	/// <summary>
+	/// The expire on.
+	/// </summary>
+	[BsonElement("expire_on")]
+	public DateTime ExpireOn { get; set; }
 }
