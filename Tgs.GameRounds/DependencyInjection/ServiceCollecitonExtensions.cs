@@ -23,13 +23,14 @@ public static class ServiceCollecitonExtensions
 			.AddSingleton<MongoDBConnectionManager>()
 			.AddSingleton<RedisConnectionManager>()
 			.AddGameRoundsCore(gameLockedOptions)
+			.AddMemoryCache()
 			.AddGameRoundBetRepositories(
-			betConfigure,
-			(sp) => sp.GetRequiredService<RedisConnectionManager>().Database,
-			(sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database)
+				betConfigure,
+				(sp) => sp.GetRequiredService<RedisConnectionManager>().Database,
+				(sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database)
 			.AddGameRoundTgsRepositories(
-			tgsConfigure,
-			(sp) => sp.GetRequiredService<RedisConnectionManager>().Database)
+				tgsConfigure,
+				(sp) => sp.GetRequiredService<RedisConnectionManager>().Database)
 			.AddGameRoundRepositories(
-			(sp) => sp.GetRequiredService<RedisConnectionManager>().Database);
+				(sp) => sp.GetRequiredService<RedisConnectionManager>().Database);
 }

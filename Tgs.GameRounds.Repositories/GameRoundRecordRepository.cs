@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Tgs.GameRounds.Core;
@@ -10,15 +11,18 @@ namespace Tgs.GameRounds.Repositories;
 internal class GameRoundRecordRepository : IGameRoundRecord
 {
 	private readonly IMongoDatabase _database;
+	private readonly IMemoryCache _memoryCache;
 	private readonly ILogger<GameRoundRecordRepository> _logger;
 	private readonly ISerialNumberGenerator _serialNumberGenerator;
 
 	public GameRoundRecordRepository(
 		IMongoDatabase database,
+		IMemoryCache memoryCache,
 		ILogger<GameRoundRecordRepository> logger,
 		ISerialNumberGenerator serialNumberGenerator)
 	{
 		_database = database ?? throw new ArgumentNullException(nameof(database));
+		_memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
 		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		_serialNumberGenerator = serialNumberGenerator ?? throw new ArgumentNullException(nameof(serialNumberGenerator));
 	}
@@ -82,140 +86,6 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 		}
 	}
 
-	private static Task ExternalRoundId_ExternalGameId_PlayerCode_IndexAsync(
-		IMongoCollection<GameRoundRecord> collection,
-		CancellationToken cancellationToken = default)
-	{
-		var index = Builders<GameRoundRecord>.IndexKeys
-		   .Ascending(m => m.ExternalRoundId)
-		   .Ascending(m => m.ExternalGameId)
-		   .Ascending(m => m.PlayerCode);
-
-		var createIndexOptions = new CreateIndexOptions
-		{
-			Name = $"ix__external_round_id_external_game_id_player_code"
-		};
-		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
-
-		return collection.Indexes.CreateOneAsync(
-			model: createIndexModel,
-			cancellationToken: cancellationToken);
-	}
-
-	private static Task ExternalRoundId_ExternalGameId_WalletId_IndexAsync(
-		IMongoCollection<GameRoundRecord> collection,
-		CancellationToken cancellationToken = default)
-	{
-		var index = Builders<GameRoundRecord>.IndexKeys
-		   .Ascending(m => m.ExternalRoundId)
-		   .Ascending(m => m.ExternalGameId)
-		   .Ascending(m => m.WalletId);
-
-		var createIndexOptions = new CreateIndexOptions
-		{
-			Name = $"ix_external_round_id_external_game_id_wallet_id"
-		};
-		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
-
-		return collection.Indexes.CreateOneAsync(
-			model: createIndexModel,
-			cancellationToken: cancellationToken);
-	}
-
-	private static Task ExternalRoundId_GameId_PlayerCode_IndexAsync(
-		IMongoCollection<GameRoundRecord> collection,
-		CancellationToken cancellationToken = default)
-	{
-		var index = Builders<GameRoundRecord>.IndexKeys
-		   .Ascending(m => m.ExternalRoundId)
-		   .Ascending(m => m.GameId)
-		   .Ascending(m => m.PlayerCode);
-
-		var createIndexOptions = new CreateIndexOptions
-		{
-			Name = $"ix_external_round_id_game_id_player_code"
-		};
-		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
-
-		return collection.Indexes.CreateOneAsync(
-			model: createIndexModel,
-			cancellationToken: cancellationToken);
-	}
-
-	private static Task ExternalRoundId_GameId_WalletId_IndexAsync(
-		IMongoCollection<GameRoundRecord> collection,
-		CancellationToken cancellationToken = default)
-	{
-		var index = Builders<GameRoundRecord>.IndexKeys
-		   .Ascending(m => m.ExternalRoundId)
-		   .Ascending(m => m.GameId)
-		   .Ascending(m => m.WalletId);
-
-		var createIndexOptions = new CreateIndexOptions
-		{
-			Name = $"ix_external_round_id_game_id_wallet_id"
-		};
-		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
-
-		return collection.Indexes.CreateOneAsync(
-			model: createIndexModel,
-			cancellationToken: cancellationToken);
-	}
-
-	private static Task PrimaryKey_IndexAsync(
-		IMongoCollection<GameRoundRecord> collection,
-		CancellationToken cancellationToken = default)
-	{
-		var index = Builders<GameRoundRecord>.IndexKeys
-		   .Ascending(m => m.GameRoundRecordId);
-
-		var createIndexOptions = new CreateIndexOptions
-		{
-			Name = $"pk_{collection.CollectionNamespace.CollectionName.ToString().ToLower()}"
-		};
-		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
-
-		return collection.Indexes.CreateOneAsync(
-			model: createIndexModel,
-			cancellationToken: cancellationToken);
-	}
-
-	private static Task ReceiveOn_IndexAsync(
-		IMongoCollection<GameRoundRecord> collection,
-		CancellationToken cancellationToken = default)
-	{
-		var index = Builders<GameRoundRecord>.IndexKeys
-			.Ascending(m => m.ReceiveOn);
-
-		var createIndexOptions = new CreateIndexOptions
-		{
-			Name = $"ix_receive_on"
-		};
-		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
-
-		return collection.Indexes.CreateOneAsync(
-			model: createIndexModel,
-			cancellationToken: cancellationToken);
-	}
-
-	private static Task RecordOn_IndexAsync(
-		IMongoCollection<GameRoundRecord> collection,
-		CancellationToken cancellationToken = default)
-	{
-		var index = Builders<GameRoundRecord>.IndexKeys
-			.Ascending(m => m.RecordOn);
-
-		var createIndexOptions = new CreateIndexOptions
-		{
-			Name = $"ix_record_on"
-		};
-		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
-
-		return collection.Indexes.CreateOneAsync(
-			model: createIndexModel,
-			cancellationToken: cancellationToken);
-	}
-
 	private static Task RoundId_IndexAsync(
 		IMongoCollection<GameRoundRecord> collection,
 		CancellationToken cancellationToken = default)
@@ -226,24 +96,6 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 		var createIndexOptions = new CreateIndexOptions
 		{
 			Name = $"ix_round_id"
-		};
-		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
-
-		return collection.Indexes.CreateOneAsync(
-			model: createIndexModel,
-			cancellationToken: cancellationToken);
-	}
-
-	private static Task SendOn_IndexAsync(
-		IMongoCollection<GameRoundRecord> collection,
-		CancellationToken cancellationToken = default)
-	{
-		var index = Builders<GameRoundRecord>.IndexKeys
-			.Ascending(m => m.SendOn);
-
-		var createIndexOptions = new CreateIndexOptions
-		{
-			Name = $"ix_send_on"
 		};
 		var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -311,14 +163,30 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 		string collectionName,
 		CancellationToken cancellationToken = default)
 	{
-		var options = new ListCollectionsOptions { Filter = new BsonDocument("name", collectionName) };
+		var key = $"mongodb:{collectionName}";
 
-		var cursor = await _database.ListCollectionsAsync(
-			options: options,
-			 cancellationToken: cancellationToken).ConfigureAwait(false);
+		if (!_memoryCache.TryGetValue(key, out bool isExist))
+		{
+			var options = new ListCollectionsOptions { Filter = new BsonDocument("name", collectionName) };
 
-		return await cursor.AnyAsync(
-			cancellationToken: cancellationToken).ConfigureAwait(false);
+			var cursor = await _database
+				.ListCollectionsAsync(
+					options: options,
+					cancellationToken: cancellationToken)
+				.ConfigureAwait(false);
+
+			isExist = await cursor
+				.AnyAsync(
+					cancellationToken: cancellationToken)
+				.ConfigureAwait(false);
+
+			if (isExist)
+			{
+				_ = _memoryCache.Set(key, isExist, TimeSpan.FromMinutes(3));
+			}
+		}
+
+		return isExist;
 	}
 
 	private async Task<IMongoCollection<GameRoundRecord>> GetCollectionAsync(string gameProviderCode, CancellationToken cancellationToken = default)
@@ -334,39 +202,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 			collectionName: collection.CollectionNamespace.CollectionName.ToString(),
 			cancellationToken: cancellationToken).ConfigureAwait(false))
 		{
-			await PrimaryKey_IndexAsync(
-				collection: collection,
-				cancellationToken: cancellationToken).ConfigureAwait(false);
-
-			await RecordOn_IndexAsync(
-				collection: collection,
-				cancellationToken: cancellationToken).ConfigureAwait(false);
-
-			await ReceiveOn_IndexAsync(
-				collection: collection,
-				cancellationToken: cancellationToken).ConfigureAwait(false);
-
-			await SendOn_IndexAsync(
-				collection: collection,
-				cancellationToken: cancellationToken).ConfigureAwait(false);
-
 			await RoundId_IndexAsync(
-				collection: collection,
-				cancellationToken: cancellationToken).ConfigureAwait(false);
-
-			await ExternalRoundId_ExternalGameId_WalletId_IndexAsync(
-				collection: collection,
-				cancellationToken: cancellationToken).ConfigureAwait(false);
-
-			await ExternalRoundId_GameId_WalletId_IndexAsync(
-				collection: collection,
-				cancellationToken: cancellationToken).ConfigureAwait(false);
-
-			await ExternalRoundId_ExternalGameId_PlayerCode_IndexAsync(
-				collection: collection,
-				cancellationToken: cancellationToken).ConfigureAwait(false);
-
-			await ExternalRoundId_GameId_PlayerCode_IndexAsync(
 				collection: collection,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MongoDB.Driver;
@@ -17,6 +18,7 @@ public class GameRoundRecordRepositoryUnitTest
 	public async Task Add_BetGameCash()
 	{
 		var fakeLogger = NullLogger<GameRoundRecordRepository>.Instance;
+		var fakeMemoryCache = Substitute.For<IMemoryCache>();
 		var fakeMongoDatabase = Substitute.For<IMongoDatabase>();
 		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
@@ -55,7 +57,7 @@ public class GameRoundRecordRepositoryUnitTest
 
 		_ = fakeSerialNumberGenerator.GenerateAsync().Returns(ValueTask.FromResult(expected));
 
-		var repository = new GameRoundRecordRepository(fakeMongoDatabase, fakeLogger, fakeSerialNumberGenerator);
+		var repository = new GameRoundRecordRepository(fakeMongoDatabase, fakeMemoryCache, fakeLogger, fakeSerialNumberGenerator);
 
 		await repository.AddAsync(data).ConfigureAwait(false);
 	}
