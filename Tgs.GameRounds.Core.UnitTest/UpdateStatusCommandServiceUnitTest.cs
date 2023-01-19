@@ -12,66 +12,66 @@ namespace Tgs.GameRounds.Core.UnitTest;
 [TestClass]
 public class UpdateStatusCommandServiceUnitTest
 {
-	[TestMethod]
-	public async Task ExternalRoundId_Not_Exist()
-	{
-		var fakeGameRound = Substitute.For<IGameRound>();
-		var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
-		var fakeLogger = NullLogger<UpdateStatusCommandService>.Instance;
+    [TestMethod]
+    public async Task ExternalRoundId_Not_Exist()
+    {
+        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
+        var fakeLogger = NullLogger<UpdateStatusCommandService>.Instance;
 
-		var roundId = Guid.NewGuid();
-		var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-		var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+        var roundId = Guid.NewGuid();
+        var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+        var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
 
-		var command = new UpdateStatusCommand(
-			RoundId: roundId,
-			Status: GameRoundStatus.Closed,
-			ExternalClosedOn: DateTimeOffset.UtcNow);
+        var command = new UpdateStatusCommand(
+            RoundId: roundId,
+            Status: GameRoundStatus.Closed,
+            ExternalClosedOn: DateTimeOffset.UtcNow);
 
-		_ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
+        _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult(false));
 
-		var service = new UpdateStatusCommandService(
-			fakeLogger,
-			fakeGameRound,
-			fakeGameRoundRecordMessage);
+        var service = new UpdateStatusCommandService(
+            fakeLogger,
+            fakeGameRound,
+            fakeGameRoundRecordMessage);
 
-		_ = await Assert.ThrowsExceptionAsync<GameRoundDoesNotExistException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
+        _ = await Assert.ThrowsExceptionAsync<GameRoundDoesNotExistException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
 
-		_ = fakeGameRoundRecordMessage
-			.Received(0)
-			.SenderGameRoundRecord(Arg.Is(command.RoundId));
-	}
+        _ = fakeGameRoundRecordMessage
+            .Received(0)
+            .SenderGameRoundRecord(Arg.Is(command.RoundId));
+    }
 
-	[TestMethod]
-	public async Task Normal_Process()
-	{
-		var fakeGameRound = Substitute.For<IGameRound>();
-		var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
-		var fakeLogger = NullLogger<UpdateStatusCommandService>.Instance;
+    [TestMethod]
+    public async Task Normal_Process()
+    {
+        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
+        var fakeLogger = NullLogger<UpdateStatusCommandService>.Instance;
 
-		var roundId = Guid.NewGuid();
+        var roundId = Guid.NewGuid();
 
-		var command = new UpdateStatusCommand(
-			RoundId: roundId,
-			Status: GameRoundStatus.Closed,
-			ExternalClosedOn: DateTimeOffset.UtcNow);
+        var command = new UpdateStatusCommand(
+            RoundId: roundId,
+            Status: GameRoundStatus.Closed,
+            ExternalClosedOn: DateTimeOffset.UtcNow);
 
-		_ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(true));
+        _ = fakeGameRound.ExistAsync(command.RoundId).Returns(ValueTask.FromResult<bool>(true));
 
-		_ = fakeGameRound.UpdateStatusAsync(
-			command.RoundId,
-			command.Status,
-			command.ExternalClosedOn);
+        _ = fakeGameRound.UpdateStatusAsync(
+            command.RoundId,
+            command.Status,
+            command.ExternalClosedOn);
 
-		var service = new UpdateStatusCommandService(
-			fakeLogger,
-			fakeGameRound,
-			fakeGameRoundRecordMessage);
+        var service = new UpdateStatusCommandService(
+            fakeLogger,
+            fakeGameRound,
+            fakeGameRoundRecordMessage);
 
-		await service.ExecuteAsync(command).ConfigureAwait(false);
+        await service.ExecuteAsync(command).ConfigureAwait(false);
 
-		_ = fakeGameRoundRecordMessage
-			.Received(1)
-			.SenderGameRoundRecord(Arg.Is(command.RoundId));
-	}
+        _ = fakeGameRoundRecordMessage
+            .Received(1)
+            .SenderGameRoundRecord(Arg.Is(command.RoundId));
+    }
 }

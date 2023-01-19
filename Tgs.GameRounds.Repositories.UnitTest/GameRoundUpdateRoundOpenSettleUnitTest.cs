@@ -16,107 +16,107 @@ namespace Tgs.GameRounds.Repositories.UnitTest;
 [TestClass]
 public class GameRoundUpdateRoundOpenSettleUnitTest
 {
-	[TestMethod]
-	public async Task Normal_Process()
-	{
-		var fakeLogger = NullLogger<GameRoundRepository>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-		var fakeGameRound = Substitute.For<IGameRound>();
-		var options = new DbContextOptionsBuilder<BetContext>()
-		   .UseInMemoryDatabase(databaseName: "bet")
-		   .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-		   .Options;
-		var context = new BetContext(options);
-		_ = context.Database.EnsureDeleted();
+    [TestMethod]
+    public async Task Normal_Process()
+    {
+        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeGameRound = Substitute.For<IGameRound>();
+        var options = new DbContextOptionsBuilder<BetContext>()
+           .UseInMemoryDatabase(databaseName: "bet")
+           .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+           .Options;
+        var context = new BetContext(options);
+        _ = context.Database.EnsureDeleted();
 
-		var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
-		var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
-		var gameId = 500001;
-		var playerCode = "4ues8xikza7o";
-		var roundId = Guid.NewGuid();
-		var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
-		var round = new Round()
-		{
-			Id = roundId,
-			ExternalRoundId = externalRoundId,
-			GameProviderId = gameProviderId,
-			PlayerCode = playerCode,
-			GameId = gameId,
-			CurrencyCode = "CNY",
-			Status = (short)GameRoundStatus.Open,
-			GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-			WalletId = walletId,
-			BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-			CreatedOn = DateTime.UtcNow,
-			ExternalCreatedOn = DateTime.UtcNow,
-			BetAmount = 20m,
-			ValidBetAmount = 20m,
-			SettleAmount = 0m,
-			Commission = 0m,
-			Turnover = 20m,
-			WinLoss = 0m,
-			ClientStatus = (short)GameRoundClientStatus.Open
-		};
+        var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+        var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+        var gameId = 500001;
+        var playerCode = "4ues8xikza7o";
+        var roundId = Guid.NewGuid();
+        var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+        var round = new Round()
+        {
+            Id = roundId,
+            ExternalRoundId = externalRoundId,
+            GameProviderId = gameProviderId,
+            PlayerCode = playerCode,
+            GameId = gameId,
+            CurrencyCode = "CNY",
+            Status = (short)GameRoundStatus.Open,
+            GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+            WalletId = walletId,
+            BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+            CreatedOn = DateTime.UtcNow,
+            ExternalCreatedOn = DateTime.UtcNow,
+            BetAmount = 20m,
+            ValidBetAmount = 20m,
+            SettleAmount = 0m,
+            Commission = 0m,
+            Turnover = 20m,
+            WinLoss = 0m,
+            ClientStatus = (short)GameRoundClientStatus.Open
+        };
 
-		_ = await context.AddAsync(round).ConfigureAwait(false);
-		_ = await context.SaveChangesAsync().ConfigureAwait(false);
+        _ = await context.AddAsync(round).ConfigureAwait(false);
+        _ = await context.SaveChangesAsync().ConfigureAwait(false);
 
-		var fakeRoundRepository = new GameRoundRepository(
-			context,
-			fakeLogger,
-			fakeSerialNumberGenerator);
+        var fakeRoundRepository = new GameRoundRepository(
+            context,
+            fakeLogger,
+            fakeSerialNumberGenerator);
 
-		var data = new UpdateRoundOpenSettle(
-			BetAmount: 20m,
-			ValidBetAmount: 20m,
-			SettleAmount: 40m,
-			Commission: 0,
-			Turnover: 20m,
-			PlayerWinLoss: 20m);
+        var data = new UpdateRoundOpenSettle(
+            BetAmount: 20m,
+            ValidBetAmount: 20m,
+            SettleAmount: 40m,
+            Commission: 0,
+            Turnover: 20m,
+            PlayerWinLoss: 20m);
 
-		await fakeRoundRepository.UpdateRoundOpenSettleAsync(roundId, data).ConfigureAwait(false);
+        await fakeRoundRepository.UpdateRoundOpenSettleAsync(roundId, data).ConfigureAwait(false);
 
-		var actual = await fakeRoundRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
-		Assert.IsNotNull(actual);
-		Assert.AreEqual(roundId, actual.RoundId);
-		Assert.AreEqual(GameRoundStatus.Open, actual.Status);
-		Assert.AreEqual(GameRoundClientStatus.Open, actual.ClientStatus);
-		Assert.AreEqual(data.BetAmount, actual.BetAmount);
-		Assert.AreEqual(data.ValidBetAmount, actual.ValidBetAmount);
-		Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
-		Assert.AreEqual(data.Commission, actual.Commission);
-		Assert.AreEqual(data.Turnover, actual.Turnover);
-		Assert.AreEqual(-data.PlayerWinLoss, actual.CompanyWinLoss);
-	}
+        var actual = await fakeRoundRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(roundId, actual.RoundId);
+        Assert.AreEqual(GameRoundStatus.Open, actual.Status);
+        Assert.AreEqual(GameRoundClientStatus.Open, actual.ClientStatus);
+        Assert.AreEqual(data.BetAmount, actual.BetAmount);
+        Assert.AreEqual(data.ValidBetAmount, actual.ValidBetAmount);
+        Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
+        Assert.AreEqual(data.Commission, actual.Commission);
+        Assert.AreEqual(data.Turnover, actual.Turnover);
+        Assert.AreEqual(-data.PlayerWinLoss, actual.CompanyWinLoss);
+    }
 
-	[TestMethod]
-	public async Task Round_Did_Not_Exist()
-	{
-		var fakeLogger = NullLogger<GameRoundRepository>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-		var fakeGameRound = Substitute.For<IGameRound>();
-		var options = new DbContextOptionsBuilder<BetContext>()
-		   .UseInMemoryDatabase(databaseName: "bet")
-		   .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-		   .Options;
-		var context = new BetContext(options);
-		_ = context.Database.EnsureDeleted();
+    [TestMethod]
+    public async Task Round_Did_Not_Exist()
+    {
+        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeGameRound = Substitute.For<IGameRound>();
+        var options = new DbContextOptionsBuilder<BetContext>()
+           .UseInMemoryDatabase(databaseName: "bet")
+           .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+           .Options;
+        var context = new BetContext(options);
+        _ = context.Database.EnsureDeleted();
 
-		var roundId = Guid.NewGuid();
+        var roundId = Guid.NewGuid();
 
-		var fakeRoundRepository = new GameRoundRepository(
-			context,
-			fakeLogger,
-			fakeSerialNumberGenerator);
+        var fakeRoundRepository = new GameRoundRepository(
+            context,
+            fakeLogger,
+            fakeSerialNumberGenerator);
 
-		var data = new UpdateRoundOpenSettle(
-			BetAmount: 20m,
-			ValidBetAmount: 20m,
-			SettleAmount: 40m,
-			Commission: 0,
-			Turnover: 20m,
-			PlayerWinLoss: 20m);
+        var data = new UpdateRoundOpenSettle(
+            BetAmount: 20m,
+            ValidBetAmount: 20m,
+            SettleAmount: 40m,
+            Commission: 0,
+            Turnover: 20m,
+            PlayerWinLoss: 20m);
 
-		_ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundOpenSettleAsync(roundId, data).AsTask()).ConfigureAwait(false);
-	}
+        _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundOpenSettleAsync(roundId, data).AsTask()).ConfigureAwait(false);
+    }
 }

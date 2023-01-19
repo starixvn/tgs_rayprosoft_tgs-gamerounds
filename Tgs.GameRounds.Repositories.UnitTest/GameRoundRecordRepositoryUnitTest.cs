@@ -14,51 +14,51 @@ namespace Tgs.GameRounds.Repositories.UnitTest;
 [TestClass]
 public class GameRoundRecordRepositoryUnitTest
 {
-	[TestMethod]
-	public async Task Add_BetGameCash()
-	{
-		var fakeLogger = NullLogger<GameRoundRecordRepository>.Instance;
-		var fakeMemoryCache = Substitute.For<IMemoryCache>();
-		var fakeMongoDatabase = Substitute.For<IMongoDatabase>();
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+    [TestMethod]
+    public async Task Add_BetGameCash()
+    {
+        var fakeLogger = NullLogger<GameRoundRecordRepository>.Instance;
+        var fakeMemoryCache = Substitute.For<IMemoryCache>();
+        var fakeMongoDatabase = Substitute.For<IMongoDatabase>();
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
 
-		var data = new AddGameRoundRecord(
-			RoundId: Guid.NewGuid(),
-			ExternalRoundId: Guid.NewGuid().ToString("N"),
-			ExternalGameId: "Bacc",
-			GameProviderId: Guid.NewGuid(),
-			GameProviderCode: "KY",
-			GameProviderConfigurationId: Guid.NewGuid(),
-			GameId: 1,
-			BrandId: Guid.NewGuid(),
-			PlayerCode: "test",
-			WalletId: Guid.NewGuid(),
-			CurrencyCode: "CNY",
-			Status: GameRoundStatus.Open,
-			ClientStatus: GameRoundClientStatus.Open,
-			CreatedOn: DateTimeOffset.UtcNow,
-			ClosedOn: null,
-			UpdatedOn: DateTimeOffset.UtcNow,
-			ExternalCreatedOn: null,
-			ExternalClosedOn: null,
-			Bet: 0,
-			ValidBet: 0,
-			Settle: 0,
-			Commission: 0,
-			Turnover: 0,
-			CompanyWinLoss: 0,
-			TieBetAdjustment: 0,
-			ReopenTurnoverAdjustment: 0,
-			ReopenedOn: null,
-			SendOn: DateTimeOffset.UtcNow.AddSeconds(-1),
-			ReceiveOn: DateTimeOffset.UtcNow);
+        var data = new AddGameRoundRecord(
+            RoundId: Guid.NewGuid(),
+            ExternalRoundId: Guid.NewGuid().ToString("N"),
+            ExternalGameId: "Bacc",
+            GameProviderId: Guid.NewGuid(),
+            GameProviderCode: "KY",
+            GameProviderConfigurationId: Guid.NewGuid(),
+            GameId: 1,
+            BrandId: Guid.NewGuid(),
+            PlayerCode: "test",
+            WalletId: Guid.NewGuid(),
+            CurrencyCode: "CNY",
+            Status: GameRoundStatus.Open,
+            ClientStatus: GameRoundClientStatus.Open,
+            CreatedOn: DateTimeOffset.UtcNow,
+            ClosedOn: null,
+            UpdatedOn: DateTimeOffset.UtcNow,
+            ExternalCreatedOn: null,
+            ExternalClosedOn: null,
+            Bet: 0,
+            ValidBet: 0,
+            Settle: 0,
+            Commission: 0,
+            Turnover: 0,
+            CompanyWinLoss: 0,
+            TieBetAdjustment: 0,
+            ReopenTurnoverAdjustment: 0,
+            ReopenedOn: null,
+            SendOn: DateTimeOffset.UtcNow.AddSeconds(-1),
+            ReceiveOn: DateTimeOffset.UtcNow);
 
-		var expected = Guid.NewGuid();
+        var expected = Guid.NewGuid();
 
-		_ = fakeSerialNumberGenerator.GenerateAsync().Returns(ValueTask.FromResult(expected));
+        _ = fakeSerialNumberGenerator.GenerateAsync().Returns(ValueTask.FromResult(expected));
 
-		var repository = new GameRoundRecordRepository(fakeMongoDatabase, fakeMemoryCache, fakeLogger, fakeSerialNumberGenerator);
+        var repository = new GameRoundRecordRepository(fakeMongoDatabase, fakeMemoryCache, fakeLogger, fakeSerialNumberGenerator);
 
-		await repository.AddAsync(data).ConfigureAwait(false);
-	}
+        await repository.AddAsync(data).ConfigureAwait(false);
+    }
 }

@@ -2,5 +2,5 @@
 
 public record AddRoundBatchsViewModel
 {
-	public IEnumerable<AddRoundBatchViewModel> AddRoundBatches { get; init; } = default!;
+    public IEnumerable<AddRoundBatchViewModel> AddRoundBatches { get; init; } = default!;
 }

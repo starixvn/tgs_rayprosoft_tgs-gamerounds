@@ -7,45 +7,45 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 
 internal class UpdateRoundOpenSettleCommandService : ICommandService<UpdateRoundOpenSettleCommand>
 {
-	private readonly IGameRound _gameRound;
-	private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
-	private readonly ILogger<UpdateRoundOpenSettleCommandService> _logger;
+    private readonly IGameRound _gameRound;
+    private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
+    private readonly ILogger<UpdateRoundOpenSettleCommandService> _logger;
 
-	public UpdateRoundOpenSettleCommandService(
-		ILogger<UpdateRoundOpenSettleCommandService> logger,
-		IGameRound gameRound,
-		IGameRoundRecordMessage gameRoundRecordMessage)
-	{
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		_gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
-		_gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
-	}
+    public UpdateRoundOpenSettleCommandService(
+        ILogger<UpdateRoundOpenSettleCommandService> logger,
+        IGameRound gameRound,
+        IGameRoundRecordMessage gameRoundRecordMessage)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
+        _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
+    }
 
-	public async ValueTask ExecuteAsync(UpdateRoundOpenSettleCommand command, CancellationToken cancellationToken = default)
-	{
-		if (!await _gameRound.ExistAsync(
-			roundId: command.RoundId,
-			cancellationToken: cancellationToken).ConfigureAwait(false))
-		{
-			_logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
-			throw new GameRoundDoesNotExistException();
-		}
+    public async ValueTask ExecuteAsync(UpdateRoundOpenSettleCommand command, CancellationToken cancellationToken = default)
+    {
+        if (!await _gameRound.ExistAsync(
+            roundId: command.RoundId,
+            cancellationToken: cancellationToken).ConfigureAwait(false))
+        {
+            _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
+            throw new GameRoundDoesNotExistException();
+        }
 
-		var updateRoundOpenSettle = new UpdateRoundOpenSettle(
-			BetAmount: command.BetAmount,
-			ValidBetAmount: command.ValidBetAmount,
-			SettleAmount: command.SettleAmount,
-			Commission: command.Commission,
-			Turnover: command.Turnover,
-			PlayerWinLoss: command.PlayerWinLoss);
+        var updateRoundOpenSettle = new UpdateRoundOpenSettle(
+            BetAmount: command.BetAmount,
+            ValidBetAmount: command.ValidBetAmount,
+            SettleAmount: command.SettleAmount,
+            Commission: command.Commission,
+            Turnover: command.Turnover,
+            PlayerWinLoss: command.PlayerWinLoss);
 
-		await _gameRound.UpdateRoundOpenSettleAsync(
-			roundId: command.RoundId,
-			source: updateRoundOpenSettle,
-			cancellationToken: cancellationToken).ConfigureAwait(false);
+        await _gameRound.UpdateRoundOpenSettleAsync(
+            roundId: command.RoundId,
+            source: updateRoundOpenSettle,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
 
-		await _gameRoundRecordMessage.SenderGameRoundRecord(
-			roundId: command.RoundId,
-			cancellationToken: cancellationToken).ConfigureAwait(false);
-	}
+        await _gameRoundRecordMessage.SenderGameRoundRecord(
+            roundId: command.RoundId,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+    }
 }

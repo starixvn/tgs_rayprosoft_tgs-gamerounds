@@ -4,7 +4,7 @@ namespace Tgs.GameRounds.Core;
 
 public interface IGameRoundRecord
 {
-	public ValueTask AddAsync(
-		AddGameRoundRecord add,
-		CancellationToken cancellationToken = default);
+    public ValueTask AddAsync(
+        AddGameRoundRecord add,
+        CancellationToken cancellationToken = default);
 }

@@ -2,6 +2,6 @@
 
 public enum FailedGameRoundAutoStatus
 {
-	Manual = 1,
-	Auto
+    Manual = 1,
+    Auto
 }

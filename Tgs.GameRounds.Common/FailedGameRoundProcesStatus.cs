@@ -2,7 +2,7 @@
 
 public enum FailedGameRoundProcesStatus
 {
-	Process = 1,
-	ProcessSuccess,
-	ProcessFailed
+    Process = 1,
+    ProcessSuccess,
+    ProcessFailed
 }

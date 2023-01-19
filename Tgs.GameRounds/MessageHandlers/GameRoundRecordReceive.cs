@@ -1,5 +1,5 @@
 ﻿namespace Tgs.GameRounds.MessageHandlers;
 
 public record GameRoundRecordReceive(
-	Guid RoundId,
-	DateTimeOffset SendOn);
+    Guid RoundId,
+    DateTimeOffset SendOn);

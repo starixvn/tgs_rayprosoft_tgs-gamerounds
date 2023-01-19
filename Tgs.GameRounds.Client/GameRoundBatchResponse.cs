@@ -3,6 +3,6 @@
 namespace Tgs.GameRounds.Client;
 
 public record GameRoundBatchResponse(
-	IEnumerable<Guid> RoundIds,
-	 bool Success = false,
-	 HttpStatusCode HttpStatusCode = HttpStatusCode.InternalServerError);
+    IEnumerable<Guid> RoundIds,
+     bool Success = false,
+     HttpStatusCode HttpStatusCode = HttpStatusCode.InternalServerError);

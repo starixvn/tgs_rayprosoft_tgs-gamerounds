@@ -2,11 +2,11 @@
 
 public class GameRoundCompanyOrderDuplicateException : Exception
 {
-	public GameRoundCompanyOrderDuplicateException() : base("This company has a duplicate order.")
-	{
-	}
+    public GameRoundCompanyOrderDuplicateException() : base("This company has a duplicate order.")
+    {
+    }
 
-	public GameRoundCompanyOrderDuplicateException(string message) : base(message)
-	{
-	}
+    public GameRoundCompanyOrderDuplicateException(string message) : base(message)
+    {
+    }
 }

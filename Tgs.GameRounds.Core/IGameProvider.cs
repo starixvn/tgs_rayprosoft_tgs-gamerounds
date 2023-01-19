@@ -2,7 +2,7 @@
 
 public interface IGameProvider
 {
-	ValueTask<string> GetGameProviderCodeAsync(
-		Guid gameProviderId,
-		CancellationToken cancellationToken = default);
+    ValueTask<string> GetGameProviderCodeAsync(
+        Guid gameProviderId,
+        CancellationToken cancellationToken = default);
 }

@@ -4,5 +4,5 @@ namespace Tgs.GameRounds.Client;
 
 public interface IGameRoundsWorkClient
 {
-	public ValueTask ExecuteAsync(GameRoundsWorkViewModel model, CancellationToken cancellationToken = default);
+    public ValueTask ExecuteAsync(GameRoundsWorkViewModel model, CancellationToken cancellationToken = default);
 }

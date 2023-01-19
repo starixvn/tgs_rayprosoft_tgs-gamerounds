@@ -1,4 +1,4 @@
-{
+﻿{
   "configProperties": {
     "System.Threading.ThreadPool.MinThreads": 256
   }
