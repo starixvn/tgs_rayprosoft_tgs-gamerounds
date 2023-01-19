@@ -60,32 +60,31 @@ internal class GameRoundCacheRepository : IGameRound
     {
         string key = string.Format(KeyExist, roundId).ToLower();
 
-        if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
+        var exist = await _database.KeyExistsAsync(key).ConfigureAwait(false);
+        if (!exist)
         {
-            var round = await _gameRound.GetAsync(
-                roundId: roundId,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
+            exist = await _gameRound.ExistAsync(
+               roundId: roundId,
+               cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            if (round == null)
+            if (exist)
             {
-                return false;
+                var value = JsonSerializer.Serialize(new
+                {
+                    roundId,
+                    LogOn = DateTimeOffset.UtcNow.ToString("O")
+                });
+
+                _ = await _database.StringSetAsync(
+                    key: key,
+                    value: value,
+                    expiry: _expiry,
+                    when: When.Always,
+                    flags: CommandFlags.None).ConfigureAwait(false);
             }
-
-            var value = JsonSerializer.Serialize(new
-            {
-                round.RoundId,
-                LogOn = DateTimeOffset.UtcNow.ToString("O")
-            });
-
-            _ = await _database.StringSetAsync(
-                key: key,
-                value: value,
-                expiry: _expiry,
-                when: When.Always,
-                flags: CommandFlags.None).ConfigureAwait(false);
         }
 
-        return true;
+        return exist;
     }
 
     public ValueTask<GameRoundInfo?> GetAsync(

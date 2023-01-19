@@ -309,7 +309,7 @@ internal class GameRoundRepository : IGameRound
     }
 
     public async ValueTask AdjustClosedRoundAsync(
-                Guid roundId,
+        Guid roundId,
         AdjustClosedRound source,
         CancellationToken cancellationToken = default)
     {
