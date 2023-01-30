@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.ApplicationServices;
@@ -224,7 +223,7 @@ public class GameRoundsController : ControllerBase
     }
 
     /// <summary>
-    /// Queries the by round identifier asynchronous.
+    /// Gets the list by round identifier query asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
     /// <param name="gameProviderId">The game provider identifier.</param>
@@ -284,19 +283,6 @@ public class GameRoundsController : ControllerBase
             externalRoundId,
             gameId,
             walletId);
-
-    /// <summary>
-    /// Gets the status asynchronous.
-    /// </summary>
-    /// <param name="repository">The repository.</param>
-    /// <param name="roundid">The roundid.</param>
-    /// <returns></returns>
-    [HttpGet("{roundid}/status", Name = "GameRoundGetStatus")]
-    public ValueTask<GameRoundStatus> GetStatusAsync(
-        [FromServices] IGameRound repository,
-        Guid roundid)
-        => repository
-            .GetStatusAsync(roundid);
 
     /// <summary>
     /// Manuals the close round asynchronous.

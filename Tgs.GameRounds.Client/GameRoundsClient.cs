@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
-using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
 
 namespace Tgs.GameRounds.Client;
@@ -80,30 +79,6 @@ internal class GameRoundsClient : IGameRoundsClient
                     cancellationToken: cancellationToken).ConfigureAwait(false));
     }
 
-    public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, string externalGameId, Guid walletId, CancellationToken cancellationToken = default)
-    {
-        var query = HttpUtility.ParseQueryString(string.Empty);
-        query["gameProviderId"] = gameProviderId.ToString();
-        query["externalRoundId"] = externalRoundId;
-        query["externalGameId"] = externalGameId;
-        query["walletId"] = walletId.ToString();
-
-        var requestUri = $"gamerounds/externalgame?{query}";
-
-        var response = await _httpClient
-            .GetAsync(
-                requestUri: requestUri,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        return new GameRoundDataResponse(
-                Success: response.IsSuccessStatusCode,
-                HttpStatusCode: response.StatusCode,
-                Data: await GetResultAsync<GameRoundViewModel>(
-                    responseMessage: response,
-                    cancellationToken: cancellationToken).ConfigureAwait(false));
-    }
-
     public async ValueTask<GameRoundDataResponse> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId, CancellationToken cancellationToken = default)
     {
         var query = HttpUtility.ParseQueryString(string.Empty);
@@ -128,31 +103,6 @@ internal class GameRoundsClient : IGameRoundsClient
                     cancellationToken: cancellationToken).ConfigureAwait(false));
     }
 
-    public async IAsyncEnumerable<Guid> GetListByRoundIdAsync(Guid gameProviderId, string externalRoundId, string externalGameId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        var response = await _httpClient
-           .GetAsync(
-               requestUri: $"gamerounds/{gameProviderId}/{externalRoundId}/{externalGameId}/roundids",
-               cancellationToken: cancellationToken)
-           .ConfigureAwait(false);
-
-        _ = response.EnsureSuccessStatusCode();
-
-        var roundIds = await GetResultAsync<IEnumerable<Guid>>(
-                    responseMessage: response,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        if (roundIds is null || !roundIds.Any())
-        {
-            yield break;
-        }
-
-        foreach (var roundId in roundIds)
-        {
-            yield return roundId;
-        }
-    }
-
     public async ValueTask<GameRoundDetailDataResponse> GetRoundDetailAsync(Guid roundId, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient
@@ -165,46 +115,6 @@ internal class GameRoundsClient : IGameRoundsClient
                 Success: response.IsSuccessStatusCode,
                 HttpStatusCode: response.StatusCode,
                 Data: await GetResultAsync<GameRoundDetailViewModel>(
-                    responseMessage: response,
-                    cancellationToken: cancellationToken).ConfigureAwait(false));
-    }
-
-    public async ValueTask<GameRoundIdResponse> GetRoundIdAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId, CancellationToken cancellationToken = default)
-    {
-        var query = HttpUtility.ParseQueryString(string.Empty);
-        query["gameProviderId"] = gameProviderId.ToString();
-        query["externalRoundId"] = externalRoundId;
-        query["gameId"] = gameId.ToString();
-        query["walletId"] = walletId.ToString();
-
-        var requestUri = $"gamerounds/getroundid?{query}";
-
-        var response = await _httpClient
-            .GetAsync(
-                requestUri: requestUri,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        var content = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        return new GameRoundIdResponse(
-                Success: response.IsSuccessStatusCode,
-                HttpStatusCode: response.StatusCode,
-                RoundId: response.StatusCode == HttpStatusCode.OK ? JsonSerializer.Deserialize<Guid?>(content, _SerializerOptions) : null);
-    }
-
-    public async ValueTask<GameRoundRoundStatusResponse> GetStatusAsync(Guid roundId, CancellationToken cancellationToken = default)
-    {
-        var response = await _httpClient
-            .GetAsync(
-                requestUri: $"gamerounds/{roundId}/status",
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        return new GameRoundRoundStatusResponse(
-                Success: response.IsSuccessStatusCode,
-                HttpStatusCode: response.StatusCode,
-                RoundStatus: await GetResultAsync<GameRoundStatus>(
                     responseMessage: response,
                     cancellationToken: cancellationToken).ConfigureAwait(false));
     }
