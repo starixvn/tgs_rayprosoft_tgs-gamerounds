@@ -83,110 +83,6 @@ public class GameRoundsWorkCommandServiceUnitTest
     }
 
     [TestMethod]
-    public async Task Update_Round_Open()
-    {
-        var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
-        var fakeAddRoundService = Substitute.For<ICommandService<AddRoundCommand>>();
-        var fakeUpdateRoundClosedService = Substitute.For<ICommandService<UpdateRoundClosedCommand>>();
-        var fakeUpdateRoundOpenService = Substitute.For<ICommandService<UpdateRoundOpenCommand>>();
-        var fakeUpdateRoundReopenService = Substitute.For<ICommandService<UpdateRoundReopenCommand>>();
-
-        var externalRoundId = Guid.NewGuid().ToString("N");
-        var gameProviderId = Guid.NewGuid();
-        var playerCode = "test";
-        var gameId = 1;
-        var walletId = Guid.NewGuid();
-        var roundId = Guid.NewGuid();
-
-        var command = new GameRoundWorkCommand(
-            ExternalRoundId: externalRoundId,
-            GameProviderId: gameProviderId,
-            GameId: gameId,
-            PlayerCode: playerCode,
-            CurrencyCode: "CNY",
-            WalletId: walletId,
-            BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
-            GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
-            Status: GameRoundStatus.Open,
-            ClientStatus: GameRoundClientStatus.Open,
-            ExternalCreatedOn: DateTimeOffset.UtcNow,
-            ExternalClosedOn: null,
-            BetAmount: 20m,
-            ValidBetAmount: 20m,
-            SettleAmount: 0,
-            Commission: 0,
-            Turnover: 0,
-            PlayerWinLoss: 0,
-            AdditionalData: "{}");
-
-        _ = fakeGameRound
-            .GetRoundIdAsync(
-                gameProviderId: Arg.Is(command.GameProviderId),
-                externalRoundId: Arg.Is(command.ExternalRoundId),
-                gameId: Arg.Is(command.GameId),
-                walletId: Arg.Is(command.WalletId))
-            .Returns(ValueTask.FromResult<Guid?>(roundId));
-
-        var gameRound = new GameRoundInfo(
-            RoundId: roundId,
-            ExternalRoundId: command.ExternalRoundId,
-            GameProviderId: command.GameProviderId,
-            PlayerCode: command.PlayerCode,
-            GameId: command.GameId,
-            CurrencyCode: command.CurrencyCode,
-            Status: GameRoundStatus.Open,
-            GameProviderConfigurationId: command.GameProviderConfigurationId,
-            WalletId: command.WalletId,
-            CreatedOn: DateTimeOffset.UtcNow,
-            ClosedOn: null,
-            UpdatedOn: DateTimeOffset.UtcNow,
-            BrandId: command.BrandId,
-            ExternalCreatedOn: command.ExternalCreatedOn,
-            ExternalClosedOn: null,
-            BetAmount: command.BetAmount,
-            ValidBetAmount: 10m,
-            SettleAmount: 10m,
-            Commission: 0,
-            Turnover: 0,
-            CompanyWinLoss: 0,
-            TieBetAdjustment: 0,
-            ClientStatus: GameRoundClientStatus.Open,
-            ReopenTurnoverAdjustment: 0,
-            ReopenedOn: null,
-            EffectiveBettingPercentage: 0,
-            AdditionalData: "{}");
-
-        _ = fakeGameRound
-            .GetAsync(
-                roundId: Arg.Is(roundId))
-            .Returns(gameRound);
-
-        var service = new GameRoundWorkHandleService(
-            fakeLogger,
-            fakeGameRound,
-            fakeAddRoundService,
-            fakeUpdateRoundOpenService,
-            fakeUpdateRoundClosedService,
-            fakeUpdateRoundReopenService);
-
-        await service.ExecuteAsync(command).ConfigureAwait(false);
-
-        _ = fakeAddRoundService
-            .Received(0)
-            .ExecuteAsync(Arg.Any<AddRoundCommand>());
-        _ = fakeUpdateRoundOpenService
-            .Received(1)
-            .ExecuteAsync(Arg.Any<UpdateRoundOpenCommand>());
-        _ = fakeUpdateRoundClosedService
-            .Received(0)
-            .ExecuteAsync(Arg.Any<UpdateRoundClosedCommand>());
-        _ = fakeUpdateRoundReopenService
-            .Received(0)
-            .ExecuteAsync(Arg.Any<UpdateRoundReopenCommand>());
-    }
-
-    [TestMethod]
     public async Task Update_Round_Closed()
     {
         var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
@@ -385,6 +281,110 @@ public class GameRoundsWorkCommandServiceUnitTest
             .ExecuteAsync(Arg.Any<AddRoundCommand>());
         _ = fakeUpdateRoundOpenService
             .Received(0)
+            .ExecuteAsync(Arg.Any<UpdateRoundOpenCommand>());
+        _ = fakeUpdateRoundClosedService
+            .Received(0)
+            .ExecuteAsync(Arg.Any<UpdateRoundClosedCommand>());
+        _ = fakeUpdateRoundReopenService
+            .Received(0)
+            .ExecuteAsync(Arg.Any<UpdateRoundReopenCommand>());
+    }
+
+    [TestMethod]
+    public async Task Update_Round_Open()
+    {
+        var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
+        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeAddRoundService = Substitute.For<ICommandService<AddRoundCommand>>();
+        var fakeUpdateRoundClosedService = Substitute.For<ICommandService<UpdateRoundClosedCommand>>();
+        var fakeUpdateRoundOpenService = Substitute.For<ICommandService<UpdateRoundOpenCommand>>();
+        var fakeUpdateRoundReopenService = Substitute.For<ICommandService<UpdateRoundReopenCommand>>();
+
+        var externalRoundId = Guid.NewGuid().ToString("N");
+        var gameProviderId = Guid.NewGuid();
+        var playerCode = "test";
+        var gameId = 1;
+        var walletId = Guid.NewGuid();
+        var roundId = Guid.NewGuid();
+
+        var command = new GameRoundWorkCommand(
+            ExternalRoundId: externalRoundId,
+            GameProviderId: gameProviderId,
+            GameId: gameId,
+            PlayerCode: playerCode,
+            CurrencyCode: "CNY",
+            WalletId: walletId,
+            BrandId: new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+            GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+            Status: GameRoundStatus.Open,
+            ClientStatus: GameRoundClientStatus.Open,
+            ExternalCreatedOn: DateTimeOffset.UtcNow,
+            ExternalClosedOn: null,
+            BetAmount: 20m,
+            ValidBetAmount: 20m,
+            SettleAmount: 0,
+            Commission: 0,
+            Turnover: 0,
+            PlayerWinLoss: 0,
+            AdditionalData: "{}");
+
+        _ = fakeGameRound
+            .GetRoundIdAsync(
+                gameProviderId: Arg.Is(command.GameProviderId),
+                externalRoundId: Arg.Is(command.ExternalRoundId),
+                gameId: Arg.Is(command.GameId),
+                walletId: Arg.Is(command.WalletId))
+            .Returns(ValueTask.FromResult<Guid?>(roundId));
+
+        var gameRound = new GameRoundInfo(
+            RoundId: roundId,
+            ExternalRoundId: command.ExternalRoundId,
+            GameProviderId: command.GameProviderId,
+            PlayerCode: command.PlayerCode,
+            GameId: command.GameId,
+            CurrencyCode: command.CurrencyCode,
+            Status: GameRoundStatus.Open,
+            GameProviderConfigurationId: command.GameProviderConfigurationId,
+            WalletId: command.WalletId,
+            CreatedOn: DateTimeOffset.UtcNow,
+            ClosedOn: null,
+            UpdatedOn: DateTimeOffset.UtcNow,
+            BrandId: command.BrandId,
+            ExternalCreatedOn: command.ExternalCreatedOn,
+            ExternalClosedOn: null,
+            BetAmount: command.BetAmount,
+            ValidBetAmount: 10m,
+            SettleAmount: 10m,
+            Commission: 0,
+            Turnover: 0,
+            CompanyWinLoss: 0,
+            TieBetAdjustment: 0,
+            ClientStatus: GameRoundClientStatus.Open,
+            ReopenTurnoverAdjustment: 0,
+            ReopenedOn: null,
+            EffectiveBettingPercentage: 0,
+            AdditionalData: "{}");
+
+        _ = fakeGameRound
+            .GetAsync(
+                roundId: Arg.Is(roundId))
+            .Returns(gameRound);
+
+        var service = new GameRoundWorkHandleService(
+            fakeLogger,
+            fakeGameRound,
+            fakeAddRoundService,
+            fakeUpdateRoundOpenService,
+            fakeUpdateRoundClosedService,
+            fakeUpdateRoundReopenService);
+
+        await service.ExecuteAsync(command).ConfigureAwait(false);
+
+        _ = fakeAddRoundService
+            .Received(0)
+            .ExecuteAsync(Arg.Any<AddRoundCommand>());
+        _ = fakeUpdateRoundOpenService
+            .Received(1)
             .ExecuteAsync(Arg.Any<UpdateRoundOpenCommand>());
         _ = fakeUpdateRoundClosedService
             .Received(0)

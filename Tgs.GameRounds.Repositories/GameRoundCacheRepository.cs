@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
+
 using StackExchange.Redis;
+
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
@@ -107,8 +109,17 @@ internal class GameRoundCacheRepository : IGameRound
             walletId: walletId,
             cancellationToken: cancellationToken);
 
+    public IAsyncEnumerable<Guid> GetListByRoundIdAsync(
+        Guid gameProviderId,
+        string externalRoundId,
+        int gameId)
+        => _gameRound.GetListByRoundIdAsync(
+            gameProviderId: gameProviderId,
+            externalRoundId: externalRoundId,
+            gameId: gameId);
+
     public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
-        Guid roundId,
+            Guid roundId,
         CancellationToken cancellationToken = default)
         => _gameRound.GetRoundDetailAsync(
             roundId: roundId,
@@ -174,15 +185,6 @@ internal class GameRoundCacheRepository : IGameRound
         => _gameRound.NewRoundAsync(
             source: source,
             cancellationToken: cancellationToken);
-
-    public IAsyncEnumerable<Guid> GetListByRoundIdAsync(
-        Guid gameProviderId,
-        string externalRoundId,
-        int gameId)
-        => _gameRound.GetListByRoundIdAsync(
-            gameProviderId: gameProviderId,
-            externalRoundId: externalRoundId,
-            gameId: gameId);
 
     public ValueTask UpdateClientStatusAsync(
         Guid roundId,

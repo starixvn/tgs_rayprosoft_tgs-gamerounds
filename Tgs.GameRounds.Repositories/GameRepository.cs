@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Repositories.Entities;
 

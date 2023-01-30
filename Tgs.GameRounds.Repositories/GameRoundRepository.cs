@@ -1,7 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.Json;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
@@ -485,8 +487,20 @@ internal class GameRoundRepository : IGameRound
         .ToAsyncEnumerable()
         .FirstOrDefaultAsync(cancellationToken);
 
+    public IAsyncEnumerable<Guid> GetListByRoundIdAsync(
+        Guid gameProviderId,
+        string externalRoundId,
+        int gameId)
+        => _context.Rounds
+            .AsQueryable()
+            .Where(x => x.ExternalRoundId == externalRoundId
+                    && x.GameProviderId == gameProviderId
+                    && x.GameId == gameId)
+            .Select(x => x.Id)
+            .ToAsyncEnumerable();
+
     public async ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
-        Guid roundId,
+            Guid roundId,
         CancellationToken cancellationToken = default)
         => await _context.RoundDetails
             .AsQueryable()
@@ -649,18 +663,6 @@ internal class GameRoundRepository : IGameRound
             return null;
         }
     }
-
-    public IAsyncEnumerable<Guid> GetListByRoundIdAsync(
-        Guid gameProviderId,
-        string externalRoundId,
-        int gameId)
-        => _context.Rounds
-            .AsQueryable()
-            .Where(x => x.ExternalRoundId == externalRoundId
-                    && x.GameProviderId == gameProviderId
-                    && x.GameId == gameId)
-            .Select(x => x.Id)
-            .ToAsyncEnumerable();
 
     public async ValueTask UpdateClientStatusAsync(
         Guid roundId,

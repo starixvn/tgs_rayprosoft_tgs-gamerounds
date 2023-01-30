@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
@@ -9,8 +10,8 @@ namespace Tgs.GameRounds.Repositories;
 
 internal class FailedGameRoundRepository : IFailedGameRound
 {
-    private readonly ISerialNumberGenerator _serialNumberGenerator;
     private readonly BetContext _context;
+    private readonly ISerialNumberGenerator _serialNumberGenerator;
 
     public FailedGameRoundRepository(
         ISerialNumberGenerator serialNumberGenerator,

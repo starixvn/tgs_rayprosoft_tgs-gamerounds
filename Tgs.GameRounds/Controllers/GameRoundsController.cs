@@ -3,7 +3,6 @@ using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.ApplicationServices;
-using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.ViewModels;
 using Tgs.ServiceUtility;
 
@@ -43,7 +42,6 @@ public class GameRoundsController : ControllerBase
             ClientStatus: model.ClientStatus,
             OperatorId: model.OperatorId,
             Remark: model.Remark));
-
 
     /// <summary>
     /// Adjusts the closed round asynchronous.
@@ -226,6 +224,26 @@ public class GameRoundsController : ControllerBase
     }
 
     /// <summary>
+    /// Queries the by round identifier asynchronous.
+    /// </summary>
+    /// <param name="service">The service.</param>
+    /// <param name="gameProviderId">The game provider identifier.</param>
+    /// <param name="externalRoundId">The external round identifier.</param>
+    /// <param name="externalGameId">The external game identifier.</param>
+    /// <returns></returns>
+    [HttpGet("{gameProviderId}/{externalRoundId}/{externalGameId}/roundids", Name = "GetListByRoundIdQuery")]
+    public IAsyncEnumerable<Guid> GetListByRoundIdQueryAsync(
+        [FromServices] IQueryService<GetListByRoundIdQuery, Guid> service,
+         Guid gameProviderId,
+         string externalRoundId,
+         string externalGameId)
+        => service
+            .QueryAsync(new GetListByRoundIdQuery(
+                gameProviderId,
+                externalRoundId,
+                externalGameId));
+
+    /// <summary>
     /// Gets the round detail asynchronous.
     /// </summary>
     /// <param name="gameRound">The game round.</param>
@@ -281,26 +299,6 @@ public class GameRoundsController : ControllerBase
             .GetStatusAsync(roundid);
 
     /// <summary>
-    /// Queries the by round identifier asynchronous.
-    /// </summary>
-    /// <param name="service">The service.</param>
-    /// <param name="gameProviderId">The game provider identifier.</param>
-    /// <param name="externalRoundId">The external round identifier.</param>
-    /// <param name="externalGameId">The external game identifier.</param>
-    /// <returns></returns>
-    [HttpGet("{gameProviderId}/{externalRoundId}/{externalGameId}/roundids", Name = "GetListByRoundIdQuery")]
-    public IAsyncEnumerable<Guid> GetListByRoundIdQueryAsync(
-        [FromServices] IQueryService<GetListByRoundIdQuery, Guid> service,
-         Guid gameProviderId,
-         string externalRoundId,
-         string externalGameId)
-        => service
-            .QueryAsync(new GetListByRoundIdQuery(
-                gameProviderId,
-                externalRoundId,
-                externalGameId));
-
-    /// <summary>
     /// Manuals the close round asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
@@ -324,7 +322,6 @@ public class GameRoundsController : ControllerBase
             ClientStatus: model.ClientStatus,
             OperatorId: model.OperatorId,
             Remark: model.Remark));
-
 
     /// <summary>
     /// Updates the round detail asynchronous.

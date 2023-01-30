@@ -232,6 +232,43 @@ public partial class GameRoundsClientUnitTest
     }
 
     [TestMethod]
+    public async Task GameRounds_GetListByRoundId()
+    {
+        var gameProviderId = Guid.NewGuid();
+        var externalRoundId = "1720321";
+        var externalGameId = "baccarat";
+
+        var web = CreateTestSettingSite(services =>
+        {
+            var fakeRepository = Substitute.For<IQueryService<GetListByRoundIdQuery, Guid>>();
+
+            var query = new GetListByRoundIdQuery(
+                        gameProviderId,
+                        externalRoundId,
+                        externalGameId);
+
+            _ = fakeRepository.QueryAsync(query).Returns(new Guid[] { Guid.NewGuid(), Guid.NewGuid() }.ToAsyncEnumerable());
+
+            _ = services.AddSingleton(fakeRepository);
+        });
+
+        var httpClient = web.CreateClient();
+
+        var sut = new GameRoundsClient(httpClient);
+
+        var actual = await sut
+                    .GetListByRoundIdAsync(
+                        gameProviderId,
+                        externalRoundId,
+                        externalGameId)
+                    .ToArrayAsync()
+                    .ConfigureAwait(false);
+
+        Assert.IsNotNull(actual);
+        Assert.IsTrue(actual.Length > 0);
+    }
+
+    [TestMethod]
     public async Task GameRounds_GetRoundDetail()
     {
         var roundId = Guid.NewGuid();
@@ -377,43 +414,6 @@ public partial class GameRoundsClientUnitTest
         Assert.AreEqual(true, actual.Success);
         Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
         Assert.AreEqual(expected, actual.RoundStatus);
-    }
-
-    [TestMethod]
-    public async Task GameRounds_GetListByRoundId()
-    {
-        var gameProviderId = Guid.NewGuid();
-        var externalRoundId = "1720321";
-        var externalGameId = "baccarat";
-
-        var web = CreateTestSettingSite(services =>
-        {
-            var fakeRepository = Substitute.For<IQueryService<GetListByRoundIdQuery, Guid>>();
-
-            var query = new GetListByRoundIdQuery(
-                        gameProviderId,
-                        externalRoundId,
-                        externalGameId);
-
-            _ = fakeRepository.QueryAsync(query).Returns(new Guid[] { Guid.NewGuid(), Guid.NewGuid() }.ToAsyncEnumerable());
-
-            _ = services.AddSingleton(fakeRepository);
-        });
-
-        var httpClient = web.CreateClient();
-
-        var sut = new GameRoundsClient(httpClient);
-
-        var actual = await sut
-                    .GetListByRoundIdAsync(
-                        gameProviderId,
-                        externalRoundId,
-                        externalGameId)
-                    .ToArrayAsync()
-                    .ConfigureAwait(false);
-
-        Assert.IsNotNull(actual);
-        Assert.IsTrue(actual.Length > 0);
     }
 
     private static WebApplicationFactory<Program> CreateTestSettingSite(Action<IServiceCollection>? configureServices = null)

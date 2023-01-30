@@ -35,7 +35,6 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
             .ConfigureAwait(false)
             ?? throw new Exception($"This order number does not exist.({query.RoundId})");
 
-
         var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(
             gameProviderId: gameRoundInfo.GameProviderId,
             cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -74,6 +73,5 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
             gameRoundInfo.ReopenedOn,
             gameRoundInfo.EffectiveBettingPercentage,
             gameRoundInfo.AdditionalData);
-
     }
 }

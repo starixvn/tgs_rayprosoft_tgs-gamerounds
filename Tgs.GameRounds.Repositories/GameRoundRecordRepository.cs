@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+
 using MongoDB.Bson;
 using MongoDB.Driver;
+
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
 using Tgs.SerialNumberGenerator;
@@ -11,8 +13,8 @@ namespace Tgs.GameRounds.Repositories;
 internal class GameRoundRecordRepository : IGameRoundRecord
 {
     private readonly IMongoDatabase _database;
-    private readonly IMemoryCache _memoryCache;
     private readonly ILogger<GameRoundRecordRepository> _logger;
+    private readonly IMemoryCache _memoryCache;
     private readonly ISerialNumberGenerator _serialNumberGenerator;
 
     public GameRoundRecordRepository(
@@ -86,16 +88,17 @@ internal class GameRoundRecordRepository : IGameRoundRecord
         }
     }
 
-    private static Task RoundId_IndexAsync(
+    private static Task ExpireOn_IndexAsync(
         IMongoCollection<GameRoundRecord> collection,
         CancellationToken cancellationToken = default)
     {
         var index = Builders<GameRoundRecord>.IndexKeys
-           .Ascending(m => m.RoundId);
+            .Ascending(m => m.ExpireOn);
 
         var createIndexOptions = new CreateIndexOptions
         {
-            Name = $"ix_round_id"
+            ExpireAfter = TimeSpan.FromSeconds(1),
+            Name = $"ix_expire_on"
         };
         var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
@@ -140,17 +143,16 @@ internal class GameRoundRecordRepository : IGameRoundRecord
             cancellationToken: cancellationToken);
     }
 
-    private static Task ExpireOn_IndexAsync(
-        IMongoCollection<GameRoundRecord> collection,
+    private static Task RoundId_IndexAsync(
+                    IMongoCollection<GameRoundRecord> collection,
         CancellationToken cancellationToken = default)
     {
         var index = Builders<GameRoundRecord>.IndexKeys
-            .Ascending(m => m.ExpireOn);
+           .Ascending(m => m.RoundId);
 
         var createIndexOptions = new CreateIndexOptions
         {
-            ExpireAfter = TimeSpan.FromSeconds(1),
-            Name = $"ix_expire_on"
+            Name = $"ix_round_id"
         };
         var createIndexModel = new CreateIndexModel<GameRoundRecord>(index, createIndexOptions);
 
