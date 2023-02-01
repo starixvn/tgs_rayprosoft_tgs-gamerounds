@@ -219,7 +219,6 @@ public class GameRoundsController : ControllerBase
             result.EffectiveBettingPercentage) : null;
     }
 
-
     /// <summary>
     /// Gets the round detail asynchronous.
     /// </summary>

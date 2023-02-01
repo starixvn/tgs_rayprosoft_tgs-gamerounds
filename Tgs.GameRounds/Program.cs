@@ -8,7 +8,6 @@ using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Prometheus;
-using Tgs.GameRounds;
 using Tgs.GameRounds.MessageHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
