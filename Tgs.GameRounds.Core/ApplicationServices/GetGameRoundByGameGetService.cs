@@ -37,6 +37,12 @@ internal class GetGameRoundByGameGetService : IGetService<GetGameRoundByGameQuer
                 id: query.GameId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
+            var detailInfo = await _gameRoundRepository
+                .GetRoundDetailAsync(
+                    gameRoundInfo.RoundId,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
             return new GameRoundResult(
                 gameRoundInfo.RoundId,
                 gameRoundInfo.ExternalRoundId,
@@ -65,7 +71,8 @@ internal class GetGameRoundByGameGetService : IGetService<GetGameRoundByGameQuer
                 gameRoundInfo.ClientStatus,
                 gameRoundInfo.ReopenTurnoverAdjustment,
                 gameRoundInfo.ReopenedOn,
-                gameRoundInfo.EffectiveBettingPercentage);
+                gameRoundInfo.EffectiveBettingPercentage,
+                detailInfo?.AdditionalData ?? string.Empty);
         }
 
         return default;

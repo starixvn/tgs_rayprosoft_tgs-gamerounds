@@ -22,7 +22,8 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
     {
         if (!await _gameRoundRepository
             .ExistAsync(
-                query.RoundId)
+                query.RoundId,
+                cancellationToken)
             .ConfigureAwait(false))
         {
             return default;
@@ -32,8 +33,12 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
             .GetAsync(
                 query.RoundId,
                 cancellationToken: cancellationToken)
-            .ConfigureAwait(false)
-            ?? throw new Exception($"This order number does not exist.({query.RoundId})");
+            .ConfigureAwait(false);
+
+        if (gameRoundInfo is null)
+        {
+            return default;
+        }
 
         var gameProviderCode = await _gameProvider.GetCode(
             id: gameRoundInfo.GameProviderId,
@@ -42,6 +47,12 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
         var externalGameId = await _game.GetExternalIdAsync(
             id: gameRoundInfo.GameId,
             cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        var detailInfo = await _gameRoundRepository
+            .GetRoundDetailAsync(
+                gameRoundInfo.RoundId,
+                cancellationToken)
+            .ConfigureAwait(false);
 
         return new GameRoundResult(
             gameRoundInfo.RoundId,
@@ -71,6 +82,7 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
             gameRoundInfo.ClientStatus,
             gameRoundInfo.ReopenTurnoverAdjustment,
             gameRoundInfo.ReopenedOn,
-            gameRoundInfo.EffectiveBettingPercentage);
+            gameRoundInfo.EffectiveBettingPercentage,
+            detailInfo?.AdditionalData ?? string.Empty);
     }
 }

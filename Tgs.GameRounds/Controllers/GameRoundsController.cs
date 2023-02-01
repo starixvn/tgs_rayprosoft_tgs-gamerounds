@@ -80,7 +80,9 @@ public class GameRoundsController : ControllerBase
     {
         var result = await service.GetAsync(new(roundid)).ConfigureAwait(false);
 
-        return result != null ? new GameRoundViewModel(
+        return result is null
+            ? null
+            : new GameRoundViewModel(
             result.RoundId,
             result.ExternalRoundId,
             result.GameProviderId,
@@ -108,7 +110,8 @@ public class GameRoundsController : ControllerBase
             result.ClientStatus,
             result.ReopenTurnoverAdjustment,
             result.ReopenedOn,
-            result.EffectiveBettingPercentage) : null;
+            result.EffectiveBettingPercentage,
+            result.AdditionalData);
     }
 
     /// <summary>
@@ -134,7 +137,9 @@ public class GameRoundsController : ControllerBase
             externalGameId,
             walletId)).ConfigureAwait(false);
 
-        return result != null ? new GameRoundViewModel(
+        return result is null
+            ? null
+            : new GameRoundViewModel(
             result.RoundId,
             result.ExternalRoundId,
             result.GameProviderId,
@@ -162,7 +167,8 @@ public class GameRoundsController : ControllerBase
             result.ClientStatus,
             result.ReopenTurnoverAdjustment,
             result.ReopenedOn,
-            result.EffectiveBettingPercentage) : null;
+            result.EffectiveBettingPercentage,
+            result.AdditionalData);
     }
 
     /// <summary>
@@ -188,7 +194,9 @@ public class GameRoundsController : ControllerBase
             gameId,
             walletId)).ConfigureAwait(false);
 
-        return result != null ? new GameRoundViewModel(
+        return result is null
+            ? null
+            : new GameRoundViewModel(
             result.RoundId,
             result.ExternalRoundId,
             result.GameProviderId,
@@ -216,7 +224,8 @@ public class GameRoundsController : ControllerBase
             result.ClientStatus,
             result.ReopenTurnoverAdjustment,
             result.ReopenedOn,
-            result.EffectiveBettingPercentage) : null;
+            result.EffectiveBettingPercentage,
+            result.AdditionalData);
     }
 
     /// <summary>

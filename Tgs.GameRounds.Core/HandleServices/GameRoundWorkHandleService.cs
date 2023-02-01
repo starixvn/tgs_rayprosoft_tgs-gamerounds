@@ -84,8 +84,8 @@ internal class GameRoundWorkHandleService : ICommandService<GameRoundWorkCommand
 
             if (gameRound.Status == GameRoundStatus.Open && command.Status == GameRoundStatus.Open)
             {
-                if (gameRound.BetAmount.GetValueOrDefault(0) != command.BetAmount ||
-                    gameRound.ValidBetAmount.GetValueOrDefault(0) != command.ValidBetAmount)
+                if (gameRound.BetAmount != command.BetAmount ||
+                    gameRound.ValidBetAmount != command.ValidBetAmount)
                 {
                     var updateRoundOpen = new UpdateRoundOpenCommand(
                         RoundId: gameRound.RoundId,
@@ -127,12 +127,12 @@ internal class GameRoundWorkHandleService : ICommandService<GameRoundWorkCommand
                 {
                     if (gameRound.Status == GameRoundStatus.Closed && command.Status == GameRoundStatus.Closed)
                     {
-                        if (gameRound.BetAmount.GetValueOrDefault(0) != command.BetAmount ||
-                        gameRound.ValidBetAmount.GetValueOrDefault(0) != command.ValidBetAmount ||
-                        gameRound.SettleAmount.GetValueOrDefault(0) != command.SettleAmount ||
-                        gameRound.Commission.GetValueOrDefault(0) != command.Commission ||
-                        gameRound.Turnover.GetValueOrDefault(0) != command.Turnover ||
-                        gameRound.CompanyWinLoss.GetValueOrDefault(0) != -command.PlayerWinLoss ||
+                        if (gameRound.BetAmount != command.BetAmount ||
+                        gameRound.ValidBetAmount != command.ValidBetAmount ||
+                        gameRound.SettleAmount != command.SettleAmount ||
+                        gameRound.Commission != command.Commission ||
+                        gameRound.Turnover != command.Turnover ||
+                        gameRound.CompanyWinLoss != -command.PlayerWinLoss ||
                         gameRound.ClientStatus != command.ClientStatus)
                         {
                             var updateRoundReopen = new UpdateRoundReopenCommand(
