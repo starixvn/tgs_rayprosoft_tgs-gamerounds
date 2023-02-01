@@ -56,10 +56,10 @@ public class GameRoundRepositoryUnitTestAddRound
             ExternalClosedOn: null,
             BetAmount: 10m,
             ValidBetAmount: 10m,
-            SettleAmount: null,
+            SettleAmount: 0,
             Commission: 0,
             Turnover: 10m,
-            PlayerWinLoss: null,
+            PlayerWinLoss: 0,
             ClientStatus: GameRoundClientStatus.Open,
             AdditionalData: "{}");
 
