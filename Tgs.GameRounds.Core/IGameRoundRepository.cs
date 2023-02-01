@@ -14,16 +14,16 @@ public interface IGameRoundRepository
         CancellationToken cancellationToken = default);
 
     ValueTask AdjustClosedRoundAsync(
-        Guid roundId,
+        Guid id,
         AdjustClosedRound source,
         CancellationToken cancellationToken = default);
 
     ValueTask<bool> ExistAsync(
-        Guid roundId,
+        Guid id,
         CancellationToken cancellationToken = default);
 
     ValueTask<GameRoundInfo?> GetAsync(
-        Guid roundId,
+        Guid id,
         CancellationToken cancellationToken = default);
 
     ValueTask<GameRoundInfo?> GetAsync(
@@ -34,7 +34,7 @@ public interface IGameRoundRepository
         CancellationToken cancellationToken = default);
 
     ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
-        Guid roundId,
+        Guid id,
         CancellationToken cancellationToken = default);
 
     ValueTask<Guid?> GetRoundIdAsync(
@@ -45,31 +45,31 @@ public interface IGameRoundRepository
         CancellationToken cancellationToken = default);
 
     ValueTask<GameRoundStatus> GetStatusAsync(
-        Guid roundId,
+        Guid id,
         CancellationToken cancellationToken = default);
 
     ValueTask ManualCloseRoundAsync(
-        Guid roundId,
+        Guid id,
         ManualCloseRound source,
         CancellationToken cancellationToken = default);
 
     ValueTask UpdateRoundClosedAsync(
-        Guid roundId,
+        Guid id,
         UpdateRoundClosed source,
         CancellationToken cancellationToken = default);
 
     ValueTask UpdateRoundDetailAsync(
-        Guid roundId,
+        Guid id,
         string additionalData,
         CancellationToken cancellationToken = default);
 
     ValueTask UpdateRoundOpenAsync(
-        Guid roundId,
+        Guid id,
         UpdateRoundOpen source,
         CancellationToken cancellationToken = default);
 
     ValueTask UpdateRoundReopenAsync(
-        Guid roundId,
+        Guid id,
         UpdateRoundReopen source,
         CancellationToken cancellationToken = default);
 }

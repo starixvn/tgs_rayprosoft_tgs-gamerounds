@@ -11,21 +11,20 @@ public static class ServiceCollecitonExtensions
 {
     public static IServiceCollection AddGameRoundBetRepositories(
         this IServiceCollection services,
-        Action<IServiceProvider, DbContextOptionsBuilder> configure,
-        Func<IServiceProvider, IDatabase> redisDatabaseResolver,
-        Func<IServiceProvider, IMongoDatabase> mongoDatabaseResolver)
+        Action<IServiceProvider, DbContextOptionsBuilder> configure)
         => services
-            .AddDbContext<BetContext>(configure)
-            .AddTransient<IGameRoundRepository, GameRoundRepository>()
-            .Decorate<IGameRoundRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameRoundCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(30)))
-            .AddTransient<IGameRoundRecord>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)))
-            .AddTransient<IFailedGameRound, FailedGameRoundRepository>();
+        .AddDbContext<BetContext>(configure)
+        .AddTransient<IGameRoundRepository, GameRoundRepository>()
+        .Decorate<IGameRoundRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameRoundCacheRepository>(sp, innerRepository))
+        .AddTransient<IFailedGameRound, FailedGameRoundRepository>();
 
     public static IServiceCollection AddGameRoundRepositories(
         this IServiceCollection services,
-        Func<IServiceProvider, IDatabase> redisDatabaseResolver)
+        Func<IServiceProvider, IDatabase> redisDatabaseResolver,
+        Func<IServiceProvider, IMongoDatabase> mongoDatabaseResolver)
         => services
-            .AddTransient<IGameRoundLocked>((sp) => ActivatorUtilities.CreateInstance<GameRoundLocked>(sp, redisDatabaseResolver(sp)));
+        .AddTransient<IGameRoundLocked>((sp) => ActivatorUtilities.CreateInstance<GameRoundLocked>(sp, redisDatabaseResolver(sp)))
+        .AddTransient<IGameRoundRecord>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)));
 
     public static IServiceCollection AddGameRoundTgsRepositories(
         this IServiceCollection services,

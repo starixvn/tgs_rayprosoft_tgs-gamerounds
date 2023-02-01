@@ -25,7 +25,7 @@ internal class AdjustClosedRoundCommandService : ICommandService<AdjustClosedRou
     public async ValueTask ExecuteAsync(AdjustClosedRoundCommand command, CancellationToken cancellationToken = default)
     {
         if (!await _gameRound.ExistAsync(
-            roundId: command.RoundId,
+            id: command.RoundId,
             cancellationToken: cancellationToken).ConfigureAwait(false))
         {
             _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
@@ -34,7 +34,7 @@ internal class AdjustClosedRoundCommandService : ICommandService<AdjustClosedRou
 
         var status = await _gameRound
                     .GetStatusAsync(
-                        roundId: command.RoundId,
+                        id: command.RoundId,
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 
@@ -56,7 +56,7 @@ internal class AdjustClosedRoundCommandService : ICommandService<AdjustClosedRou
             Remark: command.Remark);
 
         await _gameRound.AdjustClosedRoundAsync(
-            roundId: command.RoundId,
+            id: command.RoundId,
             source: adjustClosed,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 

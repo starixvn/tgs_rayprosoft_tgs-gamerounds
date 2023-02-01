@@ -20,7 +20,7 @@ internal class UpdateRoundDetailCommandService : ICommandService<UpdateRoundDeta
     public async ValueTask ExecuteAsync(UpdateRoundDetailCommand command, CancellationToken cancellationToken = default)
     {
         if (!await _gameRound.ExistAsync(
-            roundId: command.RoundId,
+            id: command.RoundId,
             cancellationToken: cancellationToken).ConfigureAwait(false))
         {
             _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
@@ -28,7 +28,7 @@ internal class UpdateRoundDetailCommandService : ICommandService<UpdateRoundDeta
         }
 
         await _gameRound.UpdateRoundDetailAsync(
-            roundId: command.RoundId,
+            id: command.RoundId,
             additionalData: command.AdditionalData,
             cancellationToken: cancellationToken).ConfigureAwait(false);
     }

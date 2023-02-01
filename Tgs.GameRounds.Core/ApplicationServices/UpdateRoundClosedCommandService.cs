@@ -23,14 +23,6 @@ internal class UpdateRoundClosedCommandService : ICommandService<UpdateRoundClos
 
     public async ValueTask ExecuteAsync(UpdateRoundClosedCommand command, CancellationToken cancellationToken = default)
     {
-        if (!await _gameRound.ExistAsync(
-            roundId: command.RoundId,
-            cancellationToken: cancellationToken).ConfigureAwait(false))
-        {
-            _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
-            throw new GameRoundDoesNotExistException();
-        }
-
         var updateRoundClosed = new UpdateRoundClosed(
             ExternalClosedOn: command.ExternalClosedOn,
             BetAmount: command.BetAmount,
@@ -43,7 +35,7 @@ internal class UpdateRoundClosedCommandService : ICommandService<UpdateRoundClos
             AdditionalData: command.AdditionalData);
 
         await _gameRound.UpdateRoundClosedAsync(
-            roundId: command.RoundId,
+            id: command.RoundId,
             source: updateRoundClosed,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 

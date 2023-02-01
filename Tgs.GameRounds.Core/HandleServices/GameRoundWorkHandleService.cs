@@ -32,12 +32,14 @@ internal class GameRoundWorkHandleService : ICommandService<GameRoundWorkCommand
 
     public async ValueTask ExecuteAsync(GameRoundWorkCommand command, CancellationToken cancellationToken = default)
     {
-        var roundId = await _gameRound.GetRoundIdAsync(
-            gameProviderId: command.GameProviderId,
-            externalRoundId: command.ExternalRoundId,
-            gameId: command.GameId,
-            walletId: command.WalletId,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+        var roundId = await _gameRound
+            .GetRoundIdAsync(
+                gameProviderId: command.GameProviderId,
+                externalRoundId: command.ExternalRoundId,
+                gameId: command.GameId,
+                walletId: command.WalletId,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
 
         if (!roundId.HasValue)
         {
@@ -63,18 +65,18 @@ internal class GameRoundWorkHandleService : ICommandService<GameRoundWorkCommand
                 AdditionalData: command.AdditionalData);
 
             await _addRoundService
-                   .ExecuteAsync(
-                       command: addRound,
-                       cancellationToken: cancellationToken)
-                   .ConfigureAwait(false);
+                .ExecuteAsync(
+                    command: addRound,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         }
         else
         {
             var gameRound = await _gameRound
-                    .GetAsync(
-                        roundId: roundId.Value,
-                        cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
+                .GetAsync(
+                    id: roundId.Value,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
             if (gameRound == null)
             {

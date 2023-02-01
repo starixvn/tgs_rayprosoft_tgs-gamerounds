@@ -137,8 +137,11 @@ internal class GameRoundRepository : IGameRoundRepository
         AddRound source,
         CancellationToken cancellationToken = default)
     {
-        var roundId = await _serialNumberGenerator.GenerateAsync(
-                            cancellationToken: cancellationToken).ConfigureAwait(false);
+        var roundId = await _serialNumberGenerator
+            .GenerateAsync(
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
         var round = new Round()
         {
             Id = roundId,
@@ -285,19 +288,19 @@ internal class GameRoundRepository : IGameRoundRepository
     }
 
     public async ValueTask<bool> ExistAsync(
-        Guid roundId,
+        Guid id,
         CancellationToken cancellationToken = default)
         => await _context.Rounds.AsQueryable()
         .AnyAsync(
-            predicate: x => x.Id == roundId,
+            predicate: x => x.Id == id,
             cancellationToken: cancellationToken)
         .ConfigureAwait(false);
 
     public ValueTask<GameRoundInfo?> GetAsync(
-        Guid roundId,
+        Guid id,
         CancellationToken cancellationToken = default)
         => _context.Rounds.AsQueryable()
-        .Where(x => x.Id == roundId)
+        .Where(x => x.Id == id)
         .Select(round => new GameRoundInfo(
             round.Id,
             round.ExternalRoundId,
@@ -394,21 +397,21 @@ internal class GameRoundRepository : IGameRoundRepository
         .FirstOrDefaultAsync(cancellationToken);
 
     public async ValueTask<GameRoundStatus> GetStatusAsync(
-        Guid roundId,
+        Guid id,
         CancellationToken cancellationToken = default)
         => await _context.Rounds.AsQueryable()
-        .Where(x => x.Id == roundId)
+        .Where(x => x.Id == id)
         .Select(x => (GameRoundStatus)x.Status)
         .SingleAsync(cancellationToken)
         .ConfigureAwait(false);
 
     public async ValueTask ManualCloseRoundAsync(
-        Guid roundId,
+        Guid id,
         ManualCloseRound source,
         CancellationToken cancellationToken = default)
     {
         var data = await _context.Rounds
-            .Where(x => x.Id == roundId)
+            .Where(x => x.Id == id)
             .FirstAsync(
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -446,7 +449,7 @@ internal class GameRoundRepository : IGameRoundRepository
             var record = new RoundOperationRecord()
             {
                 Id = recordId,
-                RoundId = roundId,
+                RoundId = id,
                 OperatorId = source.OperatorId,
                 OldData = JsonSerializer.Serialize(oldData),
                 NewData = JsonSerializer.Serialize(data),
@@ -477,17 +480,17 @@ internal class GameRoundRepository : IGameRoundRepository
                     .RollbackAsync(
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
-            _logger.LogError(exception: ex, "An exception occurs when closing the game record.({roundId})", roundId);
+            _logger.LogError(exception: ex, "An exception occurs when closing the game record.({roundId})", id);
         }
     }
 
     public async ValueTask UpdateRoundClosedAsync(
-        Guid roundId,
+        Guid id,
         UpdateRoundClosed source,
         CancellationToken cancellationToken = default)
     {
         var round = await _context.Rounds.SingleAsync(
-           predicate: x => x.Id == roundId,
+           predicate: x => x.Id == id,
            cancellationToken: cancellationToken).ConfigureAwait(false);
 
         round.Status = (short)GameRoundStatus.Closed;
@@ -505,7 +508,7 @@ internal class GameRoundRepository : IGameRoundRepository
         _ = _context.Rounds.Update(round);
 
         var roundDetail = await _context.RoundDetails.SingleAsync(
-            predicate: x => x.RoundId == roundId,
+            predicate: x => x.RoundId == id,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         roundDetail.AdditionalData = source.AdditionalData;
@@ -515,12 +518,12 @@ internal class GameRoundRepository : IGameRoundRepository
     }
 
     public async ValueTask UpdateRoundDetailAsync(
-        Guid roundId,
+        Guid id,
         string additionalData,
         CancellationToken cancellationToken = default)
     {
         var roundDetail = await _context.RoundDetails.SingleAsync(
-            predicate: x => x.RoundId == roundId,
+            predicate: x => x.RoundId == id,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         roundDetail.AdditionalData = additionalData;
@@ -530,12 +533,12 @@ internal class GameRoundRepository : IGameRoundRepository
     }
 
     public async ValueTask UpdateRoundOpenAsync(
-        Guid roundId,
+        Guid id,
         UpdateRoundOpen source,
         CancellationToken cancellationToken = default)
     {
         var round = await _context.Rounds.SingleAsync(
-            predicate: x => x.Id == roundId,
+            predicate: x => x.Id == id,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         round.Status = (short)GameRoundStatus.Open;
@@ -550,12 +553,12 @@ internal class GameRoundRepository : IGameRoundRepository
     }
 
     public async ValueTask UpdateRoundReopenAsync(
-        Guid roundId,
+        Guid id,
         UpdateRoundReopen source,
         CancellationToken cancellationToken = default)
     {
         var round = await _context.Rounds.SingleAsync(
-                predicate: x => x.Id == roundId,
+                predicate: x => x.Id == id,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
         round.Status = (short)source.Status;
@@ -574,7 +577,7 @@ internal class GameRoundRepository : IGameRoundRepository
         _ = _context.Rounds.Update(round);
 
         var roundDetail = await _context.RoundDetails.SingleAsync(
-            predicate: x => x.RoundId == roundId,
+            predicate: x => x.RoundId == id,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         roundDetail.AdditionalData = source.AdditionalData;

@@ -144,7 +144,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
     }
 
     private static Task RoundId_IndexAsync(
-                    IMongoCollection<GameRoundRecord> collection,
+        IMongoCollection<GameRoundRecord> collection,
         CancellationToken cancellationToken = default)
     {
         var index = Builders<GameRoundRecord>.IndexKeys

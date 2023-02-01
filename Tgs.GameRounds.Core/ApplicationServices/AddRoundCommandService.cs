@@ -38,12 +38,14 @@ internal class AddRoundCommandService : ICommandService<AddRoundCommand>
             return;
         }
 
-        if (!await _gameRoundLocked.LockingAsync(
+        if (!await _gameRoundLocked
+            .LockingAsync(
                 gameProviderId: command.GameProviderId,
                 externalRoundId: command.ExternalRoundId,
                 gameId: command.GameId,
                 walletId: command.WalletId,
-                cancellationToken: cancellationToken).ConfigureAwait(false))
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false))
         {
             throw new GameRoundCreationFailedException();
         }
@@ -89,12 +91,14 @@ internal class AddRoundCommandService : ICommandService<AddRoundCommand>
         }
         finally
         {
-            await _gameRoundLocked.UnlockAsync(
+            await _gameRoundLocked
+                .UnlockAsync(
                     gameProviderId: command.GameProviderId,
                     externalRoundId: command.ExternalRoundId,
                     gameId: command.GameId,
                     walletId: command.WalletId,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

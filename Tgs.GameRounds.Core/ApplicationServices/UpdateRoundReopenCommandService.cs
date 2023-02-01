@@ -23,14 +23,6 @@ internal class UpdateRoundReopenCommandService : ICommandService<UpdateRoundReop
 
     public async ValueTask ExecuteAsync(UpdateRoundReopenCommand command, CancellationToken cancellationToken = default)
     {
-        if (!await _gameRound.ExistAsync(
-            roundId: command.RoundId,
-            cancellationToken: cancellationToken).ConfigureAwait(false))
-        {
-            _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
-            throw new GameRoundDoesNotExistException();
-        }
-
         var updateRoundReopen = new UpdateRoundReopen(
             Status: command.Status,
             ExternalClosedOn: command.ExternalClosedOn,
@@ -44,7 +36,7 @@ internal class UpdateRoundReopenCommandService : ICommandService<UpdateRoundReop
             AdditionalData: command.AdditionalData);
 
         await _gameRound.UpdateRoundReopenAsync(
-            roundId: command.RoundId,
+            id: command.RoundId,
             source: updateRoundReopen,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 

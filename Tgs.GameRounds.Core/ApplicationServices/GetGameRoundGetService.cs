@@ -20,15 +20,6 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
 
     public async ValueTask<GameRoundResult?> GetAsync(GetGameRoundQuery query, CancellationToken cancellationToken = default)
     {
-        if (!await _gameRoundRepository
-            .ExistAsync(
-                query.RoundId,
-                cancellationToken)
-            .ConfigureAwait(false))
-        {
-            return default;
-        }
-
         var gameRoundInfo = await _gameRoundRepository
             .GetAsync(
                 query.RoundId,

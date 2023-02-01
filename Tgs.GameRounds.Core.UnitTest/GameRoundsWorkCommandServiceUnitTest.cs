@@ -158,7 +158,7 @@ public class GameRoundsWorkCommandServiceUnitTest
 
         _ = fakeGameRound
             .GetAsync(
-                roundId: Arg.Is(roundId))
+                id: Arg.Is(roundId))
             .Returns(gameRound);
 
         var service = new GameRoundWorkHandleService(
@@ -261,7 +261,7 @@ public class GameRoundsWorkCommandServiceUnitTest
 
         _ = fakeGameRound
             .GetAsync(
-                roundId: Arg.Is(roundId))
+                id: Arg.Is(roundId))
             .Returns(gameRound);
 
         var service = new GameRoundWorkHandleService(
@@ -364,7 +364,7 @@ public class GameRoundsWorkCommandServiceUnitTest
 
         _ = fakeGameRound
             .GetAsync(
-                roundId: Arg.Is(roundId))
+                id: Arg.Is(roundId))
             .Returns(gameRound);
 
         var service = new GameRoundWorkHandleService(
@@ -467,7 +467,7 @@ public class GameRoundsWorkCommandServiceUnitTest
 
         _ = fakeGameRound
             .GetAsync(
-                roundId: Arg.Is(roundId))
+                id: Arg.Is(roundId))
             .Returns(gameRound);
 
         var service = new GameRoundWorkHandleService(
@@ -570,7 +570,7 @@ public class GameRoundsWorkCommandServiceUnitTest
 
         _ = fakeGameRound
             .GetAsync(
-                roundId: Arg.Is(roundId))
+                id: Arg.Is(roundId))
             .Returns(gameRound);
 
         var service = new GameRoundWorkHandleService(

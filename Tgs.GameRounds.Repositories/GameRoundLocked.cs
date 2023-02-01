@@ -20,19 +20,12 @@ internal class GameRoundLocked : IGameRoundLocked
         _gameLockedOptions = options.Value;
     }
 
-    public Task<bool> ExistAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            return _database.KeyExistsAsync(key: GetKey(gameProviderId, externalRoundId, gameId, walletId));
-        }
-        catch
-        {
-            return Task.FromResult(true);
-        }
-    }
-
-    public Task<bool> LockingAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId, CancellationToken cancellationToken = default)
+    public Task<bool> LockingAsync(
+        Guid gameProviderId, 
+        string externalRoundId, 
+        int gameId, 
+        Guid walletId, 
+        CancellationToken cancellationToken = default)
         => _database
         .StringSetAsync(
             key: GetKey(gameProviderId, externalRoundId, gameId, walletId),

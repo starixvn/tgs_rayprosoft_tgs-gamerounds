@@ -29,7 +29,7 @@ public class AddGameRoundRecordCommandService : ICommandService<AddGameRoundReco
     public async ValueTask ExecuteAsync(AddGameRoundRecordCommand command, CancellationToken cancellationToken = default)
     {
         var round = await _gameRound.GetAsync(
-           roundId: command.RoundId,
+           id: command.RoundId,
            cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (round is null)

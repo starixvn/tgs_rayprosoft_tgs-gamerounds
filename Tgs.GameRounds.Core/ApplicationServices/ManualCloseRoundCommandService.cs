@@ -24,9 +24,11 @@ internal class ManualCloseRoundCommandService : ICommandService<ManualCloseRound
 
     public async ValueTask ExecuteAsync(ManualCloseRoundCommand command, CancellationToken cancellationToken = default)
     {
-        if (!await _gameRound.ExistAsync(
-            roundId: command.RoundId,
-            cancellationToken: cancellationToken).ConfigureAwait(false))
+        if (!await _gameRound
+            .ExistAsync(
+                id: command.RoundId,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false))
         {
             _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
             throw new GameRoundDoesNotExistException();
@@ -34,7 +36,7 @@ internal class ManualCloseRoundCommandService : ICommandService<ManualCloseRound
 
         var status = await _gameRound
                     .GetStatusAsync(
-                        roundId: command.RoundId,
+                        id: command.RoundId,
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 
@@ -56,7 +58,7 @@ internal class ManualCloseRoundCommandService : ICommandService<ManualCloseRound
             Remark: command.Remark);
 
         await _gameRound.ManualCloseRoundAsync(
-            roundId: command.RoundId,
+            id: command.RoundId,
             source: manualClose,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
