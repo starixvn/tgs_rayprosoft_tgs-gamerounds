@@ -30,6 +30,4 @@ public record GameRoundResult(
     GameRoundClientStatus ClientStatus,
     decimal? ReopenTurnoverAdjustment,
     DateTimeOffset? ReopenedOn,
-    decimal? EffectiveBettingPercentage,
-    string AdditionalData
-    );
+    decimal? EffectiveBettingPercentage);

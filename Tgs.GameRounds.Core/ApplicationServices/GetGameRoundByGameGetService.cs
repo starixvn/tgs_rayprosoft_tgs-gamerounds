@@ -4,14 +4,14 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 
 internal class GetGameRoundByGameGetService : IGetService<GetGameRoundByGameQuery, GameRoundResult?>
 {
-    private readonly IGame _game;
-    private readonly IGameProvider _gameProvider;
-    private readonly IGameRound _gameRoundRepository;
+    private readonly IGameRepository _game;
+    private readonly IGameProviderRepository _gameProvider;
+    private readonly IGameRoundRepository _gameRoundRepository;
 
     public GetGameRoundByGameGetService(
-        IGame game,
-        IGameProvider gameProvider,
-        IGameRound gameRoundRepository)
+        IGameRepository game,
+        IGameProviderRepository gameProvider,
+        IGameRoundRepository gameRoundRepository)
     {
         _game = game ?? throw new ArgumentNullException(nameof(game));
         _gameProvider = gameProvider ?? throw new ArgumentNullException(nameof(gameProvider));
@@ -29,12 +29,12 @@ internal class GetGameRoundByGameGetService : IGetService<GetGameRoundByGameQuer
 
         if (gameRoundInfo is not null)
         {
-            var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(
-                gameProviderId: query.GameProviderId,
+            var gameProviderCode = await _gameProvider.GetCode(
+                id: query.GameProviderId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var externalGameId = await _game.GetExternalGameIdAsync(
-                gameId: query.GameId,
+            var externalGameId = await _game.GetExternalIdAsync(
+                id: query.GameId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
             return new GameRoundResult(
@@ -65,8 +65,7 @@ internal class GetGameRoundByGameGetService : IGetService<GetGameRoundByGameQuer
                 gameRoundInfo.ClientStatus,
                 gameRoundInfo.ReopenTurnoverAdjustment,
                 gameRoundInfo.ReopenedOn,
-                gameRoundInfo.EffectiveBettingPercentage,
-                gameRoundInfo.AdditionalData);
+                gameRoundInfo.EffectiveBettingPercentage);
         }
 
         return default;

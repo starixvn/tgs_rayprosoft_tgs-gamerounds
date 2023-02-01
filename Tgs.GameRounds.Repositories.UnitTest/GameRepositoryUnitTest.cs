@@ -11,7 +11,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest;
 public class GameRepositoryUnitTest
 {
     [TestMethod]
-    public async Task Get_ExternalGameId()
+    public async Task Get_ExternalId()
     {
         var options = new DbContextOptionsBuilder<TgsContext>()
            .UseInMemoryDatabase(databaseName: "dbo")
@@ -48,14 +48,14 @@ public class GameRepositoryUnitTest
 
         var fakeRoundRepository = new GameRepository(context);
 
-        var actual = await fakeRoundRepository.GetExternalGameIdAsync(gameId).ConfigureAwait(false);
+        var actual = await fakeRoundRepository.GetExternalIdAsync(gameId).ConfigureAwait(false);
 
         Assert.IsNotNull(actual);
         Assert.AreEqual(externalGameId, actual);
     }
 
     [TestMethod]
-    public async Task Get_GameId()
+    public async Task Get_Id()
     {
         var options = new DbContextOptionsBuilder<TgsContext>()
             .UseInMemoryDatabase(databaseName: "dbo")
@@ -92,7 +92,7 @@ public class GameRepositoryUnitTest
 
         var fakeRoundRepository = new GameRepository(context);
 
-        var actual = await fakeRoundRepository.GetGameIdAsync(gameProviderId, externalGameId).ConfigureAwait(false);
+        var actual = await fakeRoundRepository.GetIdAsync(gameProviderId, externalGameId).ConfigureAwait(false);
 
         Assert.IsNotNull(actual);
         Assert.AreEqual(gameId, actual);

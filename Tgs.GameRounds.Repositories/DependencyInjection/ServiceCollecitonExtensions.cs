@@ -16,8 +16,8 @@ public static class ServiceCollecitonExtensions
         Func<IServiceProvider, IMongoDatabase> mongoDatabaseResolver)
         => services
             .AddDbContext<BetContext>(configure)
-            .AddTransient<IGameRound, GameRoundRepository>()
-            .Decorate<IGameRound>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameRoundCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(30)))
+            .AddTransient<IGameRoundRepository, GameRoundRepository>()
+            .Decorate<IGameRoundRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameRoundCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(30)))
             .AddTransient<IGameRoundRecord>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)))
             .AddTransient<IFailedGameRound, FailedGameRoundRepository>();
 
@@ -29,12 +29,11 @@ public static class ServiceCollecitonExtensions
 
     public static IServiceCollection AddGameRoundTgsRepositories(
         this IServiceCollection services,
-        Action<IServiceProvider, DbContextOptionsBuilder> configure,
-        Func<IServiceProvider, IDatabase> redisDatabaseResolver)
+        Action<IServiceProvider, DbContextOptionsBuilder> configure)
         => services
-            .AddDbContext<TgsContext>(configure)
-            .AddTransient<IGameProvider, GameProviderRepository>()
-            .Decorate<IGameProvider>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameProviderCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromHours(1)))
-            .AddTransient<IGame, GameRepository>()
-            .Decorate<IGame>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameCacheRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromHours(1)));
+        .AddDbContext<TgsContext>(configure)
+        .AddTransient<IGameProviderRepository, GameProviderRepository>()
+        .Decorate<IGameProviderRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameProviderCacheRepository>(sp, innerRepository))
+        .AddTransient<IGameRepository, GameRepository>()
+        .Decorate<IGameRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameCacheRepository>(sp, innerRepository));
 }

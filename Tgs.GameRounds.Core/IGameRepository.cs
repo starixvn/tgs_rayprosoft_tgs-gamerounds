@@ -1,13 +1,13 @@
 ﻿namespace Tgs.GameRounds.Core;
 
-public interface IGame
+public interface IGameRepository
 {
-    public ValueTask<string> GetExternalGameIdAsync(
-        int gameId,
+    public ValueTask<string> GetExternalIdAsync(
+        int id,
         CancellationToken cancellationToken = default);
 
-    public ValueTask<int> GetGameIdAsync(
+    public ValueTask<int> GetIdAsync(
         Guid gameProviderId,
-        string externalGameId,
+        string externalId,
         CancellationToken cancellationToken = default);
 }

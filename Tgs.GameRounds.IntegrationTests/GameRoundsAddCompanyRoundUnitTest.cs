@@ -203,7 +203,7 @@ public partial class GameRoundsClientUnitTest
 
         var web = CreateTestSettingSite(services =>
         {
-            var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
             _ = fakeGameRound.GetRoundIdAsync(model.GameProviderId, model.ExternalRoundId, model.GameId, model.WalletId).Returns(ValueTask.FromResult<Guid?>(null));
 

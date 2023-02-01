@@ -14,7 +14,7 @@ public class UpdateRoundDetailCommandServiceUnitTest
     [TestMethod]
     public async Task ExternalRoundId_Not_Exist()
     {
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeLogger = NullLogger<UpdateRoundDetailCommandService>.Instance;
 
         var roundId = Guid.NewGuid();
@@ -38,7 +38,7 @@ public class UpdateRoundDetailCommandServiceUnitTest
     [TestMethod]
     public async Task Normal_Process()
     {
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeLogger = NullLogger<UpdateRoundDetailCommandService>.Instance;
 
         var roundId = Guid.NewGuid();

@@ -4,14 +4,14 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 
 internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRoundResult?>
 {
-    private readonly IGame _game;
-    private readonly IGameProvider _gameProvider;
-    private readonly IGameRound _gameRoundRepository;
+    private readonly IGameRepository _game;
+    private readonly IGameProviderRepository _gameProvider;
+    private readonly IGameRoundRepository _gameRoundRepository;
 
     public GetGameRoundGetService(
-        IGame game,
-        IGameProvider gameProvider,
-        IGameRound gameRoundRepository)
+        IGameRepository game,
+        IGameProviderRepository gameProvider,
+        IGameRoundRepository gameRoundRepository)
     {
         _game = game ?? throw new ArgumentNullException(nameof(game));
         _gameProvider = gameProvider ?? throw new ArgumentNullException(nameof(gameProvider));
@@ -35,12 +35,12 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
             .ConfigureAwait(false)
             ?? throw new Exception($"This order number does not exist.({query.RoundId})");
 
-        var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(
-            gameProviderId: gameRoundInfo.GameProviderId,
+        var gameProviderCode = await _gameProvider.GetCode(
+            id: gameRoundInfo.GameProviderId,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        var externalGameId = await _game.GetExternalGameIdAsync(
-            gameId: gameRoundInfo.GameId,
+        var externalGameId = await _game.GetExternalIdAsync(
+            id: gameRoundInfo.GameId,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return new GameRoundResult(
@@ -71,7 +71,6 @@ internal class GetGameRoundGetService : IGetService<GetGameRoundQuery, GameRound
             gameRoundInfo.ClientStatus,
             gameRoundInfo.ReopenTurnoverAdjustment,
             gameRoundInfo.ReopenedOn,
-            gameRoundInfo.EffectiveBettingPercentage,
-            gameRoundInfo.AdditionalData);
+            gameRoundInfo.EffectiveBettingPercentage);
     }
 }

@@ -6,12 +6,12 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 
 internal class UpdateRoundDetailCommandService : ICommandService<UpdateRoundDetailCommand>
 {
-    private readonly IGameRound _gameRound;
+    private readonly IGameRoundRepository _gameRound;
     private readonly ILogger<UpdateRoundDetailCommandService> _logger;
 
     public UpdateRoundDetailCommandService(
         ILogger<UpdateRoundDetailCommandService> logger,
-        IGameRound gameRound)
+        IGameRoundRepository gameRound)
     {
         _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

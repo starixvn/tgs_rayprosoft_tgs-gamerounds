@@ -16,7 +16,7 @@ public class ManualCloseRoundCommandServiceUnitTest
     [TestMethod]
     public async Task ExternalRoundId_Not_Exist()
     {
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
         var fakeLogger = NullLogger<ManualCloseRoundCommandService>.Instance;
 
@@ -54,7 +54,7 @@ public class ManualCloseRoundCommandServiceUnitTest
     [TestMethod]
     public async Task GameRound_Status_Is_Not_Closed()
     {
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
         var fakeLogger = NullLogger<ManualCloseRoundCommandService>.Instance;
 
@@ -94,7 +94,7 @@ public class ManualCloseRoundCommandServiceUnitTest
     [TestMethod]
     public async Task Normal_Process()
     {
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
         var fakeLogger = NullLogger<ManualCloseRoundCommandService>.Instance;
 

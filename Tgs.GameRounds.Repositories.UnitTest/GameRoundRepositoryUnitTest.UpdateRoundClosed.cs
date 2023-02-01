@@ -15,14 +15,14 @@ using Tgs.SerialNumberGenerator;
 namespace Tgs.GameRounds.Repositories.UnitTest;
 
 [TestClass]
-public class GameRoundUpdateRoundReopenUnitTest
+public class GameRoundRepositoryUnitTestUpdateRoundClosed
 {
     [TestMethod]
     public async Task Normal_Process()
     {
         var fakeLogger = NullLogger<GameRoundRepository>.Instance;
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var options = new DbContextOptionsBuilder<BetContext>()
            .UseInMemoryDatabase(databaseName: "bet")
            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -45,23 +45,23 @@ public class GameRoundUpdateRoundReopenUnitTest
             PlayerCode = playerCode,
             GameId = gameId,
             CurrencyCode = "CNY",
-            Status = (short)GameRoundStatus.Closed,
+            Status = (short)GameRoundStatus.Open,
             GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
             WalletId = walletId,
             CreatedOn = DateTime.UtcNow,
-            ClosedOn = DateTime.UtcNow,
+            ClosedOn = null,
             UpdatedOn = DateTime.UtcNow,
             BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
             ExternalCreatedOn = DateTime.UtcNow,
-            ExternalClosedOn = DateTime.UtcNow,
+            ExternalClosedOn = null,
             BetAmount = 10m,
             ValidBetAmount = 10m,
-            SettleAmount = 0m,
-            Commission = 0m,
+            SettleAmount = null,
+            Commission = null,
             Turnover = 10m,
-            WinLoss = 10m,
+            WinLoss = null,
             TieBetAdjustment = null,
-            ClientStatus = (short)GameRoundClientStatus.Loss,
+            ClientStatus = (short)GameRoundClientStatus.Open,
             ReopenTurnoverAdjustment = null,
             ReopenedOn = null,
             EffectiveBettingPercentage = null,
@@ -87,31 +87,29 @@ public class GameRoundUpdateRoundReopenUnitTest
         Assert.AreEqual(externalRoundId, oldActual.ExternalRoundId);
         Assert.AreEqual(gameId, oldActual.GameId);
         Assert.AreEqual(playerCode, oldActual.PlayerCode);
-        Assert.AreEqual(GameRoundClientStatus.Loss, oldActual.ClientStatus);
-        Assert.AreEqual(0m, oldActual.SettleAmount);
-        Assert.AreEqual(10m, oldActual.CompanyWinLoss);
-        Assert.IsNull(oldActual.ReopenedOn);
-        Assert.IsNull(oldActual.ReopenTurnoverAdjustment);
+        Assert.AreEqual(GameRoundStatus.Open, oldActual.Status);
+        Assert.AreEqual(GameRoundClientStatus.Open, oldActual.ClientStatus);
 
-        var data = new UpdateRoundReopen(
-            Status: GameRoundStatus.Closed,
+        var data = new UpdateRoundClosed(
             ExternalClosedOn: DateTimeOffset.UtcNow,
             BetAmount: 10m,
             ValidBetAmount: 10m,
-            SettleAmount: 20m,
+            SettleAmount: 0,
             Commission: 0,
             Turnover: 10m,
-            PlayerWinLoss: 10m,
-            ClientStatus: GameRoundClientStatus.Win,
+            PlayerWinLoss: -10m,
+            ClientStatus: GameRoundClientStatus.Loss,
             AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
-        await fakeRoundRepository.UpdateRoundReopenAsync(roundId, data).ConfigureAwait(false);
+        await fakeRoundRepository.UpdateRoundClosedAsync(
+            roundId,
+            data).ConfigureAwait(false);
 
         var actual = await fakeRoundRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
         Assert.IsNotNull(actual);
         Assert.AreEqual(roundId, actual.RoundId);
         Assert.AreEqual(GameRoundStatus.Closed, actual.Status);
-        Assert.AreEqual(GameRoundClientStatus.Win, actual.ClientStatus);
+        Assert.AreEqual(GameRoundClientStatus.Loss, actual.ClientStatus);
         Assert.AreEqual(data.BetAmount, actual.BetAmount);
         Assert.AreEqual(data.ValidBetAmount, actual.ValidBetAmount);
         Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
@@ -125,7 +123,7 @@ public class GameRoundUpdateRoundReopenUnitTest
     {
         var fakeLogger = NullLogger<GameRoundRepository>.Instance;
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var options = new DbContextOptionsBuilder<BetContext>()
            .UseInMemoryDatabase(databaseName: "bet")
            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -140,18 +138,17 @@ public class GameRoundUpdateRoundReopenUnitTest
             fakeLogger,
             fakeSerialNumberGenerator);
 
-        var data = new UpdateRoundReopen(
-            Status: GameRoundStatus.Closed,
+        var data = new UpdateRoundClosed(
             ExternalClosedOn: DateTimeOffset.UtcNow,
             BetAmount: 10m,
             ValidBetAmount: 10m,
-            SettleAmount: 20m,
+            SettleAmount: 0,
             Commission: 0,
             Turnover: 10m,
-            PlayerWinLoss: 10m,
-            ClientStatus: GameRoundClientStatus.Win,
+            PlayerWinLoss: -10m,
+            ClientStatus: GameRoundClientStatus.Loss,
             AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
-        _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundReopenAsync(roundId, data).AsTask()).ConfigureAwait(false);
+        _ = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => fakeRoundRepository.UpdateRoundClosedAsync(roundId, data).AsTask()).ConfigureAwait(false);
     }
 }

@@ -11,7 +11,7 @@ namespace Tgs.GameRounds.Repositories.UnitTest;
 public class GameProviderRepositoryUnitTest
 {
     [TestMethod]
-    public async Task Get_GameProviderCode()
+    public async Task Get_Code()
     {
         var options = new DbContextOptionsBuilder<TgsContext>()
            .UseInMemoryDatabase(databaseName: "dbo")
@@ -46,7 +46,7 @@ public class GameProviderRepositoryUnitTest
 
         var fakeRoundRepository = new GameProviderRepository(context);
 
-        var actual = await fakeRoundRepository.GetGameProviderCodeAsync(gameProviderId).ConfigureAwait(false);
+        var actual = await fakeRoundRepository.GetCode(gameProviderId).ConfigureAwait(false);
 
         Assert.IsNotNull(actual);
         Assert.AreEqual(gameProviderCode, actual);

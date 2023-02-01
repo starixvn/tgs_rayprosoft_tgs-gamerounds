@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -17,9 +16,9 @@ public class AddGameRoundRecordCommandServiceUnitTest
     public async Task Database_Could_Not_Find_The_Game_Round_Data()
     {
         var fakeLogger = NullLogger<AddGameRoundRecordCommandService>.Instance;
-        var fakeGame = Substitute.For<IGame>();
-        var fakeGameProvider = Substitute.For<IGameProvider>();
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGame = Substitute.For<IGameRepository>();
+        var fakeGameProvider = Substitute.For<IGameProviderRepository>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundRecord = Substitute.For<IGameRoundRecord>();
 
         var roundId = Guid.NewGuid();
@@ -43,12 +42,12 @@ public class AddGameRoundRecordCommandServiceUnitTest
 
         _ = fakeGameProvider
             .Received(0)
-            .GetGameProviderCodeAsync(
+            .GetCode(
             Arg.Any<Guid>());
 
         _ = fakeGame
             .Received(0)
-            .GetExternalGameIdAsync(
+            .GetExternalIdAsync(
             Arg.Any<int>());
 
         _ = fakeGameRoundRecord
@@ -60,9 +59,9 @@ public class AddGameRoundRecordCommandServiceUnitTest
     public async Task Normal_Process()
     {
         var fakeLogger = NullLogger<AddGameRoundRecordCommandService>.Instance;
-        var fakeGame = Substitute.For<IGame>();
-        var fakeGameProvider = Substitute.For<IGameProvider>();
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGame = Substitute.For<IGameRepository>();
+        var fakeGameProvider = Substitute.For<IGameProviderRepository>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundRecord = Substitute.For<IGameRoundRecord>();
 
         var roundId = Guid.NewGuid();
@@ -98,19 +97,17 @@ public class AddGameRoundRecordCommandServiceUnitTest
             ClientStatus: GameRoundClientStatus.Win,
             ReopenTurnoverAdjustment: null,
             ReopenedOn: null,
-            EffectiveBettingPercentage: null,
-            AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId })
-            );
+            EffectiveBettingPercentage: null);
 
         _ = fakeGameRound.GetAsync(
             Arg.Is(roundId)).Returns(gameRoundInfo);
 
         var gameProviderCode = "KY";
-        _ = fakeGameProvider.GetGameProviderCodeAsync(
+        _ = fakeGameProvider.GetCode(
             Arg.Is(gameRoundInfo.GameProviderId)).Returns(gameProviderCode);
 
         var externalGameId = "Bacc";
-        _ = fakeGame.GetExternalGameIdAsync(
+        _ = fakeGame.GetExternalIdAsync(
             Arg.Is(gameRoundInfo.GameId)).Returns(externalGameId);
 
         var service = new AddGameRoundRecordCommandService(

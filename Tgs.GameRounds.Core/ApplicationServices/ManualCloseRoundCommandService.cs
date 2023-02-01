@@ -8,13 +8,13 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 
 internal class ManualCloseRoundCommandService : ICommandService<ManualCloseRoundCommand>
 {
-    private readonly IGameRound _gameRound;
+    private readonly IGameRoundRepository _gameRound;
     private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
     private readonly ILogger<ManualCloseRoundCommandService> _logger;
 
     public ManualCloseRoundCommandService(
         ILogger<ManualCloseRoundCommandService> logger,
-        IGameRound gameRound,
+        IGameRoundRepository gameRound,
         IGameRoundRecordMessage gameRoundRecordMessage)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

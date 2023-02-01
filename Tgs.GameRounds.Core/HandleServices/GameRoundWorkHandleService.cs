@@ -8,7 +8,7 @@ namespace Tgs.GameRounds.Core.HandleServices;
 internal class GameRoundWorkHandleService : ICommandService<GameRoundWorkCommand>
 {
     private readonly ICommandService<AddRoundCommand> _addRoundService;
-    private readonly IGameRound _gameRound;
+    private readonly IGameRoundRepository _gameRound;
     private readonly ILogger<GameRoundWorkHandleService> _logger;
     private readonly ICommandService<UpdateRoundClosedCommand> _updateRoundClosedService;
     private readonly ICommandService<UpdateRoundOpenCommand> _updateRoundOpenService;
@@ -16,7 +16,7 @@ internal class GameRoundWorkHandleService : ICommandService<GameRoundWorkCommand
 
     public GameRoundWorkHandleService(
         ILogger<GameRoundWorkHandleService> logger,
-        IGameRound gameRound,
+        IGameRoundRepository gameRound,
         ICommandService<AddRoundCommand> addRoundService,
         ICommandService<UpdateRoundOpenCommand> updateRoundOpenService,
         ICommandService<UpdateRoundClosedCommand> updateRoundClosedService,

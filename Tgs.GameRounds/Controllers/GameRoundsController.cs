@@ -108,8 +108,7 @@ public class GameRoundsController : ControllerBase
             result.ClientStatus,
             result.ReopenTurnoverAdjustment,
             result.ReopenedOn,
-            result.EffectiveBettingPercentage,
-            result.AdditionalData) : null;
+            result.EffectiveBettingPercentage) : null;
     }
 
     /// <summary>
@@ -163,8 +162,7 @@ public class GameRoundsController : ControllerBase
             result.ClientStatus,
             result.ReopenTurnoverAdjustment,
             result.ReopenedOn,
-            result.EffectiveBettingPercentage,
-            result.AdditionalData) : null;
+            result.EffectiveBettingPercentage) : null;
     }
 
     /// <summary>
@@ -218,29 +216,9 @@ public class GameRoundsController : ControllerBase
             result.ClientStatus,
             result.ReopenTurnoverAdjustment,
             result.ReopenedOn,
-            result.EffectiveBettingPercentage,
-            result.AdditionalData) : null;
+            result.EffectiveBettingPercentage) : null;
     }
 
-    /// <summary>
-    /// Gets the list by round identifier query asynchronous.
-    /// </summary>
-    /// <param name="service">The service.</param>
-    /// <param name="gameProviderId">The game provider identifier.</param>
-    /// <param name="externalRoundId">The external round identifier.</param>
-    /// <param name="externalGameId">The external game identifier.</param>
-    /// <returns></returns>
-    [HttpGet("{gameProviderId}/{externalRoundId}/{externalGameId}/roundids", Name = "GetListByRoundIdQuery")]
-    public IAsyncEnumerable<Guid> GetListByRoundIdQueryAsync(
-        [FromServices] IQueryService<GetListByRoundIdQuery, Guid> service,
-         Guid gameProviderId,
-         string externalRoundId,
-         string externalGameId)
-        => service
-            .QueryAsync(new GetListByRoundIdQuery(
-                gameProviderId,
-                externalRoundId,
-                externalGameId));
 
     /// <summary>
     /// Gets the round detail asynchronous.
@@ -250,7 +228,7 @@ public class GameRoundsController : ControllerBase
     /// <returns></returns>
     [HttpGet("{roundid}/getdetail", Name = "GetRoundDetail")]
     public async ValueTask<GameRoundDetailViewModel?> GetRoundDetailAsync(
-        [FromServices] IGameRound gameRound,
+        [FromServices] IGameRoundRepository gameRound,
         Guid roundid)
     {
         var result = await gameRound
@@ -273,7 +251,7 @@ public class GameRoundsController : ControllerBase
     /// <returns></returns>
     [HttpGet("getroundid", Name = "GetRoundId")]
     public ValueTask<Guid?> GetRoundIdAsync(
-        [FromServices] IGameRound gameRound,
+        [FromServices] IGameRoundRepository gameRound,
         [FromQuery] Guid gameProviderId,
         [FromQuery] string externalRoundId,
         [FromQuery] int gameId,

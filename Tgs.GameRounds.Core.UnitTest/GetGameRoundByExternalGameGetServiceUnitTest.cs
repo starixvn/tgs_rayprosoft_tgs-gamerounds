@@ -13,9 +13,9 @@ public class GetGameRoundByExternalGameGetServiceUnitTest
     [TestMethod]
     public async Task Normal_Process()
     {
-        var fakeGame = Substitute.For<IGame>();
-        var fakeGameProvider = Substitute.For<IGameProvider>();
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGame = Substitute.For<IGameRepository>();
+        var fakeGameProvider = Substitute.For<IGameProviderRepository>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
         var roundId = Guid.NewGuid();
 
@@ -51,13 +51,12 @@ public class GetGameRoundByExternalGameGetServiceUnitTest
             ClientStatus: GameRoundClientStatus.Open,
             ReopenTurnoverAdjustment: null,
             ReopenedOn: null,
-            EffectiveBettingPercentage: null,
-            AdditionalData: string.Empty);
+            EffectiveBettingPercentage: null);
 
         var query = new GetGameRoundByExternalGameQuery(gameProviderId, externalRoundId, externalGameId, walletId);
 
-        _ = fakeGame.GetGameIdAsync(query.GameProviderId, query.ExternalGameId).Returns(ValueTask.FromResult(gameId));
-        _ = fakeGameProvider.GetGameProviderCodeAsync(query.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
+        _ = fakeGame.GetIdAsync(query.GameProviderId, query.ExternalGameId).Returns(ValueTask.FromResult(gameId));
+        _ = fakeGameProvider.GetCode(query.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
 
         _ = fakeGameRound.GetAsync(query.GameProviderId, query.ExternalRoundId, gameId, query.WalletId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 

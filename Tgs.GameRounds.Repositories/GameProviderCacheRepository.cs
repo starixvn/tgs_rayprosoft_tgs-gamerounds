@@ -1,45 +1,44 @@
-﻿using StackExchange.Redis;
-
+﻿using Microsoft.Extensions.Caching.Memory;
 using Tgs.GameRounds.Core;
 
 namespace Tgs.GameRounds.Repositories;
 
-internal class GameProviderCacheRepository : IGameProvider
+internal class GameProviderCacheRepository : IGameProviderRepository
 {
-    private const string KeyGameProvider = "gameround:gameprovider:{0}";
-    private readonly IDatabase _database;
-    private readonly TimeSpan _expiry;
-    private readonly IGameProvider _gameProvider;
+    private readonly IMemoryCache _memoryCache;
+    private readonly IGameProviderRepository _repository;
 
-    public GameProviderCacheRepository(IGameProvider gameProvider, IDatabase database, TimeSpan expiry)
+    public GameProviderCacheRepository(
+        IGameProviderRepository repository,
+        IMemoryCache memoryCache)
     {
-        _database = database ?? throw new ArgumentNullException(nameof(database));
-        _gameProvider = gameProvider ?? throw new ArgumentNullException(nameof(gameProvider));
-        _expiry = expiry;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
     }
 
-    public async ValueTask<string> GetGameProviderCodeAsync(
-        Guid gameProviderId,
+    public async ValueTask<string> GetCode(
+        Guid id,
         CancellationToken cancellationToken = default)
     {
-        var key = string.Format(KeyGameProvider, gameProviderId);
-        if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
+        var key = string.Format("gamerounds:gameprovider:get:code:{0}", id);
+        if (!_memoryCache.TryGetValue(key, out string? code))
         {
-            var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(
-                gameProviderId: gameProviderId,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            _ = await _database.StringSetAsync(
-                key: key,
-                value: gameProviderCode,
-                expiry: _expiry,
-                when: When.NotExists);
-
-            return gameProviderCode;
+            code = await _repository
+                .GetCode(
+                    id: id,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(code))
+            {
+                return _memoryCache.Set(
+                    key: key,
+                    value: code);
+            }
         }
-
-        var value = await _database.StringGetAsync(key).ConfigureAwait(false);
-
-        return value.ToString();
+        return code!;
     }
+
+    public IAsyncEnumerable<Guid> GetIds(
+        CancellationToken cancellationToken = default)
+        => _repository.GetIds(cancellationToken);
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -54,8 +53,7 @@ public partial class GameRoundsClientUnitTest
            ClientStatus: GameRoundClientStatus.Open,
            ReopenTurnoverAdjustment: null,
            ReopenedOn: null,
-           EffectiveBettingPercentage: null,
-           AdditionalData: string.Empty);
+           EffectiveBettingPercentage: null);
 
         var web = CreateTestSettingSite(services =>
         {
@@ -117,26 +115,25 @@ public partial class GameRoundsClientUnitTest
           ClientStatus: GameRoundClientStatus.Open,
           ReopenTurnoverAdjustment: null,
           ReopenedOn: null,
-          EffectiveBettingPercentage: null,
-          AdditionalData: string.Empty);
+          EffectiveBettingPercentage: null);
 
         var web = CreateTestSettingSite(services =>
         {
-            var fakeRepository = Substitute.For<IGameRound>();
+            var fakeRepository = Substitute.For<IGameRoundRepository>();
 
             _ = fakeRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).Returns(ValueTask.FromResult<GameRoundInfo?>(data));
 
             _ = services.AddSingleton(fakeRepository);
 
-            var fakeGame = Substitute.For<IGame>();
+            var fakeGame = Substitute.For<IGameRepository>();
 
-            _ = fakeGame.GetExternalGameIdAsync(data.GameId).Returns(ValueTask.FromResult(externalGameId));
+            _ = fakeGame.GetExternalIdAsync(data.GameId).Returns(ValueTask.FromResult(externalGameId));
 
             _ = services.AddSingleton(fakeGame);
 
-            var fakeGameProvider = Substitute.For<IGameProvider>();
+            var fakeGameProvider = Substitute.For<IGameProviderRepository>();
 
-            _ = fakeGameProvider.GetGameProviderCodeAsync(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
+            _ = fakeGameProvider.GetCode(data.GameProviderId).Returns(ValueTask.FromResult(gameProviderCode));
 
             _ = services.AddSingleton(fakeGameProvider);
         });
@@ -169,7 +166,7 @@ public partial class GameRoundsClientUnitTest
 
         var web = CreateTestSettingSite(services =>
         {
-            var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
             _ = fakeGameRound.GetRoundDetailAsync(roundId).Returns(ValueTask.FromResult<GameRoundDetailInfo?>(data));
 

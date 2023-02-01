@@ -16,7 +16,7 @@ public interface IGameRoundLocked
         Guid walletId,
         CancellationToken cancellationToken = default);
 
-    ValueTask UnlockAsync(
+    Task UnlockAsync(
         Guid gameProviderId,
         string externalRoundId,
         int gameId,

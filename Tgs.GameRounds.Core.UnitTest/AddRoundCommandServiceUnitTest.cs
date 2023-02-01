@@ -17,7 +17,7 @@ public class AddRoundCommandServiceUnitTest
     public async Task Add_Has_Been_Locked()
     {
         var fakeLogger = NullLogger<AddRoundCommandService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
         var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
 
@@ -81,7 +81,7 @@ public class AddRoundCommandServiceUnitTest
     public async Task Normal_Process()
     {
         var fakeLogger = NullLogger<AddRoundCommandService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
         var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
 

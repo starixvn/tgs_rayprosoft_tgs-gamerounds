@@ -21,7 +21,7 @@ public class GameRoundRepositoryUnitTest
     {
         var fakeLogger = NullLogger<GameRoundRepository>.Instance;
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var options = new DbContextOptionsBuilder<BetContext>()
            .UseInMemoryDatabase(databaseName: "bet")
            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -84,7 +84,7 @@ public class GameRoundRepositoryUnitTest
     {
         var fakeLogger = NullLogger<GameRoundRepository>.Instance;
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var options = new DbContextOptionsBuilder<BetContext>()
            .UseInMemoryDatabase(databaseName: "bet")
            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))

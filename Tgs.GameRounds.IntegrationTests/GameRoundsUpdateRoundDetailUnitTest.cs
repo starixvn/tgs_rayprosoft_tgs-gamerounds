@@ -23,7 +23,7 @@ public partial class GameRoundsClientUnitTest
 
         var web = CreateTestSettingSite(services =>
         {
-            var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeGameRound = Substitute.For<IGameRoundRepository>();
             _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(false));
             _ = services.AddSingleton(fakeGameRound);
 
@@ -56,7 +56,7 @@ public partial class GameRoundsClientUnitTest
 
         var web = CreateTestSettingSite(services =>
         {
-            var fakeGameRound = Substitute.For<IGameRound>();
+            var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
             _ = fakeGameRound.ExistAsync(roundId).Returns(ValueTask.FromResult(true));
 
@@ -90,8 +90,7 @@ public partial class GameRoundsClientUnitTest
                 ClientStatus: GameRoundClientStatus.Open,
                 ReopenTurnoverAdjustment: null,
                 ReopenedOn: null,
-                EffectiveBettingPercentage: null,
-                AdditionalData: additionalData ?? string.Empty);
+                EffectiveBettingPercentage: null);
 
             _ = fakeGameRound.GetAsync(roundId).Returns(ValueTask.FromResult<GameRoundInfo?>(gameRound));
 

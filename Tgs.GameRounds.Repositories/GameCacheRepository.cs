@@ -1,74 +1,67 @@
-﻿using StackExchange.Redis;
+﻿using Microsoft.Extensions.Caching.Memory;
 
 using Tgs.GameRounds.Core;
 
 namespace Tgs.GameRounds.Repositories;
 
-internal class GameCacheRepository : IGame
+internal class GameCacheRepository : IGameRepository
 {
-    private const string KeyExternalGameId = "gameround:game:externalgameid:{0}:{1}";
-    private const string KeyGameId = "gameround:game:gameid:{0}";
-    private readonly IDatabase _database;
-    private readonly TimeSpan _expiry;
-    private readonly IGame _game;
+    private readonly IMemoryCache _memoryCache;
+    private readonly IGameRepository _repository;
 
-    public GameCacheRepository(IGame game, IDatabase database, TimeSpan expiry)
+    public GameCacheRepository(
+        IGameRepository repository,
+        IMemoryCache memoryCache)
     {
-        _database = database ?? throw new ArgumentNullException(nameof(database));
-        _game = game ?? throw new ArgumentNullException(nameof(game));
-        _expiry = expiry;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
     }
 
-    public async ValueTask<string> GetExternalGameIdAsync(
-        int gameId,
+    public async ValueTask<string> GetExternalIdAsync(
+        int id,
         CancellationToken cancellationToken = default)
     {
-        var key = string.Format(KeyGameId, gameId);
-        if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
+        var key = string.Format("gamerounds:game:get:externalid:{0}", id);
+        if (!_memoryCache.TryGetValue(key, out string? externalId))
         {
-            var externalGameId = await _game.GetExternalGameIdAsync(
-                gameId: gameId,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            _ = await _database.StringSetAsync(
-                key: key,
-                value: externalGameId,
-                expiry: _expiry,
-                when: When.NotExists,
-                flags: CommandFlags.FireAndForget);
-
-            return externalGameId;
+            externalId = await _repository
+                .GetExternalIdAsync(
+                    id: id,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(externalId))
+            {
+                return _memoryCache.Set(
+                    key: key,
+                    value: externalId,
+                    absoluteExpirationRelativeToNow: TimeSpan.FromMinutes(5));
+            }
         }
-
-        var value = await _database.StringGetAsync(key).ConfigureAwait(false);
-
-        return value.ToString();
+        return externalId!;
     }
 
-    public async ValueTask<int> GetGameIdAsync(
+    public async ValueTask<int> GetIdAsync(
         Guid gameProviderId,
-        string externalGameId,
+        string externalId,
         CancellationToken cancellationToken = default)
     {
-        var key = string.Format(KeyExternalGameId, gameProviderId, externalGameId);
-        if (!await _database.KeyExistsAsync(key).ConfigureAwait(false))
+        var key = string.Format("gamerounds:game:get:id:{0}:{1}", gameProviderId, externalId);
+        if (!_memoryCache.TryGetValue(key, out int? id))
         {
-            var gameId = await _game.GetGameIdAsync(
-                gameProviderId: gameProviderId,
-                externalGameId: externalGameId,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
-
-            _ = await _database.StringSetAsync(
-                key: key,
-                value: gameId,
-                expiry: _expiry,
-                when: When.NotExists,
-                flags: CommandFlags.FireAndForget);
-
-            return gameId;
+            id = await _repository
+                        .GetIdAsync(
+                           gameProviderId: gameProviderId,
+                           externalId: externalId,
+                           cancellationToken: cancellationToken)
+                        .ConfigureAwait(false);
+            if (id.HasValue)
+            {
+                return _memoryCache.Set(
+                    key: key,
+                    value: id.Value,
+                    absoluteExpirationRelativeToNow: TimeSpan.FromMinutes(5));
+            }
         }
-        var value = await _database.StringGetAsync(key).ConfigureAwait(false);
-
-        return int.Parse(value!);
+        return id!.Value;
     }
 }

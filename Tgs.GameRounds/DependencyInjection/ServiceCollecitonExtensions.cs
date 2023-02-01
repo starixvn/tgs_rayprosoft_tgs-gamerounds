@@ -29,8 +29,7 @@ public static class ServiceCollecitonExtensions
                 (sp) => sp.GetRequiredService<RedisConnectionManager>().Database,
                 (sp) => sp.GetRequiredService<MongoDBConnectionManager>().Database)
             .AddGameRoundTgsRepositories(
-                tgsConfigure,
-                (sp) => sp.GetRequiredService<RedisConnectionManager>().Database)
+                tgsConfigure)
             .AddGameRoundRepositories(
                 (sp) => sp.GetRequiredService<RedisConnectionManager>().Database);
 }

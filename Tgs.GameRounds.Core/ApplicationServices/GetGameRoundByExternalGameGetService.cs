@@ -4,14 +4,14 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 
 internal class GetGameRoundByExternalGameGetService : IGetService<GetGameRoundByExternalGameQuery, GameRoundResult?>
 {
-    private readonly IGame _game;
-    private readonly IGameProvider _gameProvider;
-    private readonly IGameRound _gameRoundRepository;
+    private readonly IGameRepository _game;
+    private readonly IGameProviderRepository _gameProvider;
+    private readonly IGameRoundRepository _gameRoundRepository;
 
     public GetGameRoundByExternalGameGetService(
-        IGame game,
-        IGameProvider gameProvider,
-        IGameRound gameRoundRepository)
+        IGameRepository game,
+        IGameProviderRepository gameProvider,
+        IGameRoundRepository gameRoundRepository)
     {
         _game = game ?? throw new ArgumentNullException(nameof(game));
         _gameProvider = gameProvider ?? throw new ArgumentNullException(nameof(gameProvider));
@@ -20,13 +20,13 @@ internal class GetGameRoundByExternalGameGetService : IGetService<GetGameRoundBy
 
     public async ValueTask<GameRoundResult?> GetAsync(GetGameRoundByExternalGameQuery query, CancellationToken cancellationToken = default)
     {
-        var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(
-            gameProviderId: query.GameProviderId,
+        var gameProviderCode = await _gameProvider.GetCode(
+            id: query.GameProviderId,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        var gameId = await _game.GetGameIdAsync(
+        var gameId = await _game.GetIdAsync(
             gameProviderId: query.GameProviderId,
-            externalGameId: query.ExternalGameId,
+            externalId: query.ExternalGameId,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         var gameRoundInfo = await _gameRoundRepository.GetAsync(
@@ -64,7 +64,6 @@ internal class GetGameRoundByExternalGameGetService : IGetService<GetGameRoundBy
             gameRoundInfo.ClientStatus,
             gameRoundInfo.ReopenTurnoverAdjustment,
             gameRoundInfo.ReopenedOn,
-            gameRoundInfo.EffectiveBettingPercentage,
-            gameRoundInfo.AdditionalData) : null;
+            gameRoundInfo.EffectiveBettingPercentage) : null;
     }
 }

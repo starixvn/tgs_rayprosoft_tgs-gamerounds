@@ -17,7 +17,7 @@ public class GameRoundsWorkCommandServiceUnitTest
     public async Task Add_Round()
     {
         var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeAddRoundService = Substitute.For<ICommandService<AddRoundCommand>>();
         var fakeUpdateRoundClosedService = Substitute.For<ICommandService<UpdateRoundClosedCommand>>();
         var fakeUpdateRoundOpenService = Substitute.For<ICommandService<UpdateRoundOpenCommand>>();
@@ -86,7 +86,7 @@ public class GameRoundsWorkCommandServiceUnitTest
     public async Task Update_Round_Closed()
     {
         var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeAddRoundService = Substitute.For<ICommandService<AddRoundCommand>>();
         var fakeUpdateRoundClosedService = Substitute.For<ICommandService<UpdateRoundClosedCommand>>();
         var fakeUpdateRoundOpenService = Substitute.For<ICommandService<UpdateRoundOpenCommand>>();
@@ -154,8 +154,7 @@ public class GameRoundsWorkCommandServiceUnitTest
             ClientStatus: GameRoundClientStatus.Open,
             ReopenTurnoverAdjustment: 0,
             ReopenedOn: null,
-            EffectiveBettingPercentage: 0,
-            AdditionalData: "{}");
+            EffectiveBettingPercentage: 0);
 
         _ = fakeGameRound
             .GetAsync(
@@ -190,7 +189,7 @@ public class GameRoundsWorkCommandServiceUnitTest
     public async Task Update_Round_Closed_Get_DataBase_GameRoundStatus_Is_Closed()
     {
         var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeAddRoundService = Substitute.For<ICommandService<AddRoundCommand>>();
         var fakeUpdateRoundClosedService = Substitute.For<ICommandService<UpdateRoundClosedCommand>>();
         var fakeUpdateRoundOpenService = Substitute.For<ICommandService<UpdateRoundOpenCommand>>();
@@ -258,8 +257,7 @@ public class GameRoundsWorkCommandServiceUnitTest
             ClientStatus: GameRoundClientStatus.Win,
             ReopenTurnoverAdjustment: 0,
             ReopenedOn: null,
-            EffectiveBettingPercentage: 0,
-            AdditionalData: "{}");
+            EffectiveBettingPercentage: 0);
 
         _ = fakeGameRound
             .GetAsync(
@@ -294,7 +292,7 @@ public class GameRoundsWorkCommandServiceUnitTest
     public async Task Update_Round_Open()
     {
         var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeAddRoundService = Substitute.For<ICommandService<AddRoundCommand>>();
         var fakeUpdateRoundClosedService = Substitute.For<ICommandService<UpdateRoundClosedCommand>>();
         var fakeUpdateRoundOpenService = Substitute.For<ICommandService<UpdateRoundOpenCommand>>();
@@ -362,8 +360,7 @@ public class GameRoundsWorkCommandServiceUnitTest
             ClientStatus: GameRoundClientStatus.Open,
             ReopenTurnoverAdjustment: 0,
             ReopenedOn: null,
-            EffectiveBettingPercentage: 0,
-            AdditionalData: "{}");
+            EffectiveBettingPercentage: 0);
 
         _ = fakeGameRound
             .GetAsync(
@@ -398,7 +395,7 @@ public class GameRoundsWorkCommandServiceUnitTest
     public async Task Update_Round_Reopen()
     {
         var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeAddRoundService = Substitute.For<ICommandService<AddRoundCommand>>();
         var fakeUpdateRoundClosedService = Substitute.For<ICommandService<UpdateRoundClosedCommand>>();
         var fakeUpdateRoundOpenService = Substitute.For<ICommandService<UpdateRoundOpenCommand>>();
@@ -466,8 +463,7 @@ public class GameRoundsWorkCommandServiceUnitTest
             ClientStatus: GameRoundClientStatus.Win,
             ReopenTurnoverAdjustment: 0,
             ReopenedOn: null,
-            EffectiveBettingPercentage: 0,
-            AdditionalData: "{}");
+            EffectiveBettingPercentage: 0);
 
         _ = fakeGameRound
             .GetAsync(
@@ -502,7 +498,7 @@ public class GameRoundsWorkCommandServiceUnitTest
     public async Task Update_Round_Reopen_Is_GameRoundStatus_Open()
     {
         var fakeLogger = NullLogger<GameRoundWorkHandleService>.Instance;
-        var fakeGameRound = Substitute.For<IGameRound>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeAddRoundService = Substitute.For<ICommandService<AddRoundCommand>>();
         var fakeUpdateRoundClosedService = Substitute.For<ICommandService<UpdateRoundClosedCommand>>();
         var fakeUpdateRoundOpenService = Substitute.For<ICommandService<UpdateRoundOpenCommand>>();
@@ -570,8 +566,7 @@ public class GameRoundsWorkCommandServiceUnitTest
             ClientStatus: GameRoundClientStatus.Win,
             ReopenTurnoverAdjustment: 0,
             ReopenedOn: null,
-            EffectiveBettingPercentage: 0,
-            AdditionalData: "{}");
+            EffectiveBettingPercentage: 0);
 
         _ = fakeGameRound
             .GetAsync(

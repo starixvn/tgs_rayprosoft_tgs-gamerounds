@@ -56,21 +56,16 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services
-    .AddRouting(options => options.LowercaseUrls = true)
-    .AddControllers(configure => _ = configure.Filters.Add<ExceptionFilter>())
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
-builder.Services
     .AddGameRounds(
     (options, sp) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        options.ConnectionString = configuration.GetConnectionString("Mongo");
+        options.ConnectionString = configuration.GetConnectionString("Mongo")!;
     },
     (options, sp) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        options.ConnectionString = configuration.GetConnectionString("Redis");
+        options.ConnectionString = configuration.GetConnectionString("Redis")!;
     },
     (sp, dbBuilder) =>
     {
@@ -94,7 +89,7 @@ builder.Services
          .ConfigQueueOptions((options, sp) =>
          {
              var configuration = sp.GetRequiredService<IConfiguration>();
-             options.Url = configuration.GetConnectionString("Nats");
+             options.Url = configuration.GetConnectionString("Nats")!;
          })
          .AddHandler<GameRoundRecordMessageHandler>("gp.gameround.gameroundrecord.add", "gp.gameround.gameroundrecord"))
      .ClearAllExchanges()
@@ -161,5 +156,7 @@ app.MapHealthChecks("/healthz");
 app.MapMetrics();
 
 app.MapProfileViewer();
+
+_ = app.UseGameRoundsRegister();
 
 app.Run();

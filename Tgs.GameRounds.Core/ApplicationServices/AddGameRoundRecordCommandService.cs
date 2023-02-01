@@ -6,17 +6,17 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 
 public class AddGameRoundRecordCommandService : ICommandService<AddGameRoundRecordCommand>
 {
-    private readonly IGame _game;
-    private readonly IGameProvider _gameProvider;
-    private readonly IGameRound _gameRound;
+    private readonly IGameRepository _game;
+    private readonly IGameProviderRepository _gameProvider;
+    private readonly IGameRoundRepository _gameRound;
     private readonly IGameRoundRecord _gameRoundRecord;
     private readonly ILogger<AddGameRoundRecordCommandService> _logger;
 
     public AddGameRoundRecordCommandService(
         ILogger<AddGameRoundRecordCommandService> logger,
-        IGame game,
-        IGameProvider gameProvider,
-        IGameRound gameRound,
+        IGameRepository game,
+        IGameProviderRepository gameProvider,
+        IGameRoundRepository gameRound,
         IGameRoundRecord gameRoundRecord)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -38,12 +38,12 @@ public class AddGameRoundRecordCommandService : ICommandService<AddGameRoundReco
             return;
         }
 
-        var gameProviderCode = await _gameProvider.GetGameProviderCodeAsync(
-             gameProviderId: round.GameProviderId,
+        var gameProviderCode = await _gameProvider.GetCode(
+             id: round.GameProviderId,
              cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        var externalGameId = await _game.GetExternalGameIdAsync(
-            gameId: round.GameId,
+        var externalGameId = await _game.GetExternalIdAsync(
+            id: round.GameId,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         var gameRoundRecordAdd = new AddGameRoundRecord(

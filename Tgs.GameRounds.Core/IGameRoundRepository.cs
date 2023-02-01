@@ -3,7 +3,7 @@ using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core;
 
-public interface IGameRound
+public interface IGameRoundRepository
 {
     ValueTask<Guid?> AddCompanyRoundAsync(
         AddCompanyRound source,
@@ -11,10 +11,6 @@ public interface IGameRound
 
     ValueTask<Guid?> AddRoundAsync(
         AddRound source,
-        CancellationToken cancellationToken = default);
-
-    IAsyncEnumerable<Guid> AddRoundBatchAsync(
-        IEnumerable<AddRoundBatch> sources,
         CancellationToken cancellationToken = default);
 
     ValueTask AdjustClosedRoundAsync(
@@ -37,11 +33,6 @@ public interface IGameRound
         Guid walletId,
         CancellationToken cancellationToken = default);
 
-    IAsyncEnumerable<Guid> GetListByRoundIdAsync(
-       Guid gameProviderId,
-       string externalRoundId,
-       int gameId);
-
     ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
         Guid roundId,
         CancellationToken cancellationToken = default);
@@ -62,15 +53,6 @@ public interface IGameRound
         ManualCloseRound source,
         CancellationToken cancellationToken = default);
 
-    ValueTask<Guid?> NewRoundAsync(
-        NewRound source,
-        CancellationToken cancellationToken = default);
-
-    ValueTask UpdateClientStatusAsync(
-        Guid roundId,
-        GameRoundClientStatus status,
-        CancellationToken cancellationToken = default);
-
     ValueTask UpdateRoundClosedAsync(
         Guid roundId,
         UpdateRoundClosed source,
@@ -86,19 +68,8 @@ public interface IGameRound
         UpdateRoundOpen source,
         CancellationToken cancellationToken = default);
 
-    ValueTask UpdateRoundOpenSettleAsync(
-        Guid roundId,
-        UpdateRoundOpenSettle source,
-        CancellationToken cancellationToken = default);
-
     ValueTask UpdateRoundReopenAsync(
         Guid roundId,
         UpdateRoundReopen source,
-        CancellationToken cancellationToken = default);
-
-    ValueTask UpdateStatusAsync(
-        Guid roundId,
-        GameRoundStatus status,
-        DateTimeOffset? externalClosedOn = null,
         CancellationToken cancellationToken = default);
 }

@@ -8,16 +8,16 @@ using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Repositories;
 
-internal class GameRoundCacheRepository : IGameRound
+internal class GameRoundCacheRepository : IGameRoundRepository
 {
     private const string KeyExist = "gameround:exist:{0}";
     private const string KeyRoundId = "gameround:roundid:{0}:{1}:{2}:{3}";
     private readonly IDatabase _database;
     private readonly TimeSpan _expiry;
-    private readonly IGameRound _gameRound;
+    private readonly IGameRoundRepository _gameRound;
 
     public GameRoundCacheRepository(
-        IGameRound gameRound,
+        IGameRoundRepository gameRound,
         IDatabase database,
         TimeSpan expiry)
     {
@@ -38,13 +38,6 @@ internal class GameRoundCacheRepository : IGameRound
         CancellationToken cancellationToken = default)
         => _gameRound.AddRoundAsync(
             source,
-            cancellationToken);
-
-    public IAsyncEnumerable<Guid> AddRoundBatchAsync(
-        IEnumerable<AddRoundBatch> sources,
-        CancellationToken cancellationToken = default)
-        => _gameRound.AddRoundBatchAsync(
-            sources,
             cancellationToken);
 
     public ValueTask AdjustClosedRoundAsync(
@@ -109,15 +102,6 @@ internal class GameRoundCacheRepository : IGameRound
             walletId: walletId,
             cancellationToken: cancellationToken);
 
-    public IAsyncEnumerable<Guid> GetListByRoundIdAsync(
-        Guid gameProviderId,
-        string externalRoundId,
-        int gameId)
-        => _gameRound.GetListByRoundIdAsync(
-            gameProviderId: gameProviderId,
-            externalRoundId: externalRoundId,
-            gameId: gameId);
-
     public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
             Guid roundId,
         CancellationToken cancellationToken = default)
@@ -179,22 +163,6 @@ internal class GameRoundCacheRepository : IGameRound
             source: source,
             cancellationToken: cancellationToken);
 
-    public ValueTask<Guid?> NewRoundAsync(
-        NewRound source,
-        CancellationToken cancellationToken = default)
-        => _gameRound.NewRoundAsync(
-            source: source,
-            cancellationToken: cancellationToken);
-
-    public ValueTask UpdateClientStatusAsync(
-        Guid roundId,
-        GameRoundClientStatus status,
-        CancellationToken cancellationToken = default)
-        => _gameRound.UpdateClientStatusAsync(
-            roundId: roundId,
-            status: status,
-            cancellationToken: cancellationToken);
-
     public ValueTask UpdateRoundClosedAsync(
         Guid roundId,
         UpdateRoundClosed source,
@@ -222,15 +190,6 @@ internal class GameRoundCacheRepository : IGameRound
              source: source,
              cancellationToken: cancellationToken);
 
-    public ValueTask UpdateRoundOpenSettleAsync(
-        Guid roundId,
-        UpdateRoundOpenSettle source,
-        CancellationToken cancellationToken = default)
-         => _gameRound.UpdateRoundOpenSettleAsync(
-             roundId: roundId,
-             source: source,
-            cancellationToken: cancellationToken);
-
     public ValueTask UpdateRoundReopenAsync(
         Guid roundId,
         UpdateRoundReopen source,
@@ -238,16 +197,5 @@ internal class GameRoundCacheRepository : IGameRound
         => _gameRound.UpdateRoundReopenAsync(
             roundId: roundId,
             source: source,
-            cancellationToken: cancellationToken);
-
-    public ValueTask UpdateStatusAsync(
-        Guid roundId,
-        GameRoundStatus status,
-        DateTimeOffset? externalClosedOn = null,
-        CancellationToken cancellationToken = default)
-        => _gameRound.UpdateStatusAsync(
-            roundId: roundId,
-            status: status,
-            externalClosedOn: externalClosedOn,
             cancellationToken: cancellationToken);
 }

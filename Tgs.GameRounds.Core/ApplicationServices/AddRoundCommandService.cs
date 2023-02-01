@@ -7,14 +7,14 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 
 internal class AddRoundCommandService : ICommandService<AddRoundCommand>
 {
-    private readonly IGameRound _gameRound;
+    private readonly IGameRoundRepository _gameRound;
     private readonly IGameRoundLocked _gameRoundLocked;
     private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
     private readonly ILogger<AddRoundCommandService> _logger;
 
     public AddRoundCommandService(
         ILogger<AddRoundCommandService> logger,
-        IGameRound gameRound,
+        IGameRoundRepository gameRound,
         IGameRoundLocked gameRoundLocked,
         IGameRoundRecordMessage gameRoundRecordMessage)
     {
