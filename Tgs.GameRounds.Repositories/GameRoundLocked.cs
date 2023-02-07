@@ -21,10 +21,10 @@ internal class GameRoundLocked : IGameRoundLocked
     }
 
     public Task<bool> LockingAsync(
-        Guid gameProviderId, 
-        string externalRoundId, 
-        int gameId, 
-        Guid walletId, 
+        Guid gameProviderId,
+        string externalRoundId,
+        int gameId,
+        Guid walletId,
         CancellationToken cancellationToken = default)
         => _database
         .StringSetAsync(
@@ -47,5 +47,5 @@ internal class GameRoundLocked : IGameRoundLocked
             flags: CommandFlags.FireAndForget);
 
     private string GetKey(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
-        => string.Format(_gameLockedOptions.LocksRedisKey, gameProviderId, externalRoundId, gameId, walletId).ToLower();
+        => string.Format(_gameLockedOptions.LocksRedisKey, gameProviderId, externalRoundId, gameId, walletId);
 }
