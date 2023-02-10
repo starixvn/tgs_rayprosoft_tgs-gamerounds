@@ -8,8 +8,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="JunitXml.TestLogger" Version="3.0.114" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.10" />
+		<PackageReference Include="JunitXml.TestLogger" Version="3.0.124" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.13" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.2" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
 		<PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
