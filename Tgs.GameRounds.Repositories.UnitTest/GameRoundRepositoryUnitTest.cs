@@ -43,11 +43,11 @@ public class GameRoundRepositoryUnitTest
             GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
             WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
             CreatedOn = DateTime.UtcNow,
-            ClosedOn = (DateTime?)null,
+            ClosedOn = null,
             UpdatedOn = DateTime.UtcNow,
             BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
             ExternalCreatedOn = DateTime.UtcNow,
-            ExternalClosedOn = (DateTime?)null,
+            ExternalClosedOn = null,
             BetAmount = 10m,
             ValidBetAmount = 10m,
             SettleAmount = null,
@@ -57,7 +57,7 @@ public class GameRoundRepositoryUnitTest
             TieBetAdjustment = null,
             ClientStatus = (short)GameRoundClientStatus.Open,
             ReopenTurnoverAdjustment = null,
-            ReopenedOn = (DateTime?)null,
+            ReopenedOn = null,
             EffectiveBettingPercentage = null,
         }).ConfigureAwait(false);
 
@@ -80,7 +80,155 @@ public class GameRoundRepositoryUnitTest
     }
 
     [TestMethod]
-    public async Task Get_Round_ExternalRoundId()
+    public async Task Get_Round_External_ExternalCreatedOn()
+    {
+        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
+        var options = new DbContextOptionsBuilder<BetContext>()
+           .UseInMemoryDatabase(databaseName: "bet")
+           .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+           .Options;
+        var context = new BetContext(options);
+        _ = context.Database.EnsureDeleted();
+
+        var roundId = Guid.NewGuid();
+        var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+        var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+        var gameId = 500001;
+        var playerCode = "4ues8xikza7o";
+        var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+        var externalCreatedOn = DateTimeOffset.Now;
+
+        _ = await context.Rounds.AddAsync(new Round()
+        {
+            Id = roundId,
+            ExternalRoundId = externalRoundId,
+            GameProviderId = gameProviderId,
+            PlayerCode = playerCode,
+            GameId = gameId,
+            CurrencyCode = "CNY",
+            Status = (short)GameRoundStatus.Open,
+            GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+            WalletId = walletId,
+            CreatedOn = DateTime.UtcNow,
+            ClosedOn = null,
+            UpdatedOn = DateTime.UtcNow,
+            BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+            ExternalCreatedOn = externalCreatedOn.UtcDateTime,
+            ExternalClosedOn = null,
+            BetAmount = 10m,
+            ValidBetAmount = 10m,
+            SettleAmount = null,
+            Commission = null,
+            Turnover = 10m,
+            WinLoss = null,
+            TieBetAdjustment = null,
+            ClientStatus = (short)GameRoundClientStatus.Open,
+            ReopenTurnoverAdjustment = null,
+            ReopenedOn = null,
+            EffectiveBettingPercentage = null,
+        }).ConfigureAwait(false);
+
+        _ = await context.RoundDetails.AddAsync(new RoundDetail()
+        {
+            RoundId = roundId,
+            AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
+        }).ConfigureAwait(false);
+
+        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+
+        var fakeRoundRepository = new GameRoundRepository(
+            context,
+            fakeLogger,
+            fakeSerialNumberGenerator);
+
+        var actual = await fakeRoundRepository
+            .GetAsync(
+                gameProviderId: gameProviderId,
+                externalRoundId: externalRoundId,
+                gameId: gameId,
+                walletId: walletId,
+                externalCreatedOn: externalCreatedOn)
+            .ConfigureAwait(false);
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(roundId, actual.RoundId);
+        Assert.AreEqual(gameProviderId, actual.GameProviderId);
+        Assert.AreEqual(externalRoundId, actual.ExternalRoundId);
+        Assert.AreEqual(gameId, actual.GameId);
+        Assert.AreEqual(playerCode, actual.PlayerCode);
+    }
+
+    [TestMethod]
+    public async Task Get_Round_ExternalCreatedOn()
+    {
+        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
+        var options = new DbContextOptionsBuilder<BetContext>()
+           .UseInMemoryDatabase(databaseName: "bet")
+           .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+           .Options;
+        var context = new BetContext(options);
+        _ = context.Database.EnsureDeleted();
+
+        var roundId = new Guid("cc4d6693-417d-401a-8ccf-68f25382a134");
+        var externalCreatedOn = DateTimeOffset.Now;
+
+        _ = await context.Rounds.AddAsync(new Round()
+        {
+            Id = roundId,
+            ExternalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134",
+            GameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f"),
+            PlayerCode = "4ues8xikza7o",
+            GameId = 500001,
+            CurrencyCode = "CNY",
+            Status = (short)GameRoundStatus.Open,
+            GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+            WalletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b"),
+            CreatedOn = DateTime.UtcNow,
+            ClosedOn = null,
+            UpdatedOn = DateTime.UtcNow,
+            BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+            ExternalCreatedOn = externalCreatedOn.UtcDateTime,
+            ExternalClosedOn = null,
+            BetAmount = 10m,
+            ValidBetAmount = 10m,
+            SettleAmount = null,
+            Commission = null,
+            Turnover = 10m,
+            WinLoss = null,
+            TieBetAdjustment = null,
+            ClientStatus = (short)GameRoundClientStatus.Open,
+            ReopenTurnoverAdjustment = null,
+            ReopenedOn = null,
+            EffectiveBettingPercentage = null,
+        }).ConfigureAwait(false);
+
+        _ = await context.RoundDetails.AddAsync(new RoundDetail()
+        {
+            RoundId = roundId,
+            AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
+        }).ConfigureAwait(false);
+
+        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+
+        var fakeRoundRepository = new GameRoundRepository(
+            context,
+            fakeLogger,
+            fakeSerialNumberGenerator);
+
+        var actual = await fakeRoundRepository
+            .GetAsync(
+                roundId,
+                externalCreatedOn)
+            .ConfigureAwait(false);
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(roundId, actual.RoundId);
+    }
+
+    [TestMethod]
+    public async Task Get_Round_ExternalId()
     {
         var fakeLogger = NullLogger<GameRoundRepository>.Instance;
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
@@ -111,11 +259,11 @@ public class GameRoundRepositoryUnitTest
             GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
             WalletId = walletId,
             CreatedOn = DateTime.UtcNow,
-            ClosedOn = (DateTime?)null,
+            ClosedOn = null,
             UpdatedOn = DateTime.UtcNow,
             BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
             ExternalCreatedOn = DateTime.UtcNow,
-            ExternalClosedOn = (DateTime?)null,
+            ExternalClosedOn = null,
             BetAmount = 10m,
             ValidBetAmount = 10m,
             SettleAmount = null,
@@ -142,12 +290,168 @@ public class GameRoundRepositoryUnitTest
             fakeLogger,
             fakeSerialNumberGenerator);
 
-        var actual = await fakeRoundRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
+        var actual = await fakeRoundRepository
+            .GetAsync(
+                gameProviderId: gameProviderId,
+                externalRoundId: externalRoundId,
+                gameId: gameId,
+                walletId: walletId)
+            .ConfigureAwait(false);
         Assert.IsNotNull(actual);
         Assert.AreEqual(roundId, actual.RoundId);
         Assert.AreEqual(gameProviderId, actual.GameProviderId);
         Assert.AreEqual(externalRoundId, actual.ExternalRoundId);
         Assert.AreEqual(gameId, actual.GameId);
         Assert.AreEqual(playerCode, actual.PlayerCode);
+    }
+
+    [TestMethod]
+    public async Task Get_RoundId_External()
+    {
+        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
+        var options = new DbContextOptionsBuilder<BetContext>()
+           .UseInMemoryDatabase(databaseName: "bet")
+           .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+           .Options;
+        var context = new BetContext(options);
+        _ = context.Database.EnsureDeleted();
+
+        var roundId = Guid.NewGuid();
+        var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+        var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+        var gameId = 500001;
+        var playerCode = "4ues8xikza7o";
+        var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+
+        _ = await context.Rounds.AddAsync(new Round()
+        {
+            Id = roundId,
+            ExternalRoundId = externalRoundId,
+            GameProviderId = gameProviderId,
+            PlayerCode = playerCode,
+            GameId = gameId,
+            CurrencyCode = "CNY",
+            Status = (short)GameRoundStatus.Open,
+            GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+            WalletId = walletId,
+            CreatedOn = DateTime.UtcNow,
+            ClosedOn = null,
+            UpdatedOn = DateTime.UtcNow,
+            BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+            ExternalCreatedOn = DateTime.UtcNow,
+            ExternalClosedOn = null,
+            BetAmount = 10m,
+            ValidBetAmount = 10m,
+            SettleAmount = null,
+            Commission = null,
+            Turnover = 10m,
+            WinLoss = null,
+            TieBetAdjustment = null,
+            ClientStatus = (short)GameRoundClientStatus.Open,
+            ReopenTurnoverAdjustment = null,
+            ReopenedOn = null,
+            EffectiveBettingPercentage = null,
+        }).ConfigureAwait(false);
+
+        _ = await context.RoundDetails.AddAsync(new RoundDetail()
+        {
+            RoundId = roundId,
+            AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
+        }).ConfigureAwait(false);
+
+        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+
+        var fakeRoundRepository = new GameRoundRepository(
+            context,
+            fakeLogger,
+            fakeSerialNumberGenerator);
+
+        var actual = await fakeRoundRepository
+            .GetRoundIdAsync(
+                gameProviderId: gameProviderId,
+                externalRoundId: externalRoundId,
+                gameId: gameId,
+                walletId: walletId)
+            .ConfigureAwait(false);
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(roundId, actual);
+    }
+
+    [TestMethod]
+    public async Task Get_RoundId_ExternalCreatedOn()
+    {
+        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
+        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+        var fakeGameRound = Substitute.For<IGameRoundRepository>();
+        var options = new DbContextOptionsBuilder<BetContext>()
+           .UseInMemoryDatabase(databaseName: "bet")
+           .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+           .Options;
+        var context = new BetContext(options);
+        _ = context.Database.EnsureDeleted();
+
+        var roundId = Guid.NewGuid();
+        var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
+        var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
+        var gameId = 500001;
+        var playerCode = "4ues8xikza7o";
+        var walletId = new Guid("e7b4251c-e715-ec11-bf22-8c554ae8ab6b");
+        var externalCreatedOn = DateTimeOffset.Now;
+
+        _ = await context.Rounds.AddAsync(new Round()
+        {
+            Id = roundId,
+            ExternalRoundId = externalRoundId,
+            GameProviderId = gameProviderId,
+            PlayerCode = playerCode,
+            GameId = gameId,
+            CurrencyCode = "CNY",
+            Status = (short)GameRoundStatus.Open,
+            GameProviderConfigurationId = new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
+            WalletId = walletId,
+            CreatedOn = DateTime.UtcNow,
+            ClosedOn = null,
+            UpdatedOn = DateTime.UtcNow,
+            BrandId = new Guid("4e86719f-243f-46f6-b010-5c758b7285af"),
+            ExternalCreatedOn = externalCreatedOn.UtcDateTime,
+            ExternalClosedOn = null,
+            BetAmount = 10m,
+            ValidBetAmount = 10m,
+            SettleAmount = null,
+            Commission = null,
+            Turnover = 10m,
+            WinLoss = null,
+            TieBetAdjustment = null,
+            ClientStatus = (short)GameRoundClientStatus.Open,
+            ReopenTurnoverAdjustment = null,
+            ReopenedOn = null,
+            EffectiveBettingPercentage = null,
+        }).ConfigureAwait(false);
+
+        _ = await context.RoundDetails.AddAsync(new RoundDetail()
+        {
+            RoundId = roundId,
+            AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
+        }).ConfigureAwait(false);
+
+        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+
+        var fakeRoundRepository = new GameRoundRepository(
+            context,
+            fakeLogger,
+            fakeSerialNumberGenerator);
+
+        var actual = await fakeRoundRepository
+            .GetRoundIdAsync(
+                gameProviderId: gameProviderId,
+                externalRoundId: externalRoundId,
+                gameId: gameId,
+                walletId: walletId,
+                externalCreatedOn: externalCreatedOn)
+            .ConfigureAwait(false);
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(roundId, actual);
     }
 }

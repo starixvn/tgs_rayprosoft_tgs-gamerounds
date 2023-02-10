@@ -193,7 +193,7 @@ internal class GameRoundRecordRepository : IGameRoundRecord
 
     private async Task<IMongoCollection<GameRoundRecord>> GetCollectionAsync(string gameProviderCode, CancellationToken cancellationToken = default)
     {
-        var collectionName = $"{gameProviderCode.ToUpper()}_game_round_records".ToLower();
+        var collectionName = $"{gameProviderCode}_game_round_records".ToLower();
         var collection = _database.GetCollection<GameRoundRecord>(collectionName);
         if (collection.CollectionNamespace == null)
         {

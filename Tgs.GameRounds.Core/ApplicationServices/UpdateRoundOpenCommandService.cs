@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Tgs.GameRounds.Core.Exceptions;
 using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 

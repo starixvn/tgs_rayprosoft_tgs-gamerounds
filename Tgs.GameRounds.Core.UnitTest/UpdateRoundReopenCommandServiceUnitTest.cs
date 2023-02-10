@@ -6,7 +6,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
-using Tgs.GameRounds.Core.Exceptions;
 using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest;

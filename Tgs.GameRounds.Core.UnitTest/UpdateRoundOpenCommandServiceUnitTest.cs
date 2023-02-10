@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Core.ApplicationServices;
-using Tgs.GameRounds.Core.Exceptions;
 using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest;
@@ -12,7 +11,6 @@ namespace Tgs.GameRounds.Core.UnitTest;
 [TestClass]
 public class UpdateRoundOpenCommandServiceUnitTest
 {
-
     [TestMethod]
     public async Task Normal_Process()
     {
