@@ -1,0 +1,19 @@
+﻿syntax = "proto3";
+
+
+import "google/protobuf/timestamp.proto";
+import "phoenix/protobuf/guid.proto";
+//import "phoenix/protobuf/decimal.proto";
+
+option csharp_namespace = "Tgs.GameRounds.Common.Protos";
+
+package gamerounds;
+
+// The request message containing the user's name.
+message GameRoundRecordRequest {
+    phoenix.protobuf.GuidValue id = 1;
+    google.protobuf.Timestamp send_on = 2;
+}
+
+
+// The response message containing the greetings.

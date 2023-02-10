@@ -1,6 +1,7 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
+using Tgs.GameRounds.Common.Protos;
 using Tgs.MessageQueue;
 
 namespace Tgs.GameRounds.Core;
@@ -20,17 +21,17 @@ internal class GameRoundRecordMessage : IGameRoundRecordMessage
 
     public async ValueTask SenderGameRoundRecord(Guid roundId, CancellationToken cancellationToken = default)
     {
-        var request = new
+        var request = new GameRoundRecordRequest
         {
-            RoundId = roundId,
-            SendOn = DateTimeOffset.UtcNow
+            Id = roundId,
+            SendOn = DateTimeOffset.UtcNow.ToTimestamp(),
         };
 
         try
         {
             await _messageSender.PublishAsync(
-                subject: "gp.gameround.gameroundrecord.add",
-                data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(request)),
+                subject: "game.gameround.gameroundrecord.add",
+                data: request.ToByteArray(),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation("LogOn:{logOn} Information Sending:{request}", DateTime.Now.ToString("o"), request);

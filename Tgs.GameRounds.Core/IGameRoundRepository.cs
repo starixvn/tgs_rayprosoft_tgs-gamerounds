@@ -27,10 +27,23 @@ public interface IGameRoundRepository
         CancellationToken cancellationToken = default);
 
     ValueTask<GameRoundInfo?> GetAsync(
+        Guid id,
+        DateTimeOffset externalCreatedOn,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<GameRoundInfo?> GetAsync(
         Guid gameProviderId,
         string externalRoundId,
         int gameId,
         Guid walletId,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<GameRoundInfo?> GetAsync(
+        Guid gameProviderId,
+        string externalRoundId,
+        int gameId,
+        Guid walletId,
+        DateTimeOffset externalCreatedOn,
         CancellationToken cancellationToken = default);
 
     ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
@@ -42,6 +55,14 @@ public interface IGameRoundRepository
         string externalRoundId,
         int gameId,
         Guid walletId,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<Guid?> GetRoundIdAsync(
+        Guid gameProviderId,
+        string externalRoundId,
+        int gameId,
+        Guid walletId,
+        DateTimeOffset externalCreatedOn,
         CancellationToken cancellationToken = default);
 
     ValueTask<GameRoundStatus> GetStatusAsync(

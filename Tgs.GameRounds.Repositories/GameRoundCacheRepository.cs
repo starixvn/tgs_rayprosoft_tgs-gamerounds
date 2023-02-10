@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.Models;
@@ -8,9 +7,9 @@ namespace Tgs.GameRounds.Repositories;
 
 internal class GameRoundCacheRepository : IGameRoundRepository
 {
+    private readonly TimeSpan _absoluteExpirationRelativeToNow;
     private readonly IMemoryCache _memoryCache;
     private readonly IGameRoundRepository _repository;
-    private readonly TimeSpan _absoluteExpirationRelativeToNow;
 
     public GameRoundCacheRepository(
         IGameRoundRepository repository,
@@ -86,6 +85,30 @@ internal class GameRoundCacheRepository : IGameRoundRepository
             walletId: walletId,
             cancellationToken: cancellationToken);
 
+    public ValueTask<GameRoundInfo?> GetAsync(
+        Guid id,
+        DateTimeOffset externalCreatedOn,
+        CancellationToken cancellationToken = default)
+        => _repository.GetAsync(
+            id: id,
+            externalCreatedOn: externalCreatedOn,
+            cancellationToken: cancellationToken);
+
+    public ValueTask<GameRoundInfo?> GetAsync(
+        Guid gameProviderId,
+        string externalRoundId,
+        int gameId,
+        Guid walletId,
+        DateTimeOffset externalCreatedOn,
+        CancellationToken cancellationToken = default)
+        => _repository.GetAsync(
+            gameProviderId: gameProviderId,
+            externalRoundId: externalRoundId,
+            gameId: gameId,
+            walletId: walletId,
+            externalCreatedOn: externalCreatedOn,
+            cancellationToken: cancellationToken);
+
     public ValueTask<GameRoundDetailInfo?> GetRoundDetailAsync(
         Guid id,
         CancellationToken cancellationToken = default)
@@ -121,7 +144,39 @@ internal class GameRoundCacheRepository : IGameRoundRepository
             }
         }
         return roundId;
+    }
 
+    public async ValueTask<Guid?> GetRoundIdAsync(
+        Guid gameProviderId,
+        string externalRoundId,
+        int gameId,
+        Guid walletId,
+        DateTimeOffset externalCreatedOn,
+        CancellationToken cancellationToken = default)
+    {
+        var key = string.Format("gamerounds:gameround:get:roundid:{0}:{1}:{2}:{3}:{4}", gameProviderId, externalRoundId, gameId, walletId, externalCreatedOn.ToUnixTimeMilliseconds());
+        if (!_memoryCache.TryGetValue(key, out Guid? roundId))
+        {
+            roundId = await _repository
+                .GetRoundIdAsync(
+                    gameProviderId: gameProviderId,
+                    externalRoundId: externalRoundId,
+                    gameId: gameId,
+                    walletId: walletId,
+                    externalCreatedOn,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            if (roundId.HasValue)
+            {
+                return _memoryCache
+                    .Set(
+                        key: key,
+                        value: roundId.Value,
+                        absoluteExpirationRelativeToNow: _absoluteExpirationRelativeToNow);
+            }
+        }
+        return roundId;
     }
 
     public ValueTask<GameRoundStatus> GetStatusAsync(

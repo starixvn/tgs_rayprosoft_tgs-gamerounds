@@ -90,9 +90,9 @@ builder.Services
              var configuration = sp.GetRequiredService<IConfiguration>();
              options.Url = configuration.GetConnectionString("Nats")!;
          })
-         .AddHandler<GameRoundRecordMessageHandler>("gp.gameround.gameroundrecord.add", "gp.gameround.gameroundrecord"))
+         .AddHandler<GameRoundRecordMessageHandler>("game.gameround.gameroundrecord.add", "tgs.game.gameround.gameroundrecord"))
      .ClearAllExchanges()
-     .AddNatsGlobPatternExchange("gp.gameround.gameroundrecord.add");
+     .AddNatsGlobPatternExchange("game.gameround.gameroundrecord.add");
 
 builder.Services
     .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(

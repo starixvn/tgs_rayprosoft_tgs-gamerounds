@@ -63,7 +63,7 @@ public class GameRoundRepositoryUnitTestUpdateRoundOpen
             TieBetAdjustment = null,
             ClientStatus = (short)GameRoundClientStatus.Open,
             ReopenTurnoverAdjustment = null,
-            ReopenedOn = (DateTime?)null,
+            ReopenedOn = null,
             EffectiveBettingPercentage = null,
         }).ConfigureAwait(false);
 

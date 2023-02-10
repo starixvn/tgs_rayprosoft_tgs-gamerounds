@@ -46,16 +46,16 @@ public class GameRoundsController : ControllerBase
     /// Adjusts the closed round asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
-    /// <param name="roundid">The roundid.</param>
+    /// <param name="id">The identifier.</param>
     /// <param name="model">The model.</param>
     /// <returns></returns>
-    [HttpPut("{roundid}/adjust/closed", Name = "AdjustClosedRound")]
+    [HttpPut("{id:guid}/adjust/closed", Name = "AdjustClosedRound")]
     public ValueTask AdjustClosedRoundAsync(
         [FromServices] ICommandService<AdjustClosedRoundCommand> service,
-        Guid roundid,
+        Guid id,
         AdjustClosedRoundViewModel model)
         => service.ExecuteAsync(new AdjustClosedRoundCommand(
-            RoundId: roundid,
+            RoundId: id,
             ExternalClosedOn: model.ExternalClosedOn,
             BetAmount: model.BetAmount,
             ValidBetAmount: model.ValidBetAmount,
@@ -71,14 +71,14 @@ public class GameRoundsController : ControllerBase
     /// Gets the game round asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
-    /// <param name="roundid">The roundid.</param>
+    /// <param name="id">The identifier.</param>
     /// <returns></returns>
-    [HttpGet("{roundid}", Name = "GetGameRound")]
+    [HttpGet("{id:guid}", Name = "GetGameRound")]
     public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(
         [FromServices] IGetService<GetGameRoundQuery, GameRoundResult> service,
-        Guid roundid)
+        Guid id)
     {
-        var result = await service.GetAsync(new(roundid)).ConfigureAwait(false);
+        var result = await service.GetAsync(new(id)).ConfigureAwait(false);
 
         return result is null
             ? null
@@ -232,15 +232,15 @@ public class GameRoundsController : ControllerBase
     /// Gets the round detail asynchronous.
     /// </summary>
     /// <param name="gameRound">The game round.</param>
-    /// <param name="roundid">The roundid.</param>
+    /// <param name="id">The identifier.</param>
     /// <returns></returns>
-    [HttpGet("{roundid}/getdetail", Name = "GetRoundDetail")]
+    [HttpGet("{id:guid}/getdetail", Name = "GetRoundDetail")]
     public async ValueTask<GameRoundDetailViewModel?> GetRoundDetailAsync(
         [FromServices] IGameRoundRepository gameRound,
-        Guid roundid)
+        Guid id)
     {
         var result = await gameRound
-            .GetRoundDetailAsync(roundid)
+            .GetRoundDetailAsync(id)
             .ConfigureAwait(false);
 
         return result != null ? new GameRoundDetailViewModel(
@@ -249,41 +249,19 @@ public class GameRoundsController : ControllerBase
     }
 
     /// <summary>
-    /// Gets the round identifier asynchronous.
-    /// </summary>
-    /// <param name="gameRound">The game round.</param>
-    /// <param name="gameProviderId">The game provider identifier.</param>
-    /// <param name="externalRoundId">The external round identifier.</param>
-    /// <param name="gameId">The game identifier.</param>
-    /// <param name="walletId">The wallet identifier.</param>
-    /// <returns></returns>
-    [HttpGet("getroundid", Name = "GetRoundId")]
-    public ValueTask<Guid?> GetRoundIdAsync(
-        [FromServices] IGameRoundRepository gameRound,
-        [FromQuery] Guid gameProviderId,
-        [FromQuery] string externalRoundId,
-        [FromQuery] int gameId,
-        [FromQuery] Guid walletId)
-        => gameRound.GetRoundIdAsync(
-            gameProviderId,
-            externalRoundId,
-            gameId,
-            walletId);
-
-    /// <summary>
     /// Manuals the close round asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
-    /// <param name="roundid">The roundid.</param>
+    /// <param name="id">The identifier.</param>
     /// <param name="model">The model.</param>
     /// <returns></returns>
-    [HttpPut("{roundid}/manual/closed", Name = "ManualCloseRound")]
+    [HttpPut("{id:guid}/manual/closed", Name = "ManualCloseRound")]
     public ValueTask ManualCloseRoundAsync(
         [FromServices] ICommandService<ManualCloseRoundCommand> service,
-        Guid roundid,
+        Guid id,
         ManualCloseRoundViewModel model)
         => service.ExecuteAsync(new ManualCloseRoundCommand(
-            RoundId: roundid,
+            RoundId: id,
             ExternalClosedOn: model.ExternalClosedOn,
             BetAmount: model.BetAmount,
             ValidBetAmount: model.ValidBetAmount,
@@ -299,13 +277,13 @@ public class GameRoundsController : ControllerBase
     /// Updates the round detail asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
-    /// <param name="roundid">The roundid.</param>
+    /// <param name="id">The identifier.</param>
     /// <param name="model">The model.</param>
     /// <returns></returns>
-    [HttpPut("{roundid}/detail", Name = "UpdateRoundDetail")]
+    [HttpPut("{id:guid}/detail", Name = "UpdateRoundDetail")]
     public ValueTask UpdateRoundDetailAsync(
         [FromServices] ICommandService<UpdateRoundDetailCommand> service,
-        Guid roundid,
+        Guid id,
         UpdateRoundDetailViewModel model)
-        => service.ExecuteAsync(new UpdateRoundDetailCommand(roundid, model.AdditionalData));
+        => service.ExecuteAsync(new UpdateRoundDetailCommand(id, model.AdditionalData));
 }
