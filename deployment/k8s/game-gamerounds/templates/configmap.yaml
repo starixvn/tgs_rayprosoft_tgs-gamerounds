@@ -8,8 +8,8 @@ data:
   appsettings.json: |
     {
         "GameLocked": {
-          "LocksRedisKey": "gameroundlock:{0}:{1}:{2}:{3}",
-           "LockSeconds": "60"
+          "LocksRedisKey": "gamerounds:lock:{0}:{1}:{2}:{3}",
+          "LockSeconds": 60
         }
     }
   monitor.settings.json: |

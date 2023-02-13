@@ -2,7 +2,7 @@
 
 public class GameLockedOptions
 {
-    public int LockSeconds { get; init; } = 60;
+    public double LockSeconds { get; init; }
 
-    public string LocksRedisKey { get; init; } = "gameroundlock:{0}:{1}:{2}:{3}";
+    public string LocksRedisKey { get; init; } = default!;
 }
