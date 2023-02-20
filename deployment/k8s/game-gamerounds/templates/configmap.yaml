@@ -7,10 +7,15 @@ metadata:
 data:
   appsettings.json: |
     {
-        "GameLocked": {
-          "LocksRedisKey": "gamerounds:lock:{0}:{1}:{2}:{3}",
-          "LockSeconds": 60
-        }
+      "Logging": {
+        "LogLevel": {
+          "Default": "Warning"
+           }
+      },
+      "GameLocked": {
+        "LocksRedisKey": "gamerounds:lock:{0}:{1}:{2}:{3}",
+        "LockSeconds": 60
+      }
     }
   monitor.settings.json: |
     {
