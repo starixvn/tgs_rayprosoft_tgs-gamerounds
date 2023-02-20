@@ -47,9 +47,9 @@ Selector labels
 */}}
 {{- define "game-gamerounds.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "game-gamerounds.name" . }}
+app.kubernetes.io/instance: RELEASE-NAME
 app: {{ include "game-gamerounds.name" . }}
 tgs.kind: game
-tgs.game.kind: gamerounds
 {{- end }}
 
 {{/*
