@@ -19,8 +19,9 @@ internal class GameRoundRecordMessage : IGameRoundRecordMessage
         _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
     }
 
-    public async ValueTask SenderGameRoundRecord(Guid roundId, CancellationToken cancellationToken = default)
+    public ValueTask SenderGameRoundRecord(Guid roundId, CancellationToken cancellationToken = default)
     {
+        /*
         var request = new GameRoundRecordRequest
         {
             Id = roundId,
@@ -40,5 +41,7 @@ internal class GameRoundRecordMessage : IGameRoundRecordMessage
         {
             _logger.LogError(ex, "LogOn:{logOn} Information Sending:{request}", DateTime.Now.ToString("o"), request);
         }
+        */
+        return ValueTask.CompletedTask;
     }
 }
