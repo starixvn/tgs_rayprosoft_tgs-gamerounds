@@ -50,16 +50,6 @@ spec:
                 secretKeyRef:
                   name: tgs-connections
                   key: redis
-            - name: ConnectionStrings__Mongo
-              valueFrom:
-                secretKeyRef:
-                  name: tgs-connections
-                  key: mongo-gameprovider
-            - name: ConnectionStrings__Nats
-              valueFrom:
-                secretKeyRef:
-                  name: tgs-connections
-                  key: nats
           ports:
             - name: http
               containerPort: 80
@@ -69,10 +59,6 @@ spec:
               name: appsettings
               readOnly: true
               subPath: appsettings.json
-            - mountPath: /etc/ssl/certs/rds-combined-ca-bundle.pem
-              name: rds-combined-ca-bundle
-              readOnly: true
-              subPath: rds-combined-ca-bundle.pem
           livenessProbe:
             httpGet:
               path: /healthz
@@ -123,9 +109,6 @@ spec:
         - name: appsettings
           configMap:
             name: configmap-{{ include "game-gamerounds.fullname" . }}
-        - name: rds-combined-ca-bundle
-          secret:
-            secretName: rds-combined-ca-bundle
         - name: diagvol
           emptyDir: {}
         - name: dumpsvol

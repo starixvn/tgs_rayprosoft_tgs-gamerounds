@@ -3,11 +3,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.GameRounds.Repositories.Entities
+namespace Tgs.GameRounds.Repositories.Entities;
+
+public partial class RoundDetail
 {
-    public partial class RoundDetail
-    {
-        public Guid RoundId { get; set; }
-        public string AdditionalData { get; set; } = null!;
-    }
+    public Guid RoundId { get; set; }
+
+    public string AdditionalData { get; set; } = null!;
+
+    public virtual Round Round { get; set; } = null!;
 }

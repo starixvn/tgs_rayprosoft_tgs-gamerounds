@@ -9,12 +9,11 @@ public static class ServiceCollecitonExtensions
         this IServiceCollection services,
         Action<GameLockedOptions, IServiceProvider> gameLockedOptions)
         => services
-            .RegisterAllServiceUtilityTypes(
-                Assembly.GetExecutingAssembly(),
-                ServiceLifetime.Transient)
-            .AddOptions<GameLockedOptions>()
-            .Configure(gameLockedOptions)
-            .Services
-            .AddSerialNumberGenerator()
-            .AddTransient<IGameRoundRecordMessage, GameRoundRecordMessage>();
+        .RegisterAllServiceUtilityTypes(
+            Assembly.GetExecutingAssembly(),
+            ServiceLifetime.Transient)
+        .AddOptions<GameLockedOptions>()
+        .Configure(gameLockedOptions)
+        .Services
+        .AddSerialNumberGenerator();
 }

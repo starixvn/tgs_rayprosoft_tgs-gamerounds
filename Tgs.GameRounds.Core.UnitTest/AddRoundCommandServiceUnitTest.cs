@@ -19,7 +19,6 @@ public class AddRoundCommandServiceUnitTest
         var fakeLogger = NullLogger<AddRoundCommandService>.Instance;
         var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
-        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
 
         var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
         var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
@@ -59,14 +58,9 @@ public class AddRoundCommandServiceUnitTest
         var service = new AddRoundCommandService(
             fakeLogger,
             fakeGameRound,
-            fakeGameRoundLocked,
-            fakeGameRoundRecordMessage);
+            fakeGameRoundLocked);
 
         _ = await Assert.ThrowsExceptionAsync<GameRoundCreationFailedException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
-
-        _ = fakeGameRoundRecordMessage
-            .Received(0)
-            .SenderGameRoundRecord(Arg.Is(expected));
 
         _ = fakeGameRoundLocked
             .Received(0)
@@ -83,7 +77,6 @@ public class AddRoundCommandServiceUnitTest
         var fakeLogger = NullLogger<AddRoundCommandService>.Instance;
         var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var fakeGameRoundLocked = Substitute.For<IGameRoundLocked>();
-        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
 
         var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
         var externalRoundId = "cc4d6693-417d-401a-8ccf-68f25382a134";
@@ -145,14 +138,9 @@ public class AddRoundCommandServiceUnitTest
         var service = new AddRoundCommandService(
             fakeLogger,
             fakeGameRound,
-            fakeGameRoundLocked,
-            fakeGameRoundRecordMessage);
+            fakeGameRoundLocked);
 
         await service.ExecuteAsync(command).ConfigureAwait(false);
-
-        _ = fakeGameRoundRecordMessage
-            .Received(1)
-            .SenderGameRoundRecord(Arg.Is(expected));
 
         _ = fakeGameRoundLocked
             .Received(1)

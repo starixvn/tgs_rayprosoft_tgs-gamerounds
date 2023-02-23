@@ -9,19 +9,16 @@ internal class AddRoundCommandService : ICommandService<AddRoundCommand>
 {
     private readonly IGameRoundRepository _gameRound;
     private readonly IGameRoundLocked _gameRoundLocked;
-    private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
     private readonly ILogger<AddRoundCommandService> _logger;
 
     public AddRoundCommandService(
         ILogger<AddRoundCommandService> logger,
         IGameRoundRepository gameRound,
-        IGameRoundLocked gameRoundLocked,
-        IGameRoundRecordMessage gameRoundRecordMessage)
+        IGameRoundLocked gameRoundLocked)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
         _gameRoundLocked = gameRoundLocked ?? throw new ArgumentNullException(nameof(gameRoundLocked));
-        _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
     }
 
     public async ValueTask ExecuteAsync(AddRoundCommand command, CancellationToken cancellationToken = default)
@@ -81,12 +78,6 @@ internal class AddRoundCommandService : ICommandService<AddRoundCommand>
             {
                 _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundCreationFailedException", DateTime.Now.ToString("o"), command);
                 throw new GameRoundCreationFailedException();
-            }
-            else
-            {
-                await _gameRoundRecordMessage.SenderGameRoundRecord(
-                    roundId: newRoundId.Value,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
             }
         }
         finally

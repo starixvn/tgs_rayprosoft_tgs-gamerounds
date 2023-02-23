@@ -8,7 +8,6 @@ using NSubstitute.ExceptionExtensions;
 using Tgs.GameRounds.Client;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Common.ViewModels;
-using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.ApplicationServices;
 using Tgs.GameRounds.Core.Exceptions;
 using Tgs.ServiceUtility;
@@ -74,8 +73,6 @@ public partial class GameRoundsClientUnitTest
             OperatorId = Guid.NewGuid(),
             Remark = "test"
         };
-
-        var fakeGameRoundRecord = Substitute.For<IGameRoundRecord>();
 
         var web = CreateTestSettingSite(services =>
         {

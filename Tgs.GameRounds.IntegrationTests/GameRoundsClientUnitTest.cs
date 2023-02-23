@@ -193,7 +193,6 @@ public partial class GameRoundsClientUnitTest
             .ConfigureServices(services =>
             {
                 _ = services
-                .AddFakeNatsMessageQueue()
                 .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
                     sp => new ConfigureNamedOptions<OtlpExporterOptions>(
                         Options.DefaultName,

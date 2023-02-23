@@ -2,9 +2,9 @@
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class GameRoundsRegisterExtensions
+public static class ServiceRegisterExtensions
 {
-    public static async Task<WebApplication> UseGameRoundsRegister(this WebApplication app)
+    public static async Task<WebApplication> UseRegister(this WebApplication app)
     {
         using (var scope = app.Services.CreateScope())
         {

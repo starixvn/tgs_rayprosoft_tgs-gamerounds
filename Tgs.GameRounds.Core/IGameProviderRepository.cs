@@ -7,5 +7,5 @@ public interface IGameProviderRepository
         CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<Guid> GetIds(
-            CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default);
 }

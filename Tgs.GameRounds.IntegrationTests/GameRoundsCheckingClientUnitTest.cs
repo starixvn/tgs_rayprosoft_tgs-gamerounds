@@ -116,7 +116,6 @@ public class GameRoundsCheckingClientUnitTest
             .ConfigureServices(services =>
             {
                 _ = services
-                .AddFakeNatsMessageQueue()
                 .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
                     sp => new ConfigureNamedOptions<OtlpExporterOptions>(
                         Options.DefaultName,

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Tgs.GameRounds.Core.Models;
+﻿using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
@@ -7,20 +6,14 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 internal class UpdateRoundOpenCommandService : ICommandService<UpdateRoundOpenCommand>
 {
     private readonly IGameRoundRepository _gameRound;
-    private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
-    private readonly ILogger<UpdateRoundOpenCommandService> _logger;
 
     public UpdateRoundOpenCommandService(
-        ILogger<UpdateRoundOpenCommandService> logger,
-        IGameRoundRepository gameRound,
-        IGameRoundRecordMessage gameRoundRecordMessage)
+        IGameRoundRepository gameRound)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
-        _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
     }
 
-    public async ValueTask ExecuteAsync(UpdateRoundOpenCommand command, CancellationToken cancellationToken = default)
+    public ValueTask ExecuteAsync(UpdateRoundOpenCommand command, CancellationToken cancellationToken = default)
     {
         var updateRoundOpen = new UpdateRoundOpen(
             BetAmount: command.BetAmount,
@@ -28,13 +21,10 @@ internal class UpdateRoundOpenCommandService : ICommandService<UpdateRoundOpenCo
             Commission: command.Commission,
             Turnover: command.Turnover);
 
-        await _gameRound.UpdateRoundOpenAsync(
+        return _gameRound
+            .UpdateRoundOpenAsync(
             id: command.RoundId,
             source: updateRoundOpen,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        await _gameRoundRecordMessage.SenderGameRoundRecord(
-            roundId: command.RoundId,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+            cancellationToken: cancellationToken);
     }
 }

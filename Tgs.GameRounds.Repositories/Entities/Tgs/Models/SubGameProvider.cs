@@ -3,18 +3,29 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.GameRounds.Repositories.Entities
+namespace Tgs.GameRounds.Repositories.Entities;
+
+public partial class SubGameProvider
 {
-    public partial class SubGameProvider
-    {
-        public string Code { get; set; } = default!;
-        public string Name { get; set; } = default!;
-        public string? Description { get; set; }
-        public Guid GameProviderId { get; set; }
-        public string? Localization { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
-        public string CreatedByUsername { get; set; } = default!;
-        public string UpdatedByUsername { get; set; } = default!;
-    }
+    public string Code { get; set; } = null!;
+
+    public string Name { get; set; } = null!;
+
+    public string? Description { get; set; }
+
+    public Guid GameProviderId { get; set; }
+
+    public string? Localization { get; set; }
+
+    public DateTime CreatedOn { get; set; }
+
+    public DateTime UpdatedOn { get; set; }
+
+    public string CreatedByUsername { get; set; } = null!;
+
+    public string UpdatedByUsername { get; set; } = null!;
+
+    public virtual GameProvider GameProvider { get; set; } = null!;
+
+    public virtual ICollection<Game> Games { get; } = new List<Game>();
 }

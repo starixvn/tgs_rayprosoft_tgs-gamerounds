@@ -8,7 +8,6 @@ using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Prometheus;
-using Tgs.GameRounds.MessageHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +22,9 @@ builder.Logging
         options.ParseStateValues = true;
         _ = options.AddFluentdForwardExporter(fluentOptions =>
         {
-            var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
+            var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
             fluentOptions.Host = nodeIp;
-            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
+            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
             fluentOptions.UseMessagePack();
         });
     });
@@ -59,11 +58,6 @@ builder.Services
     (options, sp) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        options.ConnectionString = configuration.GetConnectionString("Mongo")!;
-    },
-    (options, sp) =>
-    {
-        var configuration = sp.GetRequiredService<IConfiguration>();
         options.ConnectionString = configuration.GetConnectionString("Redis")!;
     },
     (sp, dbBuilder) =>
@@ -81,18 +75,6 @@ builder.Services
         var configuration = sp.GetRequiredService<IConfiguration>();
         configuration.GetSection("GameLocked").Bind(options);
     });
-
-builder.Services
-    .AddMessageQueue()
-     .AddNatsMessageQueue(natsConfig => _ = natsConfig
-         .ConfigQueueOptions((options, sp) =>
-         {
-             var configuration = sp.GetRequiredService<IConfiguration>();
-             options.Url = configuration.GetConnectionString("Nats")!;
-         })
-         .AddHandler<GameRoundRecordMessageHandler>("game.gameround.gameroundrecord.add", "tgs.game.gameround.gameroundrecord"))
-     .ClearAllExchanges()
-     .AddNatsGlobPatternExchange("game.gameround.gameroundrecord.add");
 
 builder.Services
     .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
@@ -156,6 +138,6 @@ app.MapMetrics();
 
 app.MapProfileViewer();
 
-_ = app.UseGameRoundsRegister();
+_ = app.UseRegister();
 
 app.Run();

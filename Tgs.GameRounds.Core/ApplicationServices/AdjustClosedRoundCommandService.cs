@@ -9,17 +9,14 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 internal class AdjustClosedRoundCommandService : ICommandService<AdjustClosedRoundCommand>
 {
     private readonly IGameRoundRepository _gameRound;
-    private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
     private readonly ILogger<AdjustClosedRoundCommandService> _logger;
 
     public AdjustClosedRoundCommandService(
         ILogger<AdjustClosedRoundCommandService> logger,
-        IGameRoundRepository gameRound,
-        IGameRoundRecordMessage gameRoundRecordMessage)
+        IGameRoundRepository gameRound)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
-        _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
     }
 
     public async ValueTask ExecuteAsync(AdjustClosedRoundCommand command, CancellationToken cancellationToken = default)
@@ -58,10 +55,6 @@ internal class AdjustClosedRoundCommandService : ICommandService<AdjustClosedRou
         await _gameRound.AdjustClosedRoundAsync(
             id: command.RoundId,
             source: adjustClosed,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        await _gameRoundRecordMessage.SenderGameRoundRecord(
-            roundId: command.RoundId,
             cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 }

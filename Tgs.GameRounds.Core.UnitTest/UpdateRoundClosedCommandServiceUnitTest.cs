@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
@@ -17,8 +17,6 @@ public class UpdateRoundClosedCommandServiceUnitTest
     public async Task Normal_Process()
     {
         var fakeGameRound = Substitute.For<IGameRoundRepository>();
-        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
-        var fakeLogger = NullLogger<UpdateRoundClosedCommandService>.Instance;
 
         var roundId = Guid.NewGuid();
 
@@ -34,6 +32,11 @@ public class UpdateRoundClosedCommandServiceUnitTest
             ClientStatus: GameRoundClientStatus.Loss,
             AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
+        var service = new UpdateRoundClosedCommandService(
+            fakeGameRound);
+
+        await service.ExecuteAsync(command).ConfigureAwait(false);
+
         var updateRoundClosed = new UpdateRoundClosed(
             ExternalClosedOn: command.ExternalClosedOn,
             BetAmount: command.BetAmount,
@@ -46,19 +49,10 @@ public class UpdateRoundClosedCommandServiceUnitTest
             AdditionalData: command.AdditionalData);
 
         _ = fakeGameRound
-            .UpdateRoundClosedAsync(
-                command.RoundId,
-                updateRoundClosed);
-
-        var service = new UpdateRoundClosedCommandService(
-            fakeLogger,
-            fakeGameRound,
-            fakeGameRoundRecordMessage);
-
-        await service.ExecuteAsync(command).ConfigureAwait(false);
-
-        _ = fakeGameRoundRecordMessage
             .Received(1)
-            .SenderGameRoundRecord(Arg.Is(command.RoundId));
+            .UpdateRoundClosedAsync(
+                Arg.Is(command.RoundId),
+                Arg.Is(updateRoundClosed),
+                Arg.Any<CancellationToken>());
     }
 }

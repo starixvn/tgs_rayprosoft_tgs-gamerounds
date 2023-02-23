@@ -1,5 +1,5 @@
 ﻿{
-  "CodeGenerationMode": 2,
+  "CodeGenerationMode": 3,
   "ContextClassName": "BetContext",
   "ContextNamespace": "Entities",
   "DefaultDacpacSchema": null,
@@ -8,6 +8,7 @@
   "ModelNamespace": "Entities",
   "OutputContextPath": "Entities\/Bet",
   "OutputPath": "Entities\/Bet\/Models",
+  "PreserveCasingWithRegex": true,
   "ProjectRootNamespace": "Tgs.GameRounds.Repositories",
   "Schemas": [
     {
@@ -22,21 +23,23 @@
       "ObjectType": 0
     },
     {
-      "Name": "bet.rounds",
-      "ObjectType": 0
-    },
-    {
       "Name": "bet.round_details",
       "ObjectType": 0
     },
     {
       "Name": "bet.round_operation_records",
       "ObjectType": 0
+    },
+    {
+      "Name": "bet.rounds",
+      "ObjectType": 0
     }
   ],
-  "UiHint": "tgs",
+  "UiHint": ".tgs",
+  "UncountableWords": null,
   "UseBoolPropertiesWithoutDefaultSql": true,
   "UseDatabaseNames": false,
+  "UseDateOnlyTimeOnly": false,
   "UseDbContextSplitting": true,
   "UseFluentApiOnly": true,
   "UseHandleBars": false,
@@ -44,12 +47,11 @@
   "UseInflector": true,
   "UseLegacyPluralizer": false,
   "UseManyToManyEntity": false,
-  "UseNoConstructor": true,
-  "UseNoDefaultConstructor": false,
-  "UseNoNavigations": true,
+  "UseNoDefaultConstructor": true,
   "UseNoObjectFilter": false,
   "UseNodaTime": false,
   "UseNullableReferences": true,
   "UseSchemaFolders": false,
-  "UseSpatial": false
+  "UseSpatial": false,
+  "UseT4": false
 }

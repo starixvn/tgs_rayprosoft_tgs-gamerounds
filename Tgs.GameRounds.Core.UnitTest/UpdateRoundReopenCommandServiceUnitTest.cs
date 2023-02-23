@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
@@ -17,8 +17,6 @@ public class UpdateRoundReopenCommandServiceUnitTest
     public async Task Normal_Process()
     {
         var fakeGameRound = Substitute.For<IGameRoundRepository>();
-        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
-        var fakeLogger = NullLogger<UpdateRoundReopenCommandService>.Instance;
 
         var roundId = Guid.NewGuid();
 
@@ -35,6 +33,11 @@ public class UpdateRoundReopenCommandServiceUnitTest
             ClientStatus: GameRoundClientStatus.Win,
             AdditionalData: JsonSerializer.Serialize(new { RoundId = roundId }));
 
+        var service = new UpdateRoundReopenCommandService(
+            fakeGameRound);
+
+        await service.ExecuteAsync(command).ConfigureAwait(false);
+
         var updateRoundReopen = new UpdateRoundReopen(
             Status: command.Status,
             ExternalClosedOn: command.ExternalClosedOn,
@@ -46,17 +49,12 @@ public class UpdateRoundReopenCommandServiceUnitTest
             PlayerWinLoss: command.PlayerWinLoss,
             ClientStatus: command.ClientStatus,
             AdditionalData: command.AdditionalData);
-        _ = fakeGameRound.UpdateRoundReopenAsync(roundId, updateRoundReopen);
 
-        var service = new UpdateRoundReopenCommandService(
-            fakeLogger,
-            fakeGameRound,
-            fakeGameRoundRecordMessage);
-
-        await service.ExecuteAsync(command).ConfigureAwait(false);
-
-        _ = fakeGameRoundRecordMessage
+        _ = fakeGameRound
             .Received(1)
-            .SenderGameRoundRecord(Arg.Is(command.RoundId));
+            .UpdateRoundReopenAsync(
+                Arg.Is(command.RoundId),
+                Arg.Is(updateRoundReopen),
+                Arg.Any<CancellationToken>());
     }
 }

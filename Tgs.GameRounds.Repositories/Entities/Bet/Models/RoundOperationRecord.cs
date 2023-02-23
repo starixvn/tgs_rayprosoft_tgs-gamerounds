@@ -3,16 +3,21 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.GameRounds.Repositories.Entities
+namespace Tgs.GameRounds.Repositories.Entities;
+
+public partial class RoundOperationRecord
 {
-    public partial class RoundOperationRecord
-    {
-        public Guid Id { get; set; }
-        public Guid RoundId { get; set; }
-        public Guid OperatorId { get; set; }
-        public string OldData { get; set; } = null!;
-        public string NewData { get; set; } = null!;
-        public DateTime CreatedOn { get; set; }
-        public string? Remark { get; set; }
-    }
+    public Guid Id { get; set; }
+
+    public Guid RoundId { get; set; }
+
+    public Guid OperatorId { get; set; }
+
+    public string OldData { get; set; } = null!;
+
+    public string NewData { get; set; } = null!;
+
+    public DateTime CreatedOn { get; set; }
+
+    public string? Remark { get; set; }
 }

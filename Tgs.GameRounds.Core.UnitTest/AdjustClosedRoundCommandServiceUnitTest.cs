@@ -17,7 +17,6 @@ public class AdjustClosedRoundCommandServiceUnitTest
     public async Task ExternalRoundId_Not_Exist()
     {
         var fakeGameRound = Substitute.For<IGameRoundRepository>();
-        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
         var fakeLogger = NullLogger<AdjustClosedRoundCommandService>.Instance;
 
         var roundId = Guid.NewGuid();
@@ -41,21 +40,15 @@ public class AdjustClosedRoundCommandServiceUnitTest
 
         var service = new AdjustClosedRoundCommandService(
             fakeLogger,
-            fakeGameRound,
-            fakeGameRoundRecordMessage);
+            fakeGameRound);
 
         _ = await Assert.ThrowsExceptionAsync<GameRoundDoesNotExistException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
-
-        _ = fakeGameRoundRecordMessage
-            .Received(0)
-            .SenderGameRoundRecord(Arg.Is(command.RoundId));
     }
 
     [TestMethod]
     public async Task GameRound_Status_Is_Not_Closed()
     {
         var fakeGameRound = Substitute.For<IGameRoundRepository>();
-        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
         var fakeLogger = NullLogger<AdjustClosedRoundCommandService>.Instance;
 
         var roundId = Guid.NewGuid();
@@ -81,21 +74,15 @@ public class AdjustClosedRoundCommandServiceUnitTest
 
         var service = new AdjustClosedRoundCommandService(
             fakeLogger,
-            fakeGameRound,
-            fakeGameRoundRecordMessage);
+            fakeGameRound);
 
         _ = await Assert.ThrowsExceptionAsync<GameRoundStatusException>(() => service.ExecuteAsync(command).AsTask()).ConfigureAwait(false);
-
-        _ = fakeGameRoundRecordMessage
-            .Received(0)
-            .SenderGameRoundRecord(Arg.Is(command.RoundId));
     }
 
     [TestMethod]
     public async Task Normal_Process()
     {
         var fakeGameRound = Substitute.For<IGameRoundRepository>();
-        var fakeGameRoundRecordMessage = Substitute.For<IGameRoundRecordMessage>();
         var fakeLogger = NullLogger<AdjustClosedRoundCommandService>.Instance;
 
         var roundId = Guid.NewGuid();
@@ -136,13 +123,8 @@ public class AdjustClosedRoundCommandServiceUnitTest
 
         var service = new AdjustClosedRoundCommandService(
             fakeLogger,
-            fakeGameRound,
-            fakeGameRoundRecordMessage);
+            fakeGameRound);
 
         await service.ExecuteAsync(command).ConfigureAwait(false);
-
-        _ = fakeGameRoundRecordMessage
-            .Received(1)
-            .SenderGameRoundRecord(Arg.Is(command.RoundId));
     }
 }

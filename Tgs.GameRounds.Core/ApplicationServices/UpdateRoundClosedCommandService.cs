@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Tgs.GameRounds.Core.Models;
+﻿using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
@@ -7,20 +6,14 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 internal class UpdateRoundClosedCommandService : ICommandService<UpdateRoundClosedCommand>
 {
     private readonly IGameRoundRepository _gameRound;
-    private readonly IGameRoundRecordMessage _gameRoundRecordMessage;
-    private readonly ILogger<UpdateRoundClosedCommandService> _logger;
 
     public UpdateRoundClosedCommandService(
-        ILogger<UpdateRoundClosedCommandService> logger,
-        IGameRoundRepository gameRound,
-        IGameRoundRecordMessage gameRoundRecordMessage)
+        IGameRoundRepository gameRound)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
-        _gameRoundRecordMessage = gameRoundRecordMessage ?? throw new ArgumentNullException(nameof(gameRoundRecordMessage));
     }
 
-    public async ValueTask ExecuteAsync(UpdateRoundClosedCommand command, CancellationToken cancellationToken = default)
+    public ValueTask ExecuteAsync(UpdateRoundClosedCommand command, CancellationToken cancellationToken = default)
     {
         var updateRoundClosed = new UpdateRoundClosed(
             ExternalClosedOn: command.ExternalClosedOn,
@@ -33,13 +26,10 @@ internal class UpdateRoundClosedCommandService : ICommandService<UpdateRoundClos
             ClientStatus: command.ClientStatus,
             AdditionalData: command.AdditionalData);
 
-        await _gameRound.UpdateRoundClosedAsync(
+        return _gameRound
+            .UpdateRoundClosedAsync(
             id: command.RoundId,
             source: updateRoundClosed,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        await _gameRoundRecordMessage.SenderGameRoundRecord(
-            roundId: command.RoundId,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+            cancellationToken: cancellationToken);
     }
 }

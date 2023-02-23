@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using StackExchange.Redis;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Repositories;
@@ -20,11 +19,9 @@ public static class ServiceCollecitonExtensions
 
     public static IServiceCollection AddGameRoundRepositories(
         this IServiceCollection services,
-        Func<IServiceProvider, IDatabase> redisDatabaseResolver,
-        Func<IServiceProvider, IMongoDatabase> mongoDatabaseResolver)
+        Func<IServiceProvider, IDatabase> redisDatabaseResolver)
         => services
-        .AddTransient<IGameRoundLocked>((sp) => ActivatorUtilities.CreateInstance<GameRoundLocked>(sp, redisDatabaseResolver(sp)))
-        .AddTransient<IGameRoundRecord>(sp => ActivatorUtilities.CreateInstance<GameRoundRecordRepository>(sp, mongoDatabaseResolver(sp)));
+        .AddTransient<IGameRoundLocked>((sp) => ActivatorUtilities.CreateInstance<GameRoundLocked>(sp, redisDatabaseResolver(sp)));
 
     public static IServiceCollection AddGameRoundTgsRepositories(
         this IServiceCollection services,
