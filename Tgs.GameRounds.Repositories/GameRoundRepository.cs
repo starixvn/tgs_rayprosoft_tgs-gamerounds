@@ -600,7 +600,7 @@ internal class GameRoundRepository : IGameRoundRepository
                 predicate: x => x.Id == id,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new Exception($"This round does not exist.({id})");
+            ?? throw new InvalidOperationException($"This round does not exist.({id})");
 
         var roundDetail = await _context
             .RoundDetails
@@ -608,7 +608,7 @@ internal class GameRoundRepository : IGameRoundRepository
                 predicate: x => x.RoundId == id,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new Exception($"This round detail does not exist.({id})");
+            ?? throw new InvalidOperationException($"This round detail does not exist.({id})");
 
         round.Status = (short)GameRoundStatus.Closed;
         round.ClosedOn = DateTime.UtcNow;
@@ -660,7 +660,7 @@ internal class GameRoundRepository : IGameRoundRepository
                 predicate: x => x.Id == id,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new Exception($"This round does not exist.({id})");
+            ?? throw new InvalidOperationException($"This round does not exist.({id})");
 
         round.Status = (short)GameRoundStatus.Open;
         round.UpdatedOn = DateTime.UtcNow;
@@ -684,7 +684,7 @@ internal class GameRoundRepository : IGameRoundRepository
                 predicate: x => x.Id == id,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false)
-            ?? throw new Exception($"This round does not exist.({id})");
+            ?? throw new InvalidOperationException($"This round does not exist.({id})");
 
         round.Status = (short)source.Status;
         round.UpdatedOn = DateTime.UtcNow;
