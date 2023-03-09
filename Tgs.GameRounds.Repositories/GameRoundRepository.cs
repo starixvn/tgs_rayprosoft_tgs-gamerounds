@@ -212,11 +212,13 @@ internal class GameRoundRepository : IGameRoundRepository
         AdjustClosedRound source,
         CancellationToken cancellationToken = default)
     {
-        var data = await _context.Rounds
-            .Where(x => x.Id == roundId)
-            .FirstAsync(
+        var data = await _context
+            .Rounds
+            .FirstOrDefaultAsync(
+                predicate: x => x.Id == roundId,
                 cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+            .ConfigureAwait(false)
+            ?? throw new Exception($"This round does not exist.({roundId})");
 
         var oldData = data;
 
@@ -511,11 +513,13 @@ internal class GameRoundRepository : IGameRoundRepository
         ManualCloseRound source,
         CancellationToken cancellationToken = default)
     {
-        var data = await _context.Rounds
-            .Where(x => x.Id == id)
-            .FirstAsync(
+        var data = await _context
+            .Rounds
+            .FirstOrDefaultAsync(
+                predicate: x => x.Id == id,
                 cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+            .ConfigureAwait(false)
+            ?? throw new Exception($"This round does not exist.({id})");
 
         var oldData = data;
 
@@ -590,9 +594,21 @@ internal class GameRoundRepository : IGameRoundRepository
         UpdateRoundClosed source,
         CancellationToken cancellationToken = default)
     {
-        var round = await _context.Rounds.SingleAsync(
-           predicate: x => x.Id == id,
-           cancellationToken: cancellationToken).ConfigureAwait(false);
+        var round = await _context
+            .Rounds
+            .FirstOrDefaultAsync(
+                predicate: x => x.Id == id,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new Exception($"This round does not exist.({id})");
+
+        var roundDetail = await _context
+            .RoundDetails
+            .FirstOrDefaultAsync(
+                predicate: x => x.RoundId == id,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new Exception($"This round detail does not exist.({id})");
 
         round.Status = (short)GameRoundStatus.Closed;
         round.ClosedOn = DateTime.UtcNow;
@@ -608,10 +624,6 @@ internal class GameRoundRepository : IGameRoundRepository
         round.ClientStatus = (short)source.ClientStatus;
         _ = _context.Rounds.Update(round);
 
-        var roundDetail = await _context.RoundDetails.SingleAsync(
-            predicate: x => x.RoundId == id,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
-
         roundDetail.AdditionalData = source.AdditionalData;
         _ = _context.RoundDetails.Update(roundDetail);
 
@@ -623,9 +635,13 @@ internal class GameRoundRepository : IGameRoundRepository
         string additionalData,
         CancellationToken cancellationToken = default)
     {
-        var roundDetail = await _context.RoundDetails.SingleAsync(
-            predicate: x => x.RoundId == id,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+        var roundDetail = await _context
+            .RoundDetails
+            .FirstOrDefaultAsync(
+                predicate: x => x.RoundId == id,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new Exception($"This round detail does not exist.({id})");
 
         roundDetail.AdditionalData = additionalData;
         _ = _context.RoundDetails.Update(roundDetail);
@@ -638,9 +654,13 @@ internal class GameRoundRepository : IGameRoundRepository
         UpdateRoundOpen source,
         CancellationToken cancellationToken = default)
     {
-        var round = await _context.Rounds.SingleAsync(
-            predicate: x => x.Id == id,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+        var round = await _context
+            .Rounds
+            .FirstOrDefaultAsync(
+                predicate: x => x.Id == id,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new Exception($"This round does not exist.({id})");
 
         round.Status = (short)GameRoundStatus.Open;
         round.UpdatedOn = DateTime.UtcNow;
@@ -658,9 +678,13 @@ internal class GameRoundRepository : IGameRoundRepository
         UpdateRoundReopen source,
         CancellationToken cancellationToken = default)
     {
-        var round = await _context.Rounds.SingleAsync(
+        var round = await _context
+            .Rounds
+            .FirstOrDefaultAsync(
                 predicate: x => x.Id == id,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new Exception($"This round does not exist.({id})");
 
         round.Status = (short)source.Status;
         round.UpdatedOn = DateTime.UtcNow;
