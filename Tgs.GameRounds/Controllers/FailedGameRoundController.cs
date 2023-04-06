@@ -51,17 +51,17 @@ public class FailedGameRoundController : ControllerBase
     [HttpGet("external", Name = "FailedGameRound_Get")]
     public async ValueTask<FailedGameRoundInfoViewModel?> GetAsync(
         [FromServices] IFailedGameRound failedGameRound,
-        Guid gameProviderId,
-        string externalRoundId,
-        int gameId,
-        string playerCode)
+        [FromQuery] Guid gameProviderId,
+        [FromQuery] string externalRoundId,
+        [FromQuery] int gameId,
+        [FromQuery] string? playerCode)
     {
         var info = await failedGameRound
                 .GetAsync(
                     gameProviderId,
                     externalRoundId,
                     gameId,
-                    playerCode,
+                    string.IsNullOrWhiteSpace(playerCode) ? string.Empty : playerCode,
                     HttpContext.RequestAborted).ConfigureAwait(false);
 
         var result = default(FailedGameRoundInfoViewModel);
