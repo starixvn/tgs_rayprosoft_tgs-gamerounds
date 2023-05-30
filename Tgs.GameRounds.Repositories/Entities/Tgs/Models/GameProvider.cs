@@ -41,7 +41,7 @@ public partial class GameProvider
 
     public string? Localization { get; set; }
 
-    public virtual ICollection<Game> Games { get; } = new List<Game>();
+    public virtual ICollection<Game> Games { get; set; } = new List<Game>();
 
-    public virtual ICollection<SubGameProvider> SubGameProviders { get; } = new List<SubGameProvider>();
+    public virtual ICollection<SubGameProvider> SubGameProviders { get; set; } = new List<SubGameProvider>();
 }

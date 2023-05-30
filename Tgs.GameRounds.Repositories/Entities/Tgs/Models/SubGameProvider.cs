@@ -27,5 +27,5 @@ public partial class SubGameProvider
 
     public virtual GameProvider GameProvider { get; set; } = null!;
 
-    public virtual ICollection<Game> Games { get; } = new List<Game>();
+    public virtual ICollection<Game> Games { get; set; } = new List<Game>();
 }
