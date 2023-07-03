@@ -2,6 +2,7 @@
 using Tgs.GameRounds.Common.ViewModels;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.ViewModels;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.Controllers;
@@ -369,6 +370,28 @@ public class GameRoundsController : ControllerBase
             ClientStatus: source.ClientStatus,
             OperatorId: source.OperatorId,
             Remark: source.Remark);
+
+        return service.ExecuteAsync(
+            command: command,
+            cancellationToken: HttpContext.RequestAborted);
+    }
+
+    /// <summary>
+    /// Updates the round detail asynchronous.
+    /// </summary>
+    /// <param name="service">The service.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="source">The source.</param>
+    /// <returns></returns>
+    [HttpPut("{id:guid}/update/detail", Name = "UpdateRoundDetail")]
+    public ValueTask UpdateRoundDetailAsync(
+        [FromServices] ICommandService<UpdateRoundDetailCommand> service,
+        Guid id,
+        UpdateRoundDetailViewModel source)
+    {
+        var command = new UpdateRoundDetailCommand(
+            RoundId: id,
+            AdditionalData: source.AdditionalData);
 
         return service.ExecuteAsync(
             command: command,

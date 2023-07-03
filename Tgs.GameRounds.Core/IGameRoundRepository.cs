@@ -48,4 +48,9 @@ public interface IGameRoundRepository
         Guid id,
         ManualCloseRound source,
         CancellationToken cancellationToken = default);
+
+    ValueTask UpdateRoundDetailAsync(
+        Guid id,
+        string additionalData,
+        CancellationToken cancellationToken = default);
 }

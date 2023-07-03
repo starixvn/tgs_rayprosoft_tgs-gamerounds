@@ -533,4 +533,23 @@ internal class GameRoundRepository : IGameRoundRepository
             _logger.LogError(exception: ex, "An exception occurs when closing the game record.({roundId})", id);
         }
     }
+
+    public async ValueTask UpdateRoundDetailAsync(
+        Guid id,
+        string additionalData,
+        CancellationToken cancellationToken = default)
+    {
+        var roundDetail = await _context
+            .RoundDetails
+            .FirstOrDefaultAsync(
+                predicate: x => x.RoundId == id,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new Exception($"This round detail does not exist.({id})");
+
+        roundDetail.AdditionalData = additionalData;
+        _ = _context.RoundDetails.Update(roundDetail);
+
+        _ = await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
 }

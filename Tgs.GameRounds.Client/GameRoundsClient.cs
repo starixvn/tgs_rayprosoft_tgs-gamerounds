@@ -142,8 +142,33 @@ internal class GameRoundsClient : IGameRoundsClient
         _ = response.EnsureSuccessStatusCode();
     }
 
+    public async ValueTask UpdateRoundDetailAsync(
+        Guid roundId,
+        string additionalData,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new
+        {
+            additionalData
+        };
+
+        var requestContent = new StringContent(
+            content: JsonSerializer.Serialize(request, _SerializerOptions),
+            encoding: Encoding.UTF8,
+            mediaType: MediaTypeNames.Application.Json);
+
+        var response = await _httpClient
+           .PutAsync(
+              requestUri: $"gamerounds/{roundId}/update/detail",
+              content: requestContent,
+              cancellationToken: cancellationToken)
+           .ConfigureAwait(false);
+
+        _ = response.EnsureSuccessStatusCode();
+    }
+
     private static async Task<TResult?> GetResultAsync<TResult>(
-        HttpResponseMessage responseMessage,
+            HttpResponseMessage responseMessage,
         CancellationToken cancellationToken = default)
     {
         var content = await responseMessage.Content.ReadAsStringAsync(

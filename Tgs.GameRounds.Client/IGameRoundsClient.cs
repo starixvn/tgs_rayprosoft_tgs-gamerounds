@@ -15,4 +15,6 @@ public interface IGameRoundsClient
     ValueTask<GameRoundDetailViewModel?> GetRoundDetailAsync(Guid roundId, CancellationToken cancellationToken = default);
 
     ValueTask ManualCloseRoundAsync(Guid roundId, ManualCloseRoundViewModel source, CancellationToken cancellationToken = default);
+
+    ValueTask UpdateRoundDetailAsync(Guid roundId, string additionalData, CancellationToken cancellationToken = default);
 }
