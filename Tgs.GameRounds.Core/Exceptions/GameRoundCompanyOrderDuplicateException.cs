@@ -2,11 +2,8 @@
 
 public class GameRoundCompanyOrderDuplicateException : Exception
 {
-    public GameRoundCompanyOrderDuplicateException() : base("This company has a duplicate order.")
-    {
-    }
-
-    public GameRoundCompanyOrderDuplicateException(string message) : base(message)
+    public GameRoundCompanyOrderDuplicateException(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+        : base($"This company has a duplicate order.({gameProviderId} | {externalRoundId} | {gameId} | {walletId})")
     {
     }
 }

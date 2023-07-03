@@ -1,5 +1,7 @@
 ﻿namespace Tgs.GameRounds.Common.ViewModels;
 
-public record GameRoundDetailViewModel(
-        Guid RoundId,
-        string AdditionalData);
+public record GameRoundDetailViewModel
+{
+    public Guid RoundId { get; init; }
+    public string AdditionalData { get; init; } = default!;
+}

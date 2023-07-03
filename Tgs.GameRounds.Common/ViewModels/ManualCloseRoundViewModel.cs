@@ -2,7 +2,7 @@
 
 namespace Tgs.GameRounds.Common.ViewModels;
 
-public record ManualCloseRoundViewModel()
+public record ManualCloseRoundViewModel
 {
     [Required]
     public DateTimeOffset ExternalClosedOn { get; init; }

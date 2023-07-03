@@ -2,15 +2,13 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tgs.GameRounds.Repositories.Entities;
 
 namespace Tgs.GameRounds.Repositories.UnitTest;
 
-[TestClass]
 public class GameRepositoryUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Get_ExternalId()
     {
         var options = new DbContextOptionsBuilder<TgsContext>()
@@ -50,11 +48,11 @@ public class GameRepositoryUnitTest
 
         var actual = await fakeRoundRepository.GetExternalIdAsync(gameId).ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(externalGameId, actual);
+        Assert.NotNull(actual);
+        Assert.Equal(externalGameId, actual);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Get_Id()
     {
         var options = new DbContextOptionsBuilder<TgsContext>()
@@ -94,7 +92,6 @@ public class GameRepositoryUnitTest
 
         var actual = await fakeRoundRepository.GetIdAsync(gameProviderId, externalGameId).ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(gameId, actual);
+        Assert.Equal(gameId, actual);
     }
 }

@@ -2,11 +2,8 @@
 
 public class GameRoundCreationFailedException : Exception
 {
-    public GameRoundCreationFailedException() : base("This GameRound failed to create an order.")
-    {
-    }
-
-    public GameRoundCreationFailedException(string message) : base(message)
+    public GameRoundCreationFailedException(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
+        : base($"This GameRound failed to create an order.({gameProviderId} | {externalRoundId} | {gameId} | {walletId})")
     {
     }
 }

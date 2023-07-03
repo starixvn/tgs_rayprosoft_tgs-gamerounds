@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Tgs.GameRounds.Core.Exceptions;
+﻿using Tgs.GameRounds.Core.Exceptions;
 using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 
@@ -9,30 +8,33 @@ internal class AddCompanyRoundCommandService : ICommandService<AddCompanyRoundCo
 {
     private readonly IGameRoundRepository _gameRound;
     private readonly IGameRoundLocked _gameRoundLocked;
-    private readonly ILogger<AddCompanyRoundCommandService> _logger;
 
     public AddCompanyRoundCommandService(
-        ILogger<AddCompanyRoundCommandService> logger,
         IGameRoundRepository gameRound,
         IGameRoundLocked gameRoundLocked)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
         _gameRoundLocked = gameRoundLocked ?? throw new ArgumentNullException(nameof(gameRoundLocked));
     }
 
     public async ValueTask ExecuteAsync(AddCompanyRoundCommand command, CancellationToken cancellationToken = default)
     {
-        var roundId = await _gameRound.GetRoundIdAsync(
+        var roundId = await _gameRound
+            .GetRoundIdAsync(
                 gameProviderId: command.GameProviderId,
                 externalRoundId: command.ExternalRoundId,
                 gameId: command.GameId,
                 walletId: command.WalletId,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
 
         if (roundId.HasValue)
         {
-            throw new GameRoundCompanyOrderDuplicateException();
+            throw new GameRoundCompanyOrderDuplicateException(
+                gameProviderId: command.GameProviderId,
+                externalRoundId: command.ExternalRoundId,
+                gameId: command.GameId,
+                walletId: command.WalletId);
         }
 
         if (!await _gameRoundLocked
@@ -44,7 +46,11 @@ internal class AddCompanyRoundCommandService : ICommandService<AddCompanyRoundCo
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false))
         {
-            throw new GameRoundCreationFailedException();
+            throw new GameRoundLockedException(
+                gameProviderId: command.GameProviderId,
+                externalRoundId: command.ExternalRoundId,
+                gameId: command.GameId,
+                walletId: command.WalletId);
         }
 
         try
@@ -76,8 +82,11 @@ internal class AddCompanyRoundCommandService : ICommandService<AddCompanyRoundCo
 
             if (!newRoundId.HasValue)
             {
-                _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundCreationFailedException", DateTime.Now.ToString("o"), command);
-                throw new GameRoundCreationFailedException();
+                throw new GameRoundCreationFailedException(
+                    gameProviderId: command.GameProviderId,
+                    externalRoundId: command.ExternalRoundId,
+                    gameId: command.GameId,
+                    walletId: command.WalletId);
             }
         }
         finally

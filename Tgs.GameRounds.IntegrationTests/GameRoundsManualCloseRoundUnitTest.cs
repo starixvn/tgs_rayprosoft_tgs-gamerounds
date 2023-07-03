@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Tgs.GameRounds.Client;
@@ -16,7 +15,7 @@ namespace Tgs.GameRounds.IntegrationTests;
 
 public partial class GameRoundsClientUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task GameRounds_ManualCloseRound_ExternalRoundId_Not_Exist()
     {
         var roundId = Guid.NewGuid();
@@ -39,7 +38,7 @@ public partial class GameRoundsClientUnitTest
         {
             var fakeService = Substitute.For<ICommandService<ManualCloseRoundCommand>>();
 
-            _ = fakeService.ExecuteAsync(Arg.Any<ManualCloseRoundCommand>()).Throws<GameRoundDoesNotExistException>();
+            _ = fakeService.ExecuteAsync(Arg.Any<ManualCloseRoundCommand>()).Throws(new GameRoundDoesNotExistException(roundId));
 
             _ = services.AddSingleton(fakeService);
         });
@@ -48,14 +47,18 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.ManualCloseRoundAsync(roundId, model).ConfigureAwait(false);
-
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(false, actual.Success);
-        Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+        _ = await Assert
+            .ThrowsAsync<HttpRequestException>(
+            () =>
+            sut
+            .ManualCloseRoundAsync(
+                roundId: roundId,
+                source: model)
+            .AsTask())
+            .ConfigureAwait(false);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GameRounds_ManualCloseRound_Normal_Process()
     {
         var roundId = Guid.NewGuid();
@@ -87,10 +90,10 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.ManualCloseRoundAsync(roundId, model).ConfigureAwait(false);
-
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(true, actual.Success);
-        Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+        await sut
+            .ManualCloseRoundAsync(
+            roundId: roundId,
+            source: model)
+            .ConfigureAwait(false);
     }
 }

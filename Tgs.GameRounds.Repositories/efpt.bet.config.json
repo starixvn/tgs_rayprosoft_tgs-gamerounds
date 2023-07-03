@@ -19,10 +19,6 @@
   "SelectedToBeGenerated": 0,
   "Tables": [
     {
-      "Name": "bet.failed_game_record_operations",
-      "ObjectType": 0
-    },
-    {
       "Name": "bet.round_details",
       "ObjectType": 0
     },

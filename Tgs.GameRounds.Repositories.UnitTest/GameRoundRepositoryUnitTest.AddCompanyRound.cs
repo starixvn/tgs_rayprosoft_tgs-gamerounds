@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
@@ -13,17 +12,16 @@ using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories.UnitTest;
 
-[TestClass]
 public class GameRoundRepositoryUnitTestAddCompanyRound
 {
-    [TestMethod]
+    [Fact]
     public async Task Normal_Process()
     {
         var fakeLogger = NullLogger<GameRoundRepository>.Instance;
         var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
         var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var options = new DbContextOptionsBuilder<BetContext>()
-           .UseInMemoryDatabase(databaseName: "bet")
+           .UseInMemoryDatabase(databaseName: "bet_add_company_round")
            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
            .Options;
         var context = new BetContext(options);
@@ -64,19 +62,19 @@ public class GameRoundRepositoryUnitTestAddCompanyRound
         _ = await fakeRoundRepository.AddCompanyRoundAsync(data).ConfigureAwait(false);
 
         var actual = await fakeRoundRepository.GetAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(gameProviderId, actual.GameProviderId);
-        Assert.AreEqual(externalRoundId, actual.ExternalRoundId);
-        Assert.AreEqual(gameId, actual.GameId);
-        Assert.AreEqual(playerCode, actual.PlayerCode);
-        Assert.IsNotNull(actual.ClosedOn);
-        Assert.IsNotNull(actual.ExternalClosedOn);
-        Assert.AreEqual(data.ClientStatus, actual.ClientStatus);
-        Assert.AreEqual(data.BetAmount, actual.BetAmount);
-        Assert.AreEqual(data.ValidBetAmount, actual.ValidBetAmount);
-        Assert.AreEqual(data.SettleAmount, actual.SettleAmount);
-        Assert.AreEqual(data.Commission, actual.Commission);
-        Assert.AreEqual(data.Turnover, actual.Turnover);
-        Assert.AreEqual(data.CompanyWinLoss, actual.CompanyWinLoss);
+        Assert.NotNull(actual);
+        Assert.Equal(gameProviderId, actual.GameProviderId);
+        Assert.Equal(externalRoundId, actual.ExternalRoundId);
+        Assert.Equal(gameId, actual.GameId);
+        Assert.Equal(playerCode, actual.PlayerCode);
+        Assert.NotNull(actual.ClosedOn);
+        Assert.NotNull(actual.ExternalClosedOn);
+        Assert.Equal(data.ClientStatus, actual.ClientStatus);
+        Assert.Equal(data.BetAmount, actual.BetAmount);
+        Assert.Equal(data.ValidBetAmount, actual.ValidBetAmount);
+        Assert.Equal(data.SettleAmount, actual.SettleAmount);
+        Assert.Equal(data.Commission, actual.Commission);
+        Assert.Equal(data.Turnover, actual.Turnover);
+        Assert.Equal(data.CompanyWinLoss, actual.CompanyWinLoss);
     }
 }

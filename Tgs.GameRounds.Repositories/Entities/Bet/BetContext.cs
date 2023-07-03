@@ -14,8 +14,6 @@ public partial class BetContext : DbContext
     {
     }
 
-    public virtual DbSet<FailedGameRecordOperation> FailedGameRecordOperations { get; set; }
-
     public virtual DbSet<Round> Rounds { get; set; }
 
     public virtual DbSet<RoundDetail> RoundDetails { get; set; }
@@ -31,7 +29,6 @@ public partial class BetContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("uuid-ossp");
 
-            modelBuilder.ApplyConfiguration(new Configurations.FailedGameRecordOperationConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.RoundConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.RoundDetailConfiguration());
             modelBuilder.ApplyConfiguration(new Configurations.RoundOperationRecordConfiguration());

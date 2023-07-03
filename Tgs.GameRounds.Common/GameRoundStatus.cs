@@ -5,6 +5,5 @@ public enum GameRoundStatus
 {
     New = 0,
     Open = 1,
-    Closed = 2,
-    Void = 3,
+    Closed = 2
 }

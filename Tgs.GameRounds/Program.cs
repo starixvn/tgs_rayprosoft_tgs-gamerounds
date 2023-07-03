@@ -120,6 +120,4 @@ app.MapControllers();
 
 app.MapHealthChecks("/healthz");
 
-_ = app.UseRegister();
-
 app.Run();

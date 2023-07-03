@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.ApplicationServices;
 
 namespace Tgs.GameRounds.Core.UnitTest;
 
-[TestClass]
 public class GetGameRoundByExternalGameGetServiceUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Normal_Process()
     {
         var fakeGame = Substitute.For<IGameRepository>();
@@ -67,7 +65,7 @@ public class GetGameRoundByExternalGameGetServiceUnitTest
 
         var actual = await service.GetAsync(query).ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
+        Assert.NotNull(actual);
         _ = Equals(gameRound, actual);
     }
 }

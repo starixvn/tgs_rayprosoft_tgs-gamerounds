@@ -21,10 +21,4 @@ internal class GameProviderRepository : IGameProviderRepository
         .Select(x => x.Code.Trim())
         .ToAsyncEnumerable()
         .SingleAsync(cancellationToken: cancellationToken);
-
-    public IAsyncEnumerable<Guid> GetIds(
-        CancellationToken cancellationToken = default)
-        => _context.GameProviders.AsQueryable()
-        .Select(x => x.Id)
-        .ToAsyncEnumerable();
 }

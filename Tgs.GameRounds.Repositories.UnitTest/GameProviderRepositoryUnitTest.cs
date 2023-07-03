@@ -2,15 +2,13 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tgs.GameRounds.Repositories.Entities;
 
 namespace Tgs.GameRounds.Repositories.UnitTest;
 
-[TestClass]
 public class GameProviderRepositoryUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Get_Code()
     {
         var options = new DbContextOptionsBuilder<TgsContext>()
@@ -48,7 +46,7 @@ public class GameProviderRepositoryUnitTest
 
         var actual = await fakeRoundRepository.GetCode(gameProviderId).ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(gameProviderCode, actual);
+        Assert.NotNull(actual);
+        Assert.Equal(gameProviderCode, actual);
     }
 }

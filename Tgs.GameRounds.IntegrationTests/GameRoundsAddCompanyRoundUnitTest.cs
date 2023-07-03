@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Tgs.GameRounds.Client;
@@ -17,7 +16,7 @@ namespace Tgs.GameRounds.IntegrationTests;
 
 public partial class GameRoundsClientUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task GameRounds_AddCompanyRound_ExternalRoundId_Exist()
     {
         var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -61,14 +60,13 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
-
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(true, actual.Success);
-        Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+        await sut
+           .AddCompanyRoundAsync(
+            source: model)
+           .ConfigureAwait(false);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GameRounds_AddCompanyRound_GameRound_Company_Order_Duplicate_Exception()
     {
         var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -103,23 +101,31 @@ public partial class GameRoundsClientUnitTest
         {
             var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
 
-            _ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Throws<GameRoundCompanyOrderDuplicateException>();
+            _ = fakeService
+            .ExecuteAsync(Arg.Any<AddCompanyRoundCommand>())
+            .Throws(new GameRoundCompanyOrderDuplicateException(
+                gameProviderId: model.GameProviderId,
+                externalRoundId: model.ExternalRoundId,
+                gameId: model.GameId,
+                walletId: model.WalletId));
 
             _ = services.AddSingleton(fakeService);
         });
 
         var httpClient = web.CreateClient();
-
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
-
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(false, actual.Success);
-        Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+        _ = await Assert
+            .ThrowsAsync<HttpRequestException>(
+            () =>
+            sut
+            .AddCompanyRoundAsync(
+                source: model)
+            .AsTask())
+            .ConfigureAwait(false);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GameRounds_AddCompanyRound_GameRound_Failed_To_Create_An_Order()
     {
         var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -154,7 +160,13 @@ public partial class GameRoundsClientUnitTest
         {
             var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
 
-            _ = fakeService.ExecuteAsync(Arg.Any<AddCompanyRoundCommand>()).Throws<GameRoundCreationFailedException>();
+            _ = fakeService
+            .ExecuteAsync(Arg.Any<AddCompanyRoundCommand>())
+            .Throws(new GameRoundCreationFailedException(
+                gameProviderId: model.GameProviderId,
+                externalRoundId: model.ExternalRoundId,
+                gameId: model.GameId,
+                walletId: model.WalletId));
 
             _ = services.AddSingleton(fakeService);
         });
@@ -163,14 +175,17 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
-
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(false, actual.Success);
-        Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+        _ = await Assert
+            .ThrowsAsync<HttpRequestException>(
+            () =>
+            sut
+            .AddCompanyRoundAsync(
+                source: model)
+            .AsTask())
+            .ConfigureAwait(false);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GameRounds_AddCompanyRound_GameRound_Generated_Order_Is_Currently_Locked()
     {
         var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -224,14 +239,17 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
-
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(false, actual.Success);
-        Assert.AreEqual(HttpStatusCode.InternalServerError, actual.HttpStatusCode);
+        _ = await Assert
+            .ThrowsAsync<HttpRequestException>(
+            () =>
+            sut
+            .AddCompanyRoundAsync(
+                source: model)
+            .AsTask())
+            .ConfigureAwait(false);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GameRounds_AddCompanyRound_Normal_Process()
     {
         var gameProviderId = new Guid("eadd378a-3bb9-6186-3815-563e220c464f");
@@ -275,10 +293,9 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.AddCompanyRoundAsync(model).ConfigureAwait(false);
-
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(true, actual.Success);
-        Assert.AreEqual(HttpStatusCode.OK, actual.HttpStatusCode);
+        await sut
+           .AddCompanyRoundAsync(
+            source: model)
+           .ConfigureAwait(false);
     }
 }

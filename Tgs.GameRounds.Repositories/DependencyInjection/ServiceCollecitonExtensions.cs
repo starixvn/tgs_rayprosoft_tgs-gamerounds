@@ -13,11 +13,9 @@ public static class ServiceCollecitonExtensions
         Action<IServiceProvider, DbContextOptionsBuilder> configure)
         => services
         .AddDbContext<BetContext>(configure)
-        .AddTransient<IGameRoundRepository, GameRoundRepository>()
-        .Decorate<IGameRoundRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameRoundCacheRepository>(sp, innerRepository))
-        .AddTransient<IFailedGameRound, FailedGameRoundRepository>();
+        .AddTransient<IGameRoundRepository, GameRoundRepository>();
 
-    public static IServiceCollection AddGameRoundRepositories(
+    public static IServiceCollection AddGameRoundLockedRepositories(
         this IServiceCollection services,
         Func<IServiceProvider, IDatabase> redisDatabaseResolver)
         => services
@@ -29,7 +27,5 @@ public static class ServiceCollecitonExtensions
         => services
         .AddDbContext<TgsContext>(configure)
         .AddTransient<IGameProviderRepository, GameProviderRepository>()
-        .Decorate<IGameProviderRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameProviderCacheRepository>(sp, innerRepository))
-        .AddTransient<IGameRepository, GameRepository>()
-        .Decorate<IGameRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<GameCacheRepository>(sp, innerRepository));
+        .AddTransient<IGameRepository, GameRepository>();
 }

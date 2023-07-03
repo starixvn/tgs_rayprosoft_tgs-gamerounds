@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Tgs.GameRounds.Common;
+﻿using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core.Exceptions;
 using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
@@ -9,13 +8,10 @@ namespace Tgs.GameRounds.Core.ApplicationServices;
 internal class ManualCloseRoundCommandService : ICommandService<ManualCloseRoundCommand>
 {
     private readonly IGameRoundRepository _gameRound;
-    private readonly ILogger<ManualCloseRoundCommandService> _logger;
 
     public ManualCloseRoundCommandService(
-        ILogger<ManualCloseRoundCommandService> logger,
         IGameRoundRepository gameRound)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _gameRound = gameRound ?? throw new ArgumentNullException(nameof(gameRound));
     }
 
@@ -27,19 +23,18 @@ internal class ManualCloseRoundCommandService : ICommandService<ManualCloseRound
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false))
         {
-            _logger.LogError("LogOn:{DateTime} Data: {data} Exception:GameRoundDoesNotExistException", DateTime.Now.ToString("o"), command);
-            throw new GameRoundDoesNotExistException();
+            throw new GameRoundDoesNotExistException(command.RoundId);
         }
 
         var status = await _gameRound
-                    .GetStatusAsync(
-                        id: command.RoundId,
-                        cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
+            .GetStatusAsync(
+            id: command.RoundId,
+            cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
 
         if (status != GameRoundStatus.Open)
         {
-            throw new GameRoundStatusException(status);
+            throw new GameRoundStatusException(command.RoundId, status);
         }
 
         var manualClose = new ManualCloseRound(

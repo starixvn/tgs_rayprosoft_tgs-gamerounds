@@ -23,6 +23,6 @@ public static class ServiceCollecitonExtensions
                 betConfigure)
             .AddGameRoundTgsRepositories(
                 tgsConfigure)
-            .AddGameRoundRepositories(
+            .AddGameRoundLockedRepositories(
                 (sp) => sp.GetRequiredService<RedisConnectionManager>().Database);
 }
