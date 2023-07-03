@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -38,7 +39,11 @@ public partial class GameRoundsClientUnitTest
         {
             var fakeService = Substitute.For<ICommandService<AdjustClosedRoundCommand>>();
 
-            _ = fakeService.ExecuteAsync(Arg.Any<AdjustClosedRoundCommand>()).Throws(new GameRoundDoesNotExistException(roundId));
+            _ = fakeService
+            .ExecuteAsync(
+                command: Arg.Any<AdjustClosedRoundCommand>(),
+                cancellationToken: Arg.Any<CancellationToken>())
+            .Throws(new GameRoundDoesNotExistException(roundId));
 
             _ = services.AddSingleton(fakeService);
         });

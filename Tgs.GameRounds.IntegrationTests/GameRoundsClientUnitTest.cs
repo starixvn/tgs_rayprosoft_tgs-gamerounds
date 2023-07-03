@@ -158,7 +158,11 @@ public partial class GameRoundsClientUnitTest
         {
             var fakeGameRound = Substitute.For<IGameRoundRepository>();
 
-            _ = fakeGameRound.GetRoundDetailAsync(roundId).Returns(ValueTask.FromResult<GameRoundDetailInfo?>(data));
+            _ = fakeGameRound
+            .GetRoundDetailAsync(
+                id: Arg.Is(roundId),
+                cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(ValueTask.FromResult<GameRoundDetailInfo?>(data));
 
             _ = services.AddSingleton(fakeGameRound);
         });

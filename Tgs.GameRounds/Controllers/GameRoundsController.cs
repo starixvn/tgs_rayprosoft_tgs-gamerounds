@@ -19,7 +19,7 @@ public class GameRoundsController : ControllerBase
     /// <b>Example</b><br />
     ///
     ///     Post
-    ///     
+    ///
     ///         {
     ///             "externalRoundId": "50-1687319019-331826368-2",
     ///             "gameProviderId": "a0f49ce0-2c1d-4f50-9fc5-58b610a30bf5",
@@ -82,9 +82,9 @@ public class GameRoundsController : ControllerBase
     /// <remarks>
     /// <b>Example</b><br />
     ///
-    ///     Put 
+    ///     Put
     ///         01891a83-9c29-0000-0001-07e769564c64/adjust/closed
-    ///     
+    ///
     ///         {
     ///             "externalClosedOn": "2023-06-21T11:44:03.000+08:00",
     ///             "betAmount": 4,
@@ -130,7 +130,7 @@ public class GameRoundsController : ControllerBase
     /// <remarks>
     /// <b>Example</b><br />
     ///
-    ///     Get 
+    ///     Get
     ///         /gamerounds/018919ab-2ece-0000-0001-07e7be4ca7ee
     /// </remarks>
     [HttpGet("{id:guid}", Name = "GetGameRound")]
@@ -265,7 +265,6 @@ public class GameRoundsController : ControllerBase
         [FromQuery] int gameId,
         [FromQuery] Guid walletId)
     {
-
         var query = new GetGameRoundByGameQuery(
             GameProviderId: gameProviderId,
             ExternalRoundId: externalRoundId,
@@ -322,7 +321,7 @@ public class GameRoundsController : ControllerBase
     /// <remarks>
     /// <b>Example</b><br />
     ///
-    ///     Get 
+    ///     Get
     ///         /gamerounds/018919ab-2ece-0000-0001-07e7be4ca7ee/getdetail
     /// </remarks>
     [HttpGet("{id:guid}/getdetail", Name = "GetRoundDetail")]

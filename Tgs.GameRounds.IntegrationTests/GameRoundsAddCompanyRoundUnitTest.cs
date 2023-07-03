@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -102,7 +103,9 @@ public partial class GameRoundsClientUnitTest
             var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
 
             _ = fakeService
-            .ExecuteAsync(Arg.Any<AddCompanyRoundCommand>())
+            .ExecuteAsync(
+                command: Arg.Any<AddCompanyRoundCommand>(),
+                cancellationToken: Arg.Any<CancellationToken>())
             .Throws(new GameRoundCompanyOrderDuplicateException(
                 gameProviderId: model.GameProviderId,
                 externalRoundId: model.ExternalRoundId,
@@ -161,7 +164,9 @@ public partial class GameRoundsClientUnitTest
             var fakeService = Substitute.For<ICommandService<AddCompanyRoundCommand>>();
 
             _ = fakeService
-            .ExecuteAsync(Arg.Any<AddCompanyRoundCommand>())
+            .ExecuteAsync(
+                command: Arg.Any<AddCompanyRoundCommand>(),
+                cancellationToken: Arg.Any<CancellationToken>())
             .Throws(new GameRoundCreationFailedException(
                 gameProviderId: model.GameProviderId,
                 externalRoundId: model.ExternalRoundId,
