@@ -4,7 +4,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>0.0.37</Version>
+		<Version>0.0.38</Version>
 		<Authors>Raypro</Authors>
 		<Description>Tgs GameRounds Client</Description>
 		<PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-gamerounds</PackageProjectUrl>
