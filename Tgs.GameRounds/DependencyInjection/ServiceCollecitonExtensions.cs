@@ -9,6 +9,7 @@ public static class ServiceCollecitonExtensions
         Action<IServiceProvider, DbContextOptionsBuilder> tgsConfigure,
         Action<IServiceProvider, DbContextOptionsBuilder> betConfigure)
         => services
+        .AddGameRoundsCore()
         .AddGameRoundBetRepositories(betConfigure)
         .AddGameRoundTgsRepositories(tgsConfigure);
 }
