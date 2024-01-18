@@ -29,9 +29,9 @@ public partial class TgsContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("uuid-ossp");
 
-            modelBuilder.ApplyConfiguration(new Configurations.GameConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.GameProviderConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.SubGameProviderConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.GameConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.GameProviderConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.SubGameProviderConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 

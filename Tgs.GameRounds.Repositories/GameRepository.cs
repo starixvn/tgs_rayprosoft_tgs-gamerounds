@@ -5,20 +5,13 @@ using Tgs.GameRounds.Repositories.Entities;
 
 namespace Tgs.GameRounds.Repositories;
 
-internal class GameRepository : IGameRepository
+internal class GameRepository(
+    TgsContext context) : IGameRepository
 {
-    private readonly TgsContext _context;
-
-    public GameRepository(
-        TgsContext context)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-    }
-
     public ValueTask<string> GetExternalIdAsync(
         int id,
         CancellationToken cancellationToken = default)
-        => _context.Games.AsQueryable()
+        => context.Games.AsQueryable()
             .Where(x => x.Id == id)
             .Select(x => x.ExternalId.Trim())
             .ToAsyncEnumerable()
@@ -28,7 +21,7 @@ internal class GameRepository : IGameRepository
         Guid gameProviderId,
         string externalId,
         CancellationToken cancellationToken = default)
-        => _context.Games.AsQueryable()
+        => context.Games.AsQueryable()
             .Where(x => x.GameProviderId == gameProviderId && x.ExternalId == externalId)
             .Select(x => x.Id)
             .ToAsyncEnumerable()

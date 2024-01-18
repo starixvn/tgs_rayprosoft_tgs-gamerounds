@@ -17,9 +17,6 @@ public class GameRoundRepositoryUnitTest
     [Fact]
     public async Task Get_Round()
     {
-        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
-        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var options = new DbContextOptionsBuilder<BetContext>()
            .UseInMemoryDatabase(databaseName: "bet_get")
            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -57,22 +54,19 @@ public class GameRoundRepositoryUnitTest
             ReopenTurnoverAdjustment = null,
             ReopenedOn = null,
             EffectiveBettingPercentage = null,
-        }).ConfigureAwait(false);
+        });
 
         _ = await context.RoundDetails.AddAsync(new RoundDetail()
         {
             RoundId = roundId,
             AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
-        }).ConfigureAwait(false);
+        });
 
-        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+        _ = await context.SaveChangesAsync();
 
-        var fakeRoundRepository = new GameRoundRepository(
-            context,
-            fakeLogger,
-            fakeSerialNumberGenerator);
+        var fakeRoundRepository = new GameRoundRepository(context);
 
-        var actual = await fakeRoundRepository.GetAsync(roundId).ConfigureAwait(false);
+        var actual = await fakeRoundRepository.GetAsync(roundId);
         Assert.NotNull(actual);
         Assert.Equal(roundId, actual.RoundId);
     }
@@ -80,9 +74,6 @@ public class GameRoundRepositoryUnitTest
     [Fact]
     public async Task Get_Round_ExternalId()
     {
-        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
-        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var options = new DbContextOptionsBuilder<BetContext>()
            .UseInMemoryDatabase(databaseName: "bet")
            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -125,28 +116,24 @@ public class GameRoundRepositoryUnitTest
             ReopenTurnoverAdjustment = null,
             ReopenedOn = null,
             EffectiveBettingPercentage = null,
-        }).ConfigureAwait(false);
+        });
 
         _ = await context.RoundDetails.AddAsync(new RoundDetail()
         {
             RoundId = roundId,
             AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
-        }).ConfigureAwait(false);
+        });
 
-        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+        _ = await context.SaveChangesAsync();
 
-        var fakeRoundRepository = new GameRoundRepository(
-            context,
-            fakeLogger,
-            fakeSerialNumberGenerator);
+        var fakeRoundRepository = new GameRoundRepository(context);
 
-        var actual = await fakeRoundRepository
-            .GetAsync(
-                gameProviderId: gameProviderId,
-                externalRoundId: externalRoundId,
-                gameId: gameId,
-                walletId: walletId)
-            .ConfigureAwait(false);
+        var actual = await fakeRoundRepository.GetAsync(
+            gameProviderId: gameProviderId,
+            externalRoundId: externalRoundId,
+            gameId: gameId,
+            walletId: walletId);
+
         Assert.NotNull(actual);
         Assert.Equal(roundId, actual.RoundId);
         Assert.Equal(gameProviderId, actual.GameProviderId);
@@ -158,9 +145,6 @@ public class GameRoundRepositoryUnitTest
     [Fact]
     public async Task Get_RoundId_External()
     {
-        var fakeLogger = NullLogger<GameRoundRepository>.Instance;
-        var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
-        var fakeGameRound = Substitute.For<IGameRoundRepository>();
         var options = new DbContextOptionsBuilder<BetContext>()
            .UseInMemoryDatabase(databaseName: "bet")
            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
@@ -203,29 +187,25 @@ public class GameRoundRepositoryUnitTest
             ReopenTurnoverAdjustment = null,
             ReopenedOn = null,
             EffectiveBettingPercentage = null,
-        }).ConfigureAwait(false);
+        });
 
         _ = await context.RoundDetails.AddAsync(new RoundDetail()
         {
             RoundId = roundId,
             AdditionalData = JsonSerializer.Serialize(new { RoundId = roundId })
-        }).ConfigureAwait(false);
+        });
 
-        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+        _ = await context.SaveChangesAsync();
 
-        var fakeRoundRepository = new GameRoundRepository(
-            context,
-            fakeLogger,
-            fakeSerialNumberGenerator);
+        var fakeRoundRepository = new GameRoundRepository(context);
 
-        var actual = await fakeRoundRepository
-            .GetRoundIdAsync(
-                gameProviderId: gameProviderId,
-                externalRoundId: externalRoundId,
-                gameId: gameId,
-                walletId: walletId)
-            .ConfigureAwait(false);
-        Assert.NotNull(actual);
+        var actual = await fakeRoundRepository.GetRoundIdAsync(
+            gameProviderId: gameProviderId,
+            externalRoundId: externalRoundId,
+            gameId: gameId,
+            walletId: walletId);
+
+        _ = Assert.NotNull(actual);
         Assert.Equal(roundId, actual);
     }
 }

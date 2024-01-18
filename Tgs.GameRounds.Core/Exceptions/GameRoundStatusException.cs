@@ -2,9 +2,6 @@
 
 namespace Tgs.GameRounds.Core.Exceptions;
 
-public class GameRoundStatusException : Exception
+public class GameRoundStatusException(Guid roundId, GameRoundStatus status) : Exception($"This order has the wrong status.({roundId} | {status})")
 {
-    public GameRoundStatusException(Guid roundId, GameRoundStatus status) : base($"This order has the wrong status.({roundId} | {status})")
-    {
-    }
 }

@@ -2,23 +2,30 @@
 
 namespace Tgs.GameRounds.Core.Models;
 
-public record AddCompanyRound(
+public record GameRoundInfo(
+    Guid RoundId,
     string ExternalRoundId,
     Guid GameProviderId,
     string PlayerCode,
     int GameId,
     string CurrencyCode,
+    GameRoundStatus Status,
     Guid GameProviderConfigurationId,
     Guid WalletId,
+    DateTimeOffset CreatedOn,
+    DateTimeOffset? ClosedOn,
+    DateTimeOffset UpdatedOn,
     Guid BrandId,
-    DateTimeOffset ExternalCreatedOn,
-    DateTimeOffset ExternalClosedOn,
+    DateTimeOffset? ExternalCreatedOn,
+    DateTimeOffset? ExternalClosedOn,
     decimal BetAmount,
     decimal ValidBetAmount,
     decimal SettleAmount,
     decimal Commission,
     decimal Turnover,
     decimal CompanyWinLoss,
+    decimal TieBetAdjustment,
     GameRoundClientStatus ClientStatus,
-    Guid OperatorId,
-    string? Remark);
+    decimal? ReopenTurnoverAdjustment,
+    DateTimeOffset? ReopenedOn,
+    decimal? EffectiveBettingPercentage);

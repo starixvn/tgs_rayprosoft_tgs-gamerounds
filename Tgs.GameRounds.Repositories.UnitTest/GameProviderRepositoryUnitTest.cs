@@ -39,12 +39,12 @@ public class GameProviderRepositoryUnitTest
             CreatedByUsername = "admin",
             UpdatedByUsername = "admin"
         };
-        _ = await context.GameProviders.AddAsync(gameProvider).ConfigureAwait(false);
-        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+        _ = await context.GameProviders.AddAsync(gameProvider);
+        _ = await context.SaveChangesAsync();
 
         var fakeRoundRepository = new GameProviderRepository(context);
 
-        var actual = await fakeRoundRepository.GetCode(gameProviderId).ConfigureAwait(false);
+        var actual = await fakeRoundRepository.GetCode(gameProviderId);
 
         Assert.NotNull(actual);
         Assert.Equal(gameProviderCode, actual);

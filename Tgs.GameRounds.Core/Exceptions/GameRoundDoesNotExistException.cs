@@ -1,8 +1,5 @@
 ﻿namespace Tgs.GameRounds.Core.Exceptions;
 
-public class GameRoundDoesNotExistException : Exception
+public class GameRoundDoesNotExistException(Guid roundId) : Exception($"This GameRound does not exist.({roundId})")
 {
-    public GameRoundDoesNotExistException(Guid roundId) : base($"This GameRound does not exist.({roundId})")
-    {
-    }
 }

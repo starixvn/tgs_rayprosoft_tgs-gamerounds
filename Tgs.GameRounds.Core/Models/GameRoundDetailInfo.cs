@@ -1,4 +1,4 @@
-﻿namespace Tgs.GameRounds.Core;
+﻿namespace Tgs.GameRounds.Core.Models;
 
 public record GameRoundDetailInfo(
     Guid RoundId,

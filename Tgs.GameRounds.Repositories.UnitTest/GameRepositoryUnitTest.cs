@@ -41,12 +41,12 @@ public class GameRepositoryUnitTest
             CreatedByUsername = "test",
             UpdatedByUsername = "test"
         };
-        _ = await context.Games.AddAsync(game).ConfigureAwait(false);
-        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+        _ = await context.Games.AddAsync(game);
+        _ = await context.SaveChangesAsync();
 
         var fakeRoundRepository = new GameRepository(context);
 
-        var actual = await fakeRoundRepository.GetExternalIdAsync(gameId).ConfigureAwait(false);
+        var actual = await fakeRoundRepository.GetExternalIdAsync(gameId);
 
         Assert.NotNull(actual);
         Assert.Equal(externalGameId, actual);
@@ -85,12 +85,12 @@ public class GameRepositoryUnitTest
             CreatedByUsername = "test",
             UpdatedByUsername = "test"
         };
-        _ = await context.Games.AddAsync(game).ConfigureAwait(false);
-        _ = await context.SaveChangesAsync().ConfigureAwait(false);
+        _ = await context.Games.AddAsync(game);
+        _ = await context.SaveChangesAsync();
 
         var fakeRoundRepository = new GameRepository(context);
 
-        var actual = await fakeRoundRepository.GetIdAsync(gameProviderId, externalGameId).ConfigureAwait(false);
+        var actual = await fakeRoundRepository.GetIdAsync(gameProviderId, externalGameId);
 
         Assert.Equal(gameId, actual);
     }

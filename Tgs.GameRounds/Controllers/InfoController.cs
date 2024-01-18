@@ -4,29 +4,28 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Tgs.GameRounds.Core;
 
-namespace Tgs.GameRounds.Controllers
+namespace Tgs.GameRounds.Controllers;
+
+[Route("[controller]")]
+[ApiController]
+public class InfoController(
+    IConfiguration configuration) : ControllerBase
 {
-    [Route("[controller]")]
-    [ApiController]
-    public class InfoController : ControllerBase
+    /// <summary>
+    /// Gets the asynchronous.
+    /// </summary>
+    /// <param name="_hostingEnvironment">The hosting environment.</param>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<object> GetAsync([FromServices] IWebHostEnvironment _hostingEnvironment)
     {
-        private readonly IConfiguration _configuration;
-
-        public InfoController(IConfiguration configuration)
+        var hostName = Dns.GetHostName();
+        var hostEntry = await Dns.GetHostEntryAsync(hostName);
+        var hostIp = Array.Find(hostEntry.AddressList,
+            x => x.AddressFamily == AddressFamily.InterNetwork);
+        return new
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        }
-
-        [HttpGet]
-        public async Task<object> GetAsync([FromServices] IWebHostEnvironment _hostingEnvironment)
-        {
-            var hostName = Dns.GetHostName();
-            var hostEntry = await Dns.GetHostEntryAsync(hostName);
-            var hostIp = Array.Find(hostEntry.AddressList,
-                x => x.AddressFamily == AddressFamily.InterNetwork);
-            var gameRecordInfo = _configuration.GetSection("GameLocked").Get<GameLockedOptions>();
-
-            return new
+            Data = new
             {
                 Environment.MachineName,
                 HostName = hostName,
@@ -35,8 +34,9 @@ namespace Tgs.GameRounds.Controllers
                 OsVersion = $"{Environment.OSVersion}",
                 Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(),
                 ProcessCount = Environment.ProcessorCount,
-                gameRecordInfo
-            };
-        }
+                ReleaseNamespace = configuration.GetValue<string>("RELEASE_NAMESPACE"),
+                PodIPAddress = configuration.GetValue<string>("POD_IP")
+            }
+        };
     }
 }

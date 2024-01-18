@@ -7,11 +7,9 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-var builder = WebApplication.CreateBuilder(args);
+var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
-builder.Configuration
-    .AddJsonFile("/config/appsettings.json", true)
-    .AddEnvironmentVariables();
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging
     .AddOpenTelemetry(options =>
@@ -28,7 +26,6 @@ builder.Logging
     });
 
 // Add services to the container.
-
 builder.Services
     .AddRouting(options => options.LowercaseUrls = true)
     .AddControllers(options =>
@@ -40,6 +37,7 @@ builder.Services
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -51,13 +49,7 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 
-builder.Services
-    .AddGameRounds(
-    (options, sp) =>
-    {
-        var configuration = sp.GetRequiredService<IConfiguration>();
-        options.ConnectionString = configuration.GetConnectionString("Redis")!;
-    },
+builder.Services.AddGameRounds(
     (sp, dbBuilder) =>
     {
         var config = sp.GetRequiredService<IConfiguration>();
@@ -67,11 +59,6 @@ builder.Services
     {
         var config = sp.GetRequiredService<IConfiguration>();
         _ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"));
-    },
-    (options, sp) =>
-    {
-        var configuration = sp.GetRequiredService<IConfiguration>();
-        configuration.GetSection("GameLocked").Bind(options);
     });
 
 builder.Services
@@ -81,6 +68,7 @@ builder.Services
             .AddEnvironmentVariableDetector())
         .AddSource("Tgs.*")
         .AddSource("TGS.*")
+        .AddSource("Valhalla.*")
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
         .AddGrpcClientInstrumentation()
@@ -94,15 +82,14 @@ builder.Services
     .AddAspNetCoreInstrumentation()
     .AddOtlpExporter())
     .Services
-    .Configure<AspNetCoreInstrumentationOptions>(options => options.Filter =
+    .Configure<AspNetCoreTraceInstrumentationOptions>(options => options.Filter =
         httpContext => !httpContext.Request.Path.HasValue
             || !httpContext.Request.Path.StartsWithSegments("/swagger")
             && !httpContext.Request.Path.StartsWithSegments("/healthz")
             && !httpContext.Request.Path.StartsWithSegments("/profiler/")
             && !httpContext.Request.Path.StartsWithSegments("/hangfire")
             && !httpContext.Request.Path.StartsWithSegments("/metrics")
-            && !new[] { "html", "ico", "png", "jpg" }.Any(
-                ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
+            && !filterInstrumentations.Any(ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
     .AddInterceptionService()
     .AddServiceUtiltiyInterceptors();
 

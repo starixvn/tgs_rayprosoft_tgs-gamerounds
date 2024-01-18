@@ -9,38 +9,32 @@
     }
   },
   "profiles": {
-    "Tgs.GameRounds": {
+    "http": {
       "commandName": "Project",
+      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5118",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "OTEL_SERVICE_NAME": "Game-GameRounds(local)",
-        "NODE_IP": "otel.rpgp.cc"
-      },
-      "applicationUrl": "https://localhost:7118;http://localhost:5118",
-      "dotnetRunMessages": true
-    },
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "OTEL_SERVICE_NAME": "Game-GameRounds(local)",
-        "NODE_IP": "otel.rpgp.cc"
+        "NODE_IP": "otel.rpgp.cc",
+        "RELEASE_NAMESPACE": "dev",
+        "POD_IP": "127.0.0.1"
       }
     },
-    "Docker": {
-      "commandName": "Docker",
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-      "publishAllPorts": true,
-      "useSSL": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7118;http://localhost:5118",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "OTEL_SERVICE_NAME": "Game-GameRounds(local)",
-        "NODE_IP": "otel.rpgp.cc"
+        "NODE_IP": "otel.rpgp.cc",
+        "RELEASE_NAMESPACE": "dev",
+        "POD_IP": "127.0.0.1"
       }
     }
   }

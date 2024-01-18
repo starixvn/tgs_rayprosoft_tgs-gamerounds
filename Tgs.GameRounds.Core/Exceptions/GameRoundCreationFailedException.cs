@@ -1,9 +1,5 @@
 ﻿namespace Tgs.GameRounds.Core.Exceptions;
 
-public class GameRoundCreationFailedException : Exception
+public class GameRoundCreationFailedException(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId) : Exception($"This GameRound failed to create an order.({gameProviderId} | {externalRoundId} | {gameId} | {walletId})")
 {
-    public GameRoundCreationFailedException(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId)
-        : base($"This GameRound failed to create an order.({gameProviderId} | {externalRoundId} | {gameId} | {walletId})")
-    {
-    }
 }

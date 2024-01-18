@@ -10,7 +10,7 @@ data:
       "Logging": {
         "LogLevel": {
           "Default": "Warning"
-           }
+        }
       }
     }
   otel-collector-config.yaml: |

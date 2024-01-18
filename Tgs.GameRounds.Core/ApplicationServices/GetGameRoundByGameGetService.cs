@@ -2,25 +2,14 @@
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
 
-internal class GetGameRoundByGameGetService : IGetService<GetGameRoundByGameQuery, GameRoundResult?>
+internal class GetGameRoundByGameGetService(
+    IGameRepository gameRepository,
+    IGameProviderRepository gameProviderRepository,
+    IGameRoundRepository gameRoundRepository) : IGetService<GetGameRoundByGameQuery, GameRoundResult?>
 {
-    private readonly IGameRepository _game;
-    private readonly IGameProviderRepository _gameProvider;
-    private readonly IGameRoundRepository _gameRoundRepository;
-
-    public GetGameRoundByGameGetService(
-        IGameRepository game,
-        IGameProviderRepository gameProvider,
-        IGameRoundRepository gameRoundRepository)
-    {
-        _game = game ?? throw new ArgumentNullException(nameof(game));
-        _gameProvider = gameProvider ?? throw new ArgumentNullException(nameof(gameProvider));
-        _gameRoundRepository = gameRoundRepository ?? throw new ArgumentNullException(nameof(gameRoundRepository));
-    }
-
     public async ValueTask<GameRoundResult?> GetAsync(GetGameRoundByGameQuery query, CancellationToken cancellationToken = default)
     {
-        var gameRoundInfo = await _gameRoundRepository.GetAsync(
+        var gameRoundInfo = await gameRoundRepository.GetAsync(
             gameProviderId: query.GameProviderId,
             externalRoundId: query.ExternalRoundId,
             gameId: query.GameId,
@@ -29,15 +18,15 @@ internal class GetGameRoundByGameGetService : IGetService<GetGameRoundByGameQuer
 
         if (gameRoundInfo is not null)
         {
-            var gameProviderCode = await _gameProvider.GetCode(
-                id: query.GameProviderId,
+            var gameProviderCode = await gameProviderRepository.GetCode(
+                id: gameRoundInfo.GameProviderId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var externalGameId = await _game.GetExternalIdAsync(
-                id: query.GameId,
+            var externalGameId = await gameRepository.GetExternalIdAsync(
+                id: gameRoundInfo.GameId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var detailInfo = await _gameRoundRepository
+            var detailInfo = await gameRoundRepository
                 .GetRoundDetailAsync(
                     gameRoundInfo.RoundId,
                     cancellationToken)

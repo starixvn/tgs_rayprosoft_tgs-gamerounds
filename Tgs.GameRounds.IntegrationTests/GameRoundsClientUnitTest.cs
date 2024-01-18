@@ -11,6 +11,7 @@ using Tgs.GameRounds.Client;
 using Tgs.GameRounds.Common;
 using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Core.ApplicationServices;
+using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRounds.IntegrationTests;
@@ -71,7 +72,7 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.GetGameRoundAsync(roundId).ConfigureAwait(false);
+        var actual = await sut.GetGameRoundAsync(roundId);
 
         Assert.NotNull(actual);
     }
@@ -135,7 +136,7 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, gameId, walletId).ConfigureAwait(false);
+        var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, gameId, walletId);
 
         Assert.NotNull(actual);
         Assert.Equal(roundId, actual.RoundId);
@@ -171,7 +172,7 @@ public partial class GameRoundsClientUnitTest
 
         var sut = new GameRoundsClient(httpClient);
 
-        var actual = await sut.GetRoundDetailAsync(roundId).ConfigureAwait(false);
+        var actual = await sut.GetRoundDetailAsync(roundId);
 
         Assert.NotNull(actual);
         Assert.Equal(roundId, actual.RoundId);

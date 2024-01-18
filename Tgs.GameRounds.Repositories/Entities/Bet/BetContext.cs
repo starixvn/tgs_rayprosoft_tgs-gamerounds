@@ -29,9 +29,9 @@ public partial class BetContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("uuid-ossp");
 
-            modelBuilder.ApplyConfiguration(new Configurations.RoundConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.RoundDetailConfiguration());
-            modelBuilder.ApplyConfiguration(new Configurations.RoundOperationRecordConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.RoundConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.RoundDetailConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.RoundOperationRecordConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 

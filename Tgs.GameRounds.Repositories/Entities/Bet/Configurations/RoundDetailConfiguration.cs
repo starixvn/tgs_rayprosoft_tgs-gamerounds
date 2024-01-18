@@ -7,28 +7,27 @@ using Tgs.GameRounds.Repositories.Entities;
 
 #nullable disable
 
-namespace Tgs.GameRounds.Repositories.Entities.Configurations
+namespace Tgs.GameRounds.Repositories.Entities.Configurations;
+
+public partial class RoundDetailConfiguration : IEntityTypeConfiguration<RoundDetail>
 {
-    public partial class RoundDetailConfiguration : IEntityTypeConfiguration<RoundDetail>
+    public void Configure(EntityTypeBuilder<RoundDetail> entity)
     {
-        public void Configure(EntityTypeBuilder<RoundDetail> entity)
-        {
-            entity.HasKey(e => e.RoundId).HasName("pk_round_details");
+        entity.HasKey(e => e.RoundId).HasName("pk_round_details");
 
-            entity.ToTable("round_details", "bet");
+        entity.ToTable("round_details", "bet");
 
-            entity.Property(e => e.RoundId)
-            .ValueGeneratedNever()
-            .HasColumnName("round_id");
-            entity.Property(e => e.AdditionalData).HasColumnName("additional_data");
+        entity.Property(e => e.RoundId)
+        .ValueGeneratedNever()
+        .HasColumnName("round_id");
+        entity.Property(e => e.AdditionalData).HasColumnName("additional_data");
 
-            entity.HasOne(d => d.Round).WithOne(p => p.RoundDetail)
-            .HasForeignKey<RoundDetail>(d => d.RoundId)
-            .HasConstraintName("fk_round_details_rounds_round_id");
+        entity.HasOne(d => d.Round).WithOne(p => p.RoundDetail)
+        .HasForeignKey<RoundDetail>(d => d.RoundId)
+        .HasConstraintName("fk_round_details_rounds_round_id");
 
-            OnConfigurePartial(entity);
-        }
-
-        partial void OnConfigurePartial(EntityTypeBuilder<RoundDetail> entity);
+        OnConfigurePartial(entity);
     }
+
+    partial void OnConfigurePartial(EntityTypeBuilder<RoundDetail> entity);
 }

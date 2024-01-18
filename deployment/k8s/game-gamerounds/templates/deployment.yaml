@@ -18,7 +18,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "game-gamerounds.selectorLabels" . | nindent 8 }}
+        {{- include "game-gamerounds.labels" . | nindent 8 }}
+	{{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -40,36 +43,48 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+            - name: RELEASE_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: POD_IP
+              valueFrom:
+               fieldRef:
+                fieldPath: status.podIP 
             - name: ConnectionStrings__Tgs
               valueFrom:
                 secretKeyRef:
                   name: tgs-connections
                   key: tgs
+            - name: ConnectionStrings__Nats
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: nats
             - name: ConnectionStrings__Redis
               valueFrom:
                 secretKeyRef:
                   name: tgs-connections
                   key: redis
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
           volumeMounts:
-            - mountPath: /config/appsettings.json
+            - mountPath: /app/appsettings.Production.json
               name: appsettings
               readOnly: true
               subPath: appsettings.json
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
               port: http
-            periodSeconds: 5
+            failureThreshold: 5
+            periodSeconds: 60
           startupProbe:
             httpGet:
               path: /healthz
               port: http
-            periodSeconds: 2
             failureThreshold: 30
+            periodSeconds: 2
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
         - name: monitor
