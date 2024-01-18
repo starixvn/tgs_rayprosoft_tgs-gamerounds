@@ -49,6 +49,9 @@ Selector labels
 app.kubernetes.io/name: {{ include "game-gamerounds.name" . }}
 app: {{ include "game-gamerounds.name" . }}
 tgs.kind: game
+tgs.game.kind: gamerounds
+tgs.gamerounds.kind: gamerounds
+tgs.node.selector.kind: gamewagers
 {{- end }}
 
 {{/*
