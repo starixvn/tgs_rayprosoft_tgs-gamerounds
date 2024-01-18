@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
@@ -10,11 +10,9 @@ internal class GameRoundsClient : IGameRoundsClient
 {
     private static readonly JsonSerializerOptions _SerializerOptions = new()
     {
+        WriteIndented = false,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Converters =
-            {
-                new JsonStringEnumConverter()
-            }
+        Converters = { new JsonStringEnumConverter() }
     };
 
     private readonly HttpClient _httpClient;
@@ -25,82 +23,70 @@ internal class GameRoundsClient : IGameRoundsClient
     }
 
     public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid roundId, CancellationToken cancellationToken = default)
-    {
-        var response = await _httpClient
-            .GetAsync(
-                requestUri: $"gamerounds/{roundId}",
-                cancellationToken: cancellationToken)
-           .ConfigureAwait(false);
-
-        return await GetResultAsync<GameRoundViewModel>(
-            responseMessage: response,
-            cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-    }
+        => await _httpClient.GetAsync($"/gamerounds/{roundId}", cancellationToken)
+        .ToAsyncEnumerable()
+        .Do(response => response.EnsureSuccessStatusCode())
+        .Where(response => response.StatusCode == System.Net.HttpStatusCode.OK)
+        .SelectMany(response => response.Content
+            .ReadFromJsonAsync<GameRoundViewModel>(_SerializerOptions, cancellationToken)
+            .ToAsyncEnumerable())
+        .FirstOrDefaultAsync(cancellationToken: cancellationToken)
+        .ConfigureAwait(false);
 
     public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, int gameId, Guid walletId, CancellationToken cancellationToken = default)
     {
-        var query = HttpUtility.ParseQueryString(string.Empty);
+        var path = new Uri(_httpClient.BaseAddress!, $"gamerounds/game");
+        var builder = new UriBuilder(path);
+        var query = HttpUtility.ParseQueryString(builder.Query);
         query["gameProviderId"] = gameProviderId.ToString();
         query["externalRoundId"] = externalRoundId;
         query["gameId"] = gameId.ToString();
         query["walletId"] = walletId.ToString();
+        builder.Query = query.ToString();
+        string url = builder.ToString();
 
-        var requestUri = $"gamerounds/game?{query}";
+        return await _httpClient.GetAsync(url, cancellationToken)
+         .ToAsyncEnumerable()
+         .Do(response => response.EnsureSuccessStatusCode())
+         .Where(response => response.StatusCode == System.Net.HttpStatusCode.OK)
+         .SelectMany(response => response.Content
+             .ReadFromJsonAsync<GameRoundViewModel>(_SerializerOptions, cancellationToken)
+             .ToAsyncEnumerable())
+         .FirstOrDefaultAsync(cancellationToken: cancellationToken)
+         .ConfigureAwait(false); ;
+    }
 
-        var response = await _httpClient
-            .GetAsync(
-                requestUri: requestUri,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+    public async ValueTask<GameRoundViewModel?> GetGameRoundAsync(Guid gameProviderId, string externalRoundId, string externalGameId, Guid walletId, CancellationToken cancellationToken = default)
+    {
+        var path = new Uri(_httpClient.BaseAddress!, $"gamerounds/external-game");
+        var builder = new UriBuilder(path);
+        var query = HttpUtility.ParseQueryString(builder.Query);
+        query["gameProviderId"] = gameProviderId.ToString();
+        query["externalRoundId"] = externalRoundId;
+        query["externalGameId"] = externalGameId;
+        query["walletId"] = walletId.ToString();
+        builder.Query = query.ToString();
+        string url = builder.ToString();
 
-        return await GetResultAsync<GameRoundViewModel>(
-            responseMessage: response,
-            cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+        return await _httpClient.GetAsync(url, cancellationToken)
+         .ToAsyncEnumerable()
+         .Do(response => response.EnsureSuccessStatusCode())
+         .Where(response => response.StatusCode == System.Net.HttpStatusCode.OK)
+         .SelectMany(response => response.Content
+             .ReadFromJsonAsync<GameRoundViewModel>(_SerializerOptions, cancellationToken)
+             .ToAsyncEnumerable())
+         .FirstOrDefaultAsync(cancellationToken: cancellationToken)
+         .ConfigureAwait(false); ;
     }
 
     public async ValueTask<GameRoundDetailViewModel?> GetRoundDetailAsync(Guid roundId, CancellationToken cancellationToken = default)
-    {
-        var response = await _httpClient
-            .GetAsync(
-                requestUri: $"gamerounds/{roundId}/getdetail",
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        return await GetResultAsync<GameRoundDetailViewModel>(
-            responseMessage: response,
-            cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-    }
-
-    private static async Task<TResult?> GetResultAsync<TResult>(HttpResponseMessage responseMessage, CancellationToken cancellationToken = default)
-    {
-        var content = await responseMessage.Content.ReadAsStringAsync(
-            cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        if (string.IsNullOrWhiteSpace(content))
-        {
-            return default;
-        }
-
-        if (responseMessage.IsSuccessStatusCode)
-        {
-            return JsonSerializer.Deserialize<TResult?>(content, _SerializerOptions);
-        }
-
-        if (responseMessage.StatusCode == HttpStatusCode.InternalServerError)
-        {
-            try
-            {
-                return JsonSerializer.Deserialize<TResult?>(content, _SerializerOptions);
-            }
-            catch
-            {
-                return default;
-            }
-        }
-
-        return default;
-    }
+            => await _httpClient.GetAsync($"/gamerounds/{roundId}/getdetail", cancellationToken)
+        .ToAsyncEnumerable()
+        .Do(response => response.EnsureSuccessStatusCode())
+        .Where(response => response.StatusCode == System.Net.HttpStatusCode.OK)
+        .SelectMany(response => response.Content
+            .ReadFromJsonAsync<GameRoundDetailViewModel>(_SerializerOptions, cancellationToken)
+            .ToAsyncEnumerable())
+        .FirstOrDefaultAsync(cancellationToken: cancellationToken)
+        .ConfigureAwait(false);
 }

@@ -2,12 +2,12 @@
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
 
-internal class GetGameRoundByGameGetService(
+internal class GameRoundByGameGetService(
     IGameRepository gameRepository,
     IGameProviderRepository gameProviderRepository,
-    IGameRoundRepository gameRoundRepository) : IGetService<GetGameRoundByGameQuery, GameRoundResult?>
+    IGameRoundRepository gameRoundRepository) : IGetService<GameRoundByGameQuery, GameRoundResult?>
 {
-    public async ValueTask<GameRoundResult?> GetAsync(GetGameRoundByGameQuery query, CancellationToken cancellationToken = default)
+    public async ValueTask<GameRoundResult?> GetAsync(GameRoundByGameQuery query, CancellationToken cancellationToken = default)
     {
         var gameRoundInfo = await gameRoundRepository.GetAsync(
             gameProviderId: query.GameProviderId,

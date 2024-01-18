@@ -8,7 +8,7 @@ using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest.ApplicationServices;
 
-public class GetGameRoundByGameGetServiceUnitTest
+public class GameRoundByExternalGameGetServiceUnitTest
 {
     [Fact]
     public async void Is_Null()
@@ -17,21 +17,34 @@ public class GetGameRoundByGameGetServiceUnitTest
         var fakeGameProviderRepository = Substitute.For<IGameProviderRepository>();
         var fakeGameRoundRepository = Substitute.For<IGameRoundRepository>();
 
-        var query = new GetGameRoundByGameQuery(
+        var query = new GameRoundByExternalGameQuery(
             GameProviderId: Guid.NewGuid(),
             ExternalRoundId: DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
-            GameId: 1,
+            ExternalGameId: "baccarat",
             WalletId: Guid.NewGuid());
+
+        var gameProviderCode = "KY";
+        _ = fakeGameProviderRepository.GetCode(
+            id: Arg.Is(query.GameProviderId),
+            cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(gameProviderCode);
+
+        var gameId = 1;
+        _ = fakeGameRepository.GetIdAsync(
+            gameProviderId: Arg.Is(query.GameProviderId),
+            externalId: Arg.Is(query.ExternalGameId),
+            cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(gameId);
 
         _ = fakeGameRoundRepository.GetAsync(
             gameProviderId: Arg.Is(query.GameProviderId),
             externalRoundId: Arg.Is(query.ExternalRoundId),
-            gameId: Arg.Is(query.GameId),
+            gameId: Arg.Is(gameId),
             walletId: Arg.Is(query.WalletId),
             cancellationToken: Arg.Any<CancellationToken>())
             .Returns((GameRoundInfo?)null);
 
-        var sut = new GetGameRoundByGameGetService(
+        var sut = new GameRoundByExternalGameGetService(
            fakeGameRepository,
            fakeGameProviderRepository,
            fakeGameRoundRepository);
@@ -48,18 +61,31 @@ public class GetGameRoundByGameGetServiceUnitTest
         var fakeGameProviderRepository = Substitute.For<IGameProviderRepository>();
         var fakeGameRoundRepository = Substitute.For<IGameRoundRepository>();
 
-        var query = new GetGameRoundByGameQuery(
+        var query = new GameRoundByExternalGameQuery(
             GameProviderId: Guid.NewGuid(),
             ExternalRoundId: DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
-            GameId: 1,
+            ExternalGameId: "baccarat",
             WalletId: Guid.NewGuid());
+
+        var gameProviderCode = "KY";
+        _ = fakeGameProviderRepository.GetCode(
+            id: Arg.Is(query.GameProviderId),
+            cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(gameProviderCode);
+
+        var gameId = 1;
+        _ = fakeGameRepository.GetIdAsync(
+            gameProviderId: Arg.Is(query.GameProviderId),
+            externalId: Arg.Is(query.ExternalGameId),
+            cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(gameId);
 
         var gameRoundInfo = new GameRoundInfo(
             RoundId: Guid.NewGuid(),
             ExternalRoundId: query.ExternalRoundId,
             GameProviderId: query.GameProviderId,
             PlayerCode: "test",
-            GameId: query.GameId,
+            GameId: gameId,
             CurrencyCode: "CNY",
             Status: GameRoundStatus.Closed,
             GameProviderConfigurationId: Guid.NewGuid(),
@@ -84,22 +110,10 @@ public class GetGameRoundByGameGetServiceUnitTest
         _ = fakeGameRoundRepository.GetAsync(
             gameProviderId: Arg.Is(query.GameProviderId),
             externalRoundId: Arg.Is(query.ExternalRoundId),
-            gameId: Arg.Is(query.GameId),
+            gameId: Arg.Is(gameId),
             walletId: Arg.Is(query.WalletId),
             cancellationToken: Arg.Any<CancellationToken>())
             .Returns(gameRoundInfo);
-
-        var gameProviderCode = "KY";
-        _ = fakeGameProviderRepository.GetCode(
-            id: Arg.Is(gameRoundInfo.GameProviderId),
-            cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(gameProviderCode);
-
-        var externalGameId = "baccarat";
-        _ = fakeGameRepository.GetExternalIdAsync(
-            id: Arg.Is(gameRoundInfo.GameId),
-            cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(externalGameId);
 
         var gameRoundDetailInfo = new GameRoundDetailInfo(
             RoundId: gameRoundInfo.RoundId,
@@ -112,7 +126,7 @@ public class GetGameRoundByGameGetServiceUnitTest
             cancellationToken: Arg.Any<CancellationToken>())
             .Returns(gameRoundDetailInfo);
 
-        var sut = new GetGameRoundByGameGetService(
+        var sut = new GameRoundByExternalGameGetService(
            fakeGameRepository,
            fakeGameProviderRepository,
            fakeGameRoundRepository);
@@ -121,6 +135,6 @@ public class GetGameRoundByGameGetServiceUnitTest
 
         Assert.NotNull(actual);
         Assert.Equal(query.ExternalRoundId, actual.ExternalRoundId);
-        Assert.Equal(externalGameId, actual.ExternalGameId);
+        Assert.Equal(gameId, actual.GameId);
     }
 }

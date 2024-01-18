@@ -3,12 +3,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Logging.Abstractions;
-using NSubstitute;
 using Tgs.GameRounds.Common;
-using Tgs.GameRounds.Core;
 using Tgs.GameRounds.Repositories.Entities;
-using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Repositories.UnitTest;
 

@@ -19,7 +19,7 @@ namespace Tgs.GameRounds.IntegrationTests;
 public partial class GameRoundsClientUnitTest
 {
     [Fact]
-    public async Task GameRounds_GetGameRound()
+    public async Task GameRounds_Get_GameRound()
     {
         var roundId = Guid.NewGuid();
         var expected = GameRoundStatus.Open;
@@ -57,13 +57,13 @@ public partial class GameRoundsClientUnitTest
 
         var web = CreateTestSettingSite(services =>
         {
-            var fakeService = Substitute.For<IGetService<GetGameRoundQuery, GameRoundResult>>();
+            var fakeService = Substitute.For<IGetService<GameRoundQuery, GameRoundResult?>>();
 
             _ = fakeService
                 .GetAsync(
-                query: Arg.Any<GetGameRoundQuery>(),
+                query: Arg.Any<GameRoundQuery>(),
                 cancellationToken: Arg.Any<CancellationToken>())
-                .Returns(ValueTask.FromResult(data));
+                .Returns(data);
 
             _ = services.AddSingleton(fakeService);
         });
@@ -78,7 +78,114 @@ public partial class GameRoundsClientUnitTest
     }
 
     [Fact]
-    public async Task GameRounds_GetGameRoundByGame()
+    public async Task GameRounds_Get_GameRound_ByExternalGame()
+    {
+        var roundId = Guid.NewGuid();
+        var gameProviderId = Guid.NewGuid();
+        var externalRoundId = Guid.NewGuid().ToString("N");
+        var gameProviderCode = "DG";
+        var externalGameId = "baccarat";
+        var walletId = Guid.NewGuid();
+
+        var data = new GameRoundResult(
+           RoundId: roundId,
+           ExternalRoundId: Guid.NewGuid().ToString("N"),
+           GameProviderId: Guid.NewGuid(),
+           GameProviderCode: gameProviderCode,
+           PlayerCode: "test",
+           GameId: 1,
+           ExternalGameId: externalGameId,
+           CurrencyCode: "CNY",
+           Status: GameRoundStatus.Open,
+           GameProviderConfigurationId: Guid.NewGuid(),
+           WalletId: walletId,
+           CreatedOn: DateTimeOffset.UtcNow,
+           ClosedOn: null,
+           UpdatedOn: DateTimeOffset.UtcNow,
+           BrandId: Guid.NewGuid(),
+           ExternalCreatedOn: null,
+           ExternalClosedOn: null,
+           BetAmount: 0,
+           ValidBetAmount: 0,
+           SettleAmount: 0,
+           Commission: 0,
+           Turnover: 0,
+           CompanyWinLoss: 0,
+           TieBetAdjustment: 0,
+           ClientStatus: GameRoundClientStatus.Open,
+           ReopenTurnoverAdjustment: null,
+           ReopenedOn: null,
+           EffectiveBettingPercentage: null,
+           AdditionalData: JsonSerializer.Serialize(new { roundId }));
+
+        var web = CreateTestSettingSite(services =>
+        {
+            var fakeService = Substitute.For<IGetService<GameRoundByExternalGameQuery, GameRoundResult?>>();
+
+            var query = new GameRoundByExternalGameQuery(
+                GameProviderId: gameProviderId,
+                ExternalRoundId: externalRoundId,
+                ExternalGameId: externalGameId,
+                WalletId: walletId);
+            _ = fakeService
+                .GetAsync(
+                query: Arg.Is(query),
+                cancellationToken: Arg.Any<CancellationToken>())
+                .Returns(data);
+
+            _ = services.AddSingleton(fakeService);
+        });
+
+        var httpClient = web.CreateClient();
+
+        var sut = new GameRoundsClient(httpClient);
+
+        var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, externalGameId, walletId);
+
+        Assert.NotNull(actual);
+        Assert.Equal(roundId, actual.RoundId);
+        Assert.Equal(externalGameId, actual.ExternalGameId);
+        Assert.Equal(gameProviderCode, actual.GameProviderCode);
+    }
+
+    [Fact]
+    public async Task GameRounds_Get_GameRound_ByExternalGame_Is_Null()
+    {
+        var roundId = Guid.NewGuid();
+        var gameProviderId = Guid.NewGuid();
+        var externalRoundId = Guid.NewGuid().ToString("N");
+        var externalGameId = "baccarat";
+        var walletId = Guid.NewGuid();
+
+        var web = CreateTestSettingSite(services =>
+        {
+            var fakeService = Substitute.For<IGetService<GameRoundByExternalGameQuery, GameRoundResult?>>();
+
+            var query = new GameRoundByExternalGameQuery(
+                GameProviderId: gameProviderId,
+                ExternalRoundId: externalRoundId,
+                ExternalGameId: externalGameId,
+                WalletId: walletId);
+            _ = fakeService
+                .GetAsync(
+                query: Arg.Is(query),
+                cancellationToken: Arg.Any<CancellationToken>())
+                .Returns((GameRoundResult?)null);
+
+            _ = services.AddSingleton(fakeService);
+        });
+
+        var httpClient = web.CreateClient();
+
+        var sut = new GameRoundsClient(httpClient);
+
+        var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, externalGameId, walletId);
+
+        Assert.Null(actual);
+    }
+
+    [Fact]
+    public async Task GameRounds_Get_GameRound_ByGame()
     {
         var roundId = Guid.NewGuid();
         Guid gameProviderId = Guid.NewGuid();
@@ -121,13 +228,18 @@ public partial class GameRoundsClientUnitTest
 
         var web = CreateTestSettingSite(services =>
         {
-            var fakeService = Substitute.For<IGetService<GetGameRoundByGameQuery, GameRoundResult>>();
+            var fakeService = Substitute.For<IGetService<GameRoundByGameQuery, GameRoundResult?>>();
 
+            var query = new GameRoundByGameQuery(
+                GameProviderId: gameProviderId,
+                ExternalRoundId: externalRoundId,
+                GameId: gameId,
+                WalletId: walletId);
             _ = fakeService
                 .GetAsync(
-                query: Arg.Any<GetGameRoundByGameQuery>(),
+                query: Arg.Is(query),
                 cancellationToken: Arg.Any<CancellationToken>())
-                .Returns(ValueTask.FromResult(data));
+                .Returns(data);
 
             _ = services.AddSingleton(fakeService);
         });
@@ -145,7 +257,43 @@ public partial class GameRoundsClientUnitTest
     }
 
     [Fact]
-    public async Task GameRounds_GetRoundDetail()
+    public async Task GameRounds_Get_GameRound_ByGame_Is_Null()
+    {
+        var roundId = Guid.NewGuid();
+        Guid gameProviderId = Guid.NewGuid();
+        string externalRoundId = Guid.NewGuid().ToString("N");
+        int gameId = 1;
+        Guid walletId = Guid.NewGuid();
+
+        var web = CreateTestSettingSite(services =>
+        {
+            var fakeService = Substitute.For<IGetService<GameRoundByGameQuery, GameRoundResult?>>();
+
+            var query = new GameRoundByGameQuery(
+                GameProviderId: gameProviderId,
+                ExternalRoundId: externalRoundId,
+                GameId: gameId,
+                WalletId: walletId);
+            _ = fakeService
+                .GetAsync(
+                query: Arg.Is(query),
+                cancellationToken: Arg.Any<CancellationToken>())
+                .Returns((GameRoundResult?)null);
+
+            _ = services.AddSingleton(fakeService);
+        });
+
+        var httpClient = web.CreateClient();
+
+        var sut = new GameRoundsClient(httpClient);
+
+        var actual = await sut.GetGameRoundAsync(gameProviderId, externalRoundId, gameId, walletId);
+
+        Assert.Null(actual);
+    }
+
+    [Fact]
+    public async Task GameRounds_Get_RoundDetail()
     {
         var roundId = Guid.NewGuid();
         var data = new GameRoundDetailInfo(

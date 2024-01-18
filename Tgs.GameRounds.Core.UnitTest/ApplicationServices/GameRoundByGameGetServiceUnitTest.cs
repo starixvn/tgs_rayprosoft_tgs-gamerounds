@@ -8,7 +8,7 @@ using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest.ApplicationServices;
 
-public class GetGameRoundGetServiceUnitTest
+public class GameRoundByGameGetServiceUnitTest
 {
     [Fact]
     public async void Is_Null()
@@ -17,15 +17,21 @@ public class GetGameRoundGetServiceUnitTest
         var fakeGameProviderRepository = Substitute.For<IGameProviderRepository>();
         var fakeGameRoundRepository = Substitute.For<IGameRoundRepository>();
 
-        var query = new GetGameRoundQuery(
-            RoundId: Guid.NewGuid());
+        var query = new GameRoundByGameQuery(
+            GameProviderId: Guid.NewGuid(),
+            ExternalRoundId: DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+            GameId: 1,
+            WalletId: Guid.NewGuid());
 
         _ = fakeGameRoundRepository.GetAsync(
-            id: Arg.Is(query.RoundId),
+            gameProviderId: Arg.Is(query.GameProviderId),
+            externalRoundId: Arg.Is(query.ExternalRoundId),
+            gameId: Arg.Is(query.GameId),
+            walletId: Arg.Is(query.WalletId),
             cancellationToken: Arg.Any<CancellationToken>())
             .Returns((GameRoundInfo?)null);
 
-        var sut = new GetGameRoundGetService(
+        var sut = new GameRoundByGameGetService(
            fakeGameRepository,
            fakeGameProviderRepository,
            fakeGameRoundRepository);
@@ -42,19 +48,22 @@ public class GetGameRoundGetServiceUnitTest
         var fakeGameProviderRepository = Substitute.For<IGameProviderRepository>();
         var fakeGameRoundRepository = Substitute.For<IGameRoundRepository>();
 
-        var query = new GetGameRoundQuery(
-            RoundId: Guid.NewGuid());
+        var query = new GameRoundByGameQuery(
+            GameProviderId: Guid.NewGuid(),
+            ExternalRoundId: DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+            GameId: 1,
+            WalletId: Guid.NewGuid());
 
         var gameRoundInfo = new GameRoundInfo(
-            RoundId: query.RoundId,
-            ExternalRoundId: DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
-            GameProviderId: Guid.NewGuid(),
+            RoundId: Guid.NewGuid(),
+            ExternalRoundId: query.ExternalRoundId,
+            GameProviderId: query.GameProviderId,
             PlayerCode: "test",
-            GameId: 1,
+            GameId: query.GameId,
             CurrencyCode: "CNY",
             Status: GameRoundStatus.Closed,
             GameProviderConfigurationId: Guid.NewGuid(),
-            WalletId: Guid.NewGuid(),
+            WalletId: query.WalletId,
             CreatedOn: DateTimeOffset.UtcNow,
             ClosedOn: DateTimeOffset.UtcNow,
             UpdatedOn: DateTimeOffset.UtcNow,
@@ -73,7 +82,10 @@ public class GetGameRoundGetServiceUnitTest
             ReopenedOn: null,
             EffectiveBettingPercentage: null);
         _ = fakeGameRoundRepository.GetAsync(
-            id: Arg.Is(query.RoundId),
+            gameProviderId: Arg.Is(query.GameProviderId),
+            externalRoundId: Arg.Is(query.ExternalRoundId),
+            gameId: Arg.Is(query.GameId),
+            walletId: Arg.Is(query.WalletId),
             cancellationToken: Arg.Any<CancellationToken>())
             .Returns(gameRoundInfo);
 
@@ -93,14 +105,14 @@ public class GetGameRoundGetServiceUnitTest
             RoundId: gameRoundInfo.RoundId,
             AdditionalData: new JsonObject
             {
-                ["platformTxId"] = gameRoundInfo.ExternalRoundId
+                ["platformTxId"] = query.ExternalRoundId
             }.ToJsonString());
         _ = fakeGameRoundRepository.GetRoundDetailAsync(
             id: gameRoundInfo.RoundId,
             cancellationToken: Arg.Any<CancellationToken>())
             .Returns(gameRoundDetailInfo);
 
-        var sut = new GetGameRoundGetService(
+        var sut = new GameRoundByGameGetService(
            fakeGameRepository,
            fakeGameProviderRepository,
            fakeGameRoundRepository);
@@ -108,7 +120,7 @@ public class GetGameRoundGetServiceUnitTest
         var actual = await sut.GetAsync(query);
 
         Assert.NotNull(actual);
-        Assert.Equal(gameRoundInfo.ExternalRoundId, actual.ExternalRoundId);
+        Assert.Equal(query.ExternalRoundId, actual.ExternalRoundId);
         Assert.Equal(externalGameId, actual.ExternalGameId);
     }
 }
