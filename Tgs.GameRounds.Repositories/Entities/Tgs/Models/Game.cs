@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tgs.GameRounds.Repositories.Entities;
+namespace Tgs.GameRounds.Entities;
 
 public partial class Game
 {

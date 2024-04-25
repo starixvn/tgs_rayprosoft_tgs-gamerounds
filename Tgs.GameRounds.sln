@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.Core.UnitTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.Client", "Tgs.GameRounds.Client\Tgs.GameRounds.Client.csproj", "{C6703726-8D32-4588-823A-6A4F950E1D9B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.IntegrationTests", "Tgs.GameRounds.IntegrationTests\Tgs.GameRounds.IntegrationTests.csproj", "{EA8CD2B2-C159-4C5B-ABDB-4C93C7D2D814}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRounds.IntegrationTest", "Tgs.GameRounds.IntegrationTest\Tgs.GameRounds.IntegrationTest.csproj", "{79311C26-691D-40FD-AA7C-5D53E9E04E51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +53,10 @@ Global
 		{C6703726-8D32-4588-823A-6A4F950E1D9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6703726-8D32-4588-823A-6A4F950E1D9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6703726-8D32-4588-823A-6A4F950E1D9B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA8CD2B2-C159-4C5B-ABDB-4C93C7D2D814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA8CD2B2-C159-4C5B-ABDB-4C93C7D2D814}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA8CD2B2-C159-4C5B-ABDB-4C93C7D2D814}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA8CD2B2-C159-4C5B-ABDB-4C93C7D2D814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79311C26-691D-40FD-AA7C-5D53E9E04E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79311C26-691D-40FD-AA7C-5D53E9E04E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79311C26-691D-40FD-AA7C-5D53E9E04E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79311C26-691D-40FD-AA7C-5D53E9E04E51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

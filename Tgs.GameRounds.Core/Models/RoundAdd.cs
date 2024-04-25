@@ -1,0 +1,21 @@
+﻿namespace Tgs.GameRounds.Core.Models;
+public record RoundAdd(
+	Guid Id,
+	Guid GameProviderId,
+	Guid GameProviderConfigurationId,
+	int GameId,
+	Guid BrandId,
+	string PlayerCode,
+	Guid WalletId,
+	string CurrencyCode,
+	Common.Enums.RoundStatus Status,
+	Common.Enums.RoundClientStatus ClientStatus,
+	string ExternalRoundId,
+	DateTimeOffset ExternalCreatedOn,
+	DateTimeOffset? ExternalClosedOn,
+	decimal Bet,
+	decimal ValidBet,
+	decimal Settle,
+	decimal Commission,
+	decimal Turnover,
+	decimal PlayerWinLoss);

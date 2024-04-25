@@ -1,17 +1,17 @@
-﻿using Tgs.GameRounds.Core;
-using Tgs.GameRounds.Repositories.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Entities;
 
 namespace Tgs.GameRounds.Repositories;
 
 internal class GameProviderRepository(
-    TgsContext context) : IGameProviderRepository
+	TgsContext context) : IGameProviderRepository
 {
-    public ValueTask<string> GetCode(
-        Guid id,
-        CancellationToken cancellationToken = default)
-        => context.GameProviders.AsQueryable()
-        .Where(x => x.Id == id)
-        .Select(x => x.Code.Trim())
-        .ToAsyncEnumerable()
-        .SingleAsync(cancellationToken: cancellationToken);
+	public async ValueTask<string> GetCode(Guid id, CancellationToken cancellationToken = default)
+		=> await context.GameProviders
+		.Where(x => x.Id == id)
+		.Select(x => x.Code.Trim())
+		.FirstOrDefaultAsync(cancellationToken: cancellationToken)
+		.ConfigureAwait(false)
+		?? throw new ArgumentNullException(id.ToString(), "This game provider does not exist.");
 }

@@ -1,24 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 using Tgs.GameRounds.Core;
+using Tgs.GameRounds.Entities;
 using Tgs.GameRounds.Repositories;
-using Tgs.GameRounds.Repositories.Entities;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollecitonExtensions
 {
-    public static IServiceCollection AddGameRoundBetRepositories(
-        this IServiceCollection services,
-        Action<IServiceProvider, DbContextOptionsBuilder> configure)
-        => services
-        .AddDbContext<BetContext>(configure)
-        .AddTransient<IGameRoundRepository, GameRoundRepository>();
-
-    public static IServiceCollection AddGameRoundTgsRepositories(
-        this IServiceCollection services,
-        Action<IServiceProvider, DbContextOptionsBuilder> configure)
-        => services
-        .AddDbContext<TgsContext>(configure)
-        .AddTransient<IGameProviderRepository, GameProviderRepository>()
-        .AddTransient<IGameRepository, GameRepository>();
+	public static IServiceCollection AddGameRoundsRepositories(
+		this IServiceCollection services,
+		Action<IServiceProvider, DbContextOptionsBuilder> dbContextOptions,
+		Func<IServiceProvider, IDatabase> redisDatabaseResolver)
+		=> services
+		.AddDbContext<TgsContext>(dbContextOptions)
+		.AddTransient<IRoundRepository, RoundRepository>()
+		.Decorate<IRoundRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<RoundCacheLockedRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(3)))
+		.AddTransient<IGameProviderRepository, GameProviderRepository>()
+		.AddTransient<IGameRepository, GameRepository>();
 }

@@ -3,50 +3,51 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
-using Tgs.GameRounds.Repositories.Entities;
+using Tgs.GameRounds.Entities;
 
 #nullable disable
 
-namespace Tgs.GameRounds.Repositories.Entities.Configurations;
-
-public partial class SubGameProviderConfiguration : IEntityTypeConfiguration<SubGameProvider>
+namespace Tgs.GameRounds.Entities.Configurations
 {
-    public void Configure(EntityTypeBuilder<SubGameProvider> entity)
+    public partial class SubGameProviderConfiguration : IEntityTypeConfiguration<SubGameProvider>
     {
-        entity.HasKey(e => e.Code).HasName("pk_sub_game_providers");
+        public void Configure(EntityTypeBuilder<SubGameProvider> entity)
+        {
+            entity.HasKey(e => e.Code).HasName("pk_sub_game_providers");
 
-        entity.ToTable("sub_game_providers", "dbo");
+            entity.ToTable("sub_game_providers", "dbo");
 
-        entity.HasIndex(e => e.GameProviderId, "ix_sub_game_providers_game_provider_id");
+            entity.HasIndex(e => e.GameProviderId, "ix_sub_game_providers_game_provider_id");
 
-        entity.Property(e => e.Code)
-        .HasMaxLength(16)
-        .HasColumnName("code");
-        entity.Property(e => e.CreatedByUsername)
-        .HasMaxLength(32)
-        .HasColumnName("created_by_username");
-        entity.Property(e => e.CreatedOn).HasColumnName("created_on");
-        entity.Property(e => e.Description)
-        .HasMaxLength(128)
-        .HasColumnName("description");
-        entity.Property(e => e.GameProviderId).HasColumnName("game_provider_id");
-        entity.Property(e => e.Localization)
-        .HasColumnType("jsonb")
-        .HasColumnName("localization");
-        entity.Property(e => e.Name)
-        .HasMaxLength(255)
-        .HasColumnName("name");
-        entity.Property(e => e.UpdatedByUsername)
-        .HasMaxLength(32)
-        .HasColumnName("updated_by_username");
-        entity.Property(e => e.UpdatedOn).HasColumnName("updated_on");
+            entity.Property(e => e.Code)
+            .HasMaxLength(16)
+            .HasColumnName("code");
+            entity.Property(e => e.CreatedByUsername)
+            .HasMaxLength(32)
+            .HasColumnName("created_by_username");
+            entity.Property(e => e.CreatedOn).HasColumnName("created_on");
+            entity.Property(e => e.Description)
+            .HasMaxLength(128)
+            .HasColumnName("description");
+            entity.Property(e => e.GameProviderId).HasColumnName("game_provider_id");
+            entity.Property(e => e.Localization)
+            .HasColumnType("jsonb")
+            .HasColumnName("localization");
+            entity.Property(e => e.Name)
+            .HasMaxLength(255)
+            .HasColumnName("name");
+            entity.Property(e => e.UpdatedByUsername)
+            .HasMaxLength(32)
+            .HasColumnName("updated_by_username");
+            entity.Property(e => e.UpdatedOn).HasColumnName("updated_on");
 
-        entity.HasOne(d => d.GameProvider).WithMany(p => p.SubGameProviders)
-        .HasForeignKey(d => d.GameProviderId)
-        .HasConstraintName("fk_sub_game_providers_game_providers_game_provider_id");
+            entity.HasOne(d => d.GameProvider).WithMany(p => p.SubGameProviders)
+            .HasForeignKey(d => d.GameProviderId)
+            .HasConstraintName("fk_sub_game_providers_game_providers_game_provider_id");
 
-        OnConfigurePartial(entity);
+            OnConfigurePartial(entity);
+        }
+
+        partial void OnConfigurePartial(EntityTypeBuilder<SubGameProvider> entity);
     }
-
-    partial void OnConfigurePartial(EntityTypeBuilder<SubGameProvider> entity);
 }
