@@ -39,7 +39,7 @@ public class RoundByExternalGameGetServiceUnitTest
 			ExternalGameId: externalGameId,
 			ExternalCreatedOn: externalCreatedOn);
 
-		_ = fakeGameProviderRepository.GetCode(
+		_ = fakeGameProviderRepository.GetCodeAsync(
 			id: Arg.Is(query.GameProviderId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameProviderCode);
@@ -161,7 +161,7 @@ public class RoundByExternalGameGetServiceUnitTest
 		_ = fakeTimeProvider.GetUtcNow()
 			.Returns(currentTime);
 
-		_ = fakeGameProviderRepository.GetCode(
+		_ = fakeGameProviderRepository.GetCodeAsync(
 			id: Arg.Is(query.GameProviderId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameProviderCode);
@@ -269,7 +269,7 @@ public class RoundByExternalGameGetServiceUnitTest
 			ExternalCreatedOn: externalCreatedOn);
 
 		var gameProviderCode = "KY";
-		_ = fakeGameProviderRepository.GetCode(
+		_ = fakeGameProviderRepository.GetCodeAsync(
 			id: Arg.Is(query.GameProviderId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameProviderCode);

@@ -24,7 +24,7 @@ internal class RoundGetService(
 			return default;
 		}
 
-		var gameProviderCode = await gameProviderRepository.GetCode(
+		var gameProviderCode = await gameProviderRepository.GetCodeAsync(
 			id: roundInfo.GameProviderId,
 			cancellationToken: cancellationToken).ConfigureAwait(false);
 

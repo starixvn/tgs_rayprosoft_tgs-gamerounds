@@ -17,10 +17,7 @@ internal class GameRepository(
 		.ConfigureAwait(false)
 		?? throw new ArgumentNullException(id.ToString(), "This game identification code does not exist.");
 
-	public async ValueTask<int> GetIdAsync(
-		Guid gameProviderId,
-		string externalGameId,
-		CancellationToken cancellationToken = default)
+	public async ValueTask<int> GetIdAsync(Guid gameProviderId, string externalGameId, CancellationToken cancellationToken = default)
 		=> await context.Games
 		.Where(x => x.GameProviderId == gameProviderId && x.ExternalId == externalGameId)
 		.Select(x => (int?)x.Id)

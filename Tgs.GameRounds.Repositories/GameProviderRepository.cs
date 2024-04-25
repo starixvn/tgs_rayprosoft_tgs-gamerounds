@@ -7,7 +7,7 @@ namespace Tgs.GameRounds.Repositories;
 internal class GameProviderRepository(
 	TgsContext context) : IGameProviderRepository
 {
-	public async ValueTask<string> GetCode(Guid id, CancellationToken cancellationToken = default)
+	public async ValueTask<string> GetCodeAsync(Guid id, CancellationToken cancellationToken = default)
 		=> await context.GameProviders
 		.Where(x => x.Id == id)
 		.Select(x => x.Code.Trim())

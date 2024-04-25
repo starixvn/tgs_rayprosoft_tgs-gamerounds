@@ -22,7 +22,7 @@ internal class RoundByGameGetService(
 
 		if (roundInfo is not null)
 		{
-			var gameProviderCode = await gameProviderRepository.GetCode(
+			var gameProviderCode = await gameProviderRepository.GetCodeAsync(
 				id: roundInfo.GameProviderId,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 

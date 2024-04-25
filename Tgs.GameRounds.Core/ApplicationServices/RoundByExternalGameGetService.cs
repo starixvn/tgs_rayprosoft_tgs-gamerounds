@@ -12,7 +12,7 @@ internal class RoundByExternalGameGetService(
 	{
 		var externalCreatedOn = query.ExternalCreatedOn ?? timeProvider.GetUtcNow().AddMonths(-3);
 
-		var gameProviderCode = await gameProviderRepository.GetCode(
+		var gameProviderCode = await gameProviderRepository.GetCodeAsync(
 			id: query.GameProviderId,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);

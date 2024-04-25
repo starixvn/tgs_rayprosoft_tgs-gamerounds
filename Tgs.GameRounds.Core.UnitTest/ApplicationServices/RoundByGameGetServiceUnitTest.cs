@@ -71,7 +71,7 @@ public class RoundByGameGetServiceUnitTest
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(roundInfo);
 
-		_ = fakeGameProviderRepository.GetCode(
+		_ = fakeGameProviderRepository.GetCodeAsync(
 			id: Arg.Is(roundInfo.GameProviderId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameProviderCode);
@@ -192,7 +192,7 @@ public class RoundByGameGetServiceUnitTest
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(roundInfo);
 
-		_ = fakeGameProviderRepository.GetCode(
+		_ = fakeGameProviderRepository.GetCodeAsync(
 			id: Arg.Is(roundInfo.GameProviderId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameProviderCode);

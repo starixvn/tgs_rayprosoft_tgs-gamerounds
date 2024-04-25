@@ -44,7 +44,7 @@ public class GameProviderRepositoryUnitTest
 
 		var fakeRoundRepository = new GameProviderRepository(context);
 
-		var actual = await fakeRoundRepository.GetCode(gameProviderId);
+		var actual = await fakeRoundRepository.GetCodeAsync(gameProviderId);
 
 		Assert.NotNull(actual);
 		Assert.Equal(gameProviderCode, actual);
