@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json.Nodes;
 using System.Threading;
+using System.Threading.Tasks;
 using NSubstitute;
 using Tgs.GameRounds.Common.Enums;
 
@@ -12,7 +13,7 @@ namespace Tgs.GameRounds.Core.UnitTest.ApplicationServices;
 public class RoundByExternalGameGetServiceUnitTest
 {
 	[Fact]
-	public async void ExternalCreatedOn_Is_Not_Null()
+	public async Task ExternalCreatedOn_Is_Not_Null()
 	{
 		var fakeTimeProvider = Substitute.For<TimeProvider>();
 		var fakeGameRepository = Substitute.For<IGameRepository>();
@@ -130,7 +131,7 @@ public class RoundByExternalGameGetServiceUnitTest
 	}
 
 	[Fact]
-	public async void ExternalCreatedOn_Is_Null()
+	public async Task ExternalCreatedOn_Is_Null()
 	{
 		var fakeTimeProvider = Substitute.For<TimeProvider>();
 		var fakeGameRepository = Substitute.For<IGameRepository>();
@@ -252,7 +253,7 @@ public class RoundByExternalGameGetServiceUnitTest
 	}
 
 	[Fact]
-	public async void Data_Is_Empty()
+	public async Task Data_Is_Empty()
 	{
 		var fakeTimeProvider = Substitute.For<TimeProvider>();
 		var fakeGameRepository = Substitute.For<IGameRepository>();
