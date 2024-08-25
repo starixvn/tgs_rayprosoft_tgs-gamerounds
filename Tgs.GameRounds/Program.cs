@@ -11,6 +11,8 @@ var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseSentry();
+
 builder.Logging
 	.AddOpenTelemetry(options =>
 	{
@@ -61,8 +63,6 @@ builder.Services
 	.AddOpenTelemetry()
 	.ConfigureResource(_ => _.AddService(builder.Configuration.GetValue<string>("Otel:ServiceName")!))
 	.WithTracing(tracerProviderBuilder => tracerProviderBuilder
-		.SetResourceBuilder(ResourceBuilder.CreateDefault()
-			.AddEnvironmentVariableDetector())
 		.AddSource("Tgs.*")
 		.AddSource("TGS.*")
 		.AddSource("Valhalla.*")
