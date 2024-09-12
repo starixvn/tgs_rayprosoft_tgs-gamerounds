@@ -6,6 +6,7 @@ using Tgs.GameRounds.Core.Models;
 using Tgs.GameRounds.Entities;
 
 namespace Tgs.GameRounds.Repositories;
+
 internal class RoundCacheLockedRepository(
 	IRoundRepository repository,
 	IDatabase database,
@@ -62,24 +63,31 @@ internal class RoundCacheLockedRepository(
 			throw;
 		}
 	}
+
 	public ValueTask ClosedAsync(Guid id, RoundClosed source, CancellationToken cancellationToken = default)
 		=> repository.ClosedAsync(id, source, cancellationToken);
+
 	public ValueTask<RoundInfo?> GetAsync(Guid id, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> repository.GetAsync(id, externalCreatedOn, cancellationToken);
+
 	public ValueTask<RoundInfo?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> repository.GetAsync(gameProviderId, gameId, walletId, externalRoundId, externalCreatedOn, cancellationToken);
+
 	public ValueTask<Guid?> GetIdAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
 		=> repository.GetIdAsync(gameProviderId, gameId, walletId, externalRoundId, externalCreatedOn, cancellationToken);
+
 	public ValueTask<RoundDetailInfo?> GetRoundDetailAsync(Guid id, CancellationToken cancellationToken = default)
 		=> repository.GetRoundDetailAsync(id, cancellationToken);
+
 	public ValueTask MergeDetailAsync(Guid id, string additionalData, CancellationToken cancellationToken = default)
 		=> repository.MergeDetailAsync(id, additionalData, cancellationToken);
+
 	public ValueTask OpenAsync(Guid id, RoundOpen source, CancellationToken cancellationToken = default)
 		=> repository.OpenAsync(id, source, cancellationToken);
+
 	public ValueTask ReopenAsync(Guid id, RoundReopen source, CancellationToken cancellationToken = default)
 		=> repository.ReopenAsync(id, source, cancellationToken);
 
 	private static string GetKey(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId)
 		=> string.Concat(typeof(RoundCacheLockedRepository).Namespace!.Replace('.', '-').ToLower(), "round", ":", "locked", ":", gameProviderId, ":", gameId, ":", walletId, ":", externalRoundId);
-
 }

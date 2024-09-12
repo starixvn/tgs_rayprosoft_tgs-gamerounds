@@ -1,24 +1,25 @@
 ﻿using System.Text.Json.Nodes;
-using Tgs.GameRounds.Common.Enums;
 
 namespace Tgs.GameRounds.Common.ViewModels;
-public record RoundCommandViewModel(
-	Guid GameProviderId,
-	Guid GameProviderConfigurationId,
-	int GameId,
-	Guid BrandId,
-	string PlayerCode,
-	Guid WalletId,
-	string CurrencyCode,
-	RoundStatus Status,
-	RoundClientStatus ClientStatus,
-	string ExternalRoundId,
-	DateTimeOffset ExternalCreatedOn,
-	DateTimeOffset? ExternalClosedOn,
-	decimal BetAmount,
-	decimal ValidBetAmount,
-	decimal SettleAmount,
-	decimal Commission,
-	decimal Turnover,
-	decimal PlayerWinLoss,
-	JsonNode AdditionalData);
+public record RoundCommandViewModel
+{
+	public Guid GameProviderId { get; init; }
+	public Guid GameProviderConfigurationId { get; init; }
+	public int GameId { get; init; }
+	public Guid BrandId { get; init; }
+	public string PlayerCode { get; init; } = default!;
+	public Guid WalletId { get; init; }
+	public string CurrencyCode { get; init; } = default!;
+	public Common.Enums.RoundStatus Status { get; init; }
+	public Common.Enums.RoundClientStatus ClientStatus { get; init; }
+	public string ExternalRoundId { get; init; } = default!;
+	public DateTimeOffset ExternalCreatedOn { get; init; }
+	public DateTimeOffset? ExternalClosedOn { get; init; }
+	public decimal BetAmount { get; init; }
+	public decimal ValidBetAmount { get; init; }
+	public decimal SettleAmount { get; init; }
+	public decimal Commission { get; init; }
+	public decimal Turnover { get; init; }
+	public decimal PlayerWinLoss { get; init; }
+	public JsonNode AdditionalData { get; init; } = default!;
+}

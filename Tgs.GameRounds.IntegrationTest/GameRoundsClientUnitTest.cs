@@ -744,29 +744,31 @@ public partial class GameRoundsClientUnitTest
 	public async Task Round_Command()
 	{
 		var externalRoundId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-		var source = new RoundCommandViewModel(
-			GameProviderId: Guid.NewGuid(),
-			GameProviderConfigurationId: Guid.NewGuid(),
-			GameId: 1,
-			BrandId: Guid.NewGuid(),
-			PlayerCode: "test",
-			WalletId: Guid.NewGuid(),
-			CurrencyCode: "CNY",
-			Status: Common.Enums.RoundStatus.Closed,
-			ClientStatus: Common.Enums.RoundClientStatus.Win,
-			ExternalRoundId: externalRoundId,
-			ExternalCreatedOn: DateTimeOffset.UtcNow.AddSeconds(-5),
-			ExternalClosedOn: DateTimeOffset.UtcNow,
-			BetAmount: 10.0m,
-			ValidBetAmount: 10.0m,
-			SettleAmount: 20.0m,
-			Commission: 0.0m,
-			Turnover: 10.0m,
-			PlayerWinLoss: 10.0m,
-			AdditionalData: new JsonObject
+		var source = new RoundCommandViewModel
+		{
+			GameProviderId = Guid.NewGuid(),
+			GameProviderConfigurationId = Guid.NewGuid(),
+			GameId = 1,
+			BrandId = Guid.NewGuid(),
+			PlayerCode = "test",
+			WalletId = Guid.NewGuid(),
+			CurrencyCode = "CNY",
+			Status = Common.Enums.RoundStatus.Closed,
+			ClientStatus = Common.Enums.RoundClientStatus.Win,
+			ExternalRoundId = externalRoundId,
+			ExternalCreatedOn = DateTimeOffset.UtcNow.AddSeconds(-5),
+			ExternalClosedOn = DateTimeOffset.UtcNow,
+			BetAmount = 10.0m,
+			ValidBetAmount = 10.0m,
+			SettleAmount = 20.0m,
+			Commission = 0.0m,
+			Turnover = 10.0m,
+			PlayerWinLoss = 10.0m,
+			AdditionalData = new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId
-			});
+			}
+		};
 
 		var roundId = Guid.NewGuid();
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>

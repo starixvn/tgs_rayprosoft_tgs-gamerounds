@@ -58,6 +58,4 @@ public partial class Round
     public DateTime? ReopenedOn { get; set; }
 
     public decimal? EffectiveBettingPercentage { get; set; }
-
-    public virtual RoundDetail? RoundDetail { get; set; }
 }

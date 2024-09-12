@@ -2,10 +2,12 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Tgs.GameRounds;
 
 var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
@@ -45,17 +47,24 @@ builder.Services.AddSwaggerGen(c =>
 	}
 });
 
-builder.Services.AddGameRounds(
+builder.Services
+	.AddOptions<RedisOptions>()
+	.Configure((RedisOptions options, IServiceProvider sp) =>
+	{
+		var configuration = sp.GetRequiredService<IConfiguration>();
+		options.ConnectionString = configuration.GetConnectionString("Redis")!;
+	})
+	.Services
+	.AddSingleton<RedisConnectionManager>()
+	.AddSingleton(TimeProvider.System)
+	.AddGameRoundsCore()
+	.AddGameRoundsRepositories(
 	(sp, dbBuilder) =>
 	{
 		var config = sp.GetRequiredService<IConfiguration>();
 		_ = dbBuilder.UseNpgsql(config.GetConnectionString("Tgs"));
 	},
-	(options, sp) =>
-	{
-		var configuration = sp.GetRequiredService<IConfiguration>();
-		options.ConnectionString = configuration.GetConnectionString("Redis")!;
-	});
+	redisDatabaseResolver: (sp) => sp.GetRequiredService<RedisConnectionManager>().Database);
 
 builder.Services
 	.AddOpenTelemetry()
