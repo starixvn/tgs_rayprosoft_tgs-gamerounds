@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text.Json.Nodes;
 using System.Threading;
+using System.Threading.Tasks;
+
 using NSubstitute;
+using Tgs.GameRounds.Common.Enums;
 using Tgs.GameRounds.Core.ApplicationServices;
 using Tgs.GameRounds.Core.Models;
-using Tgs.GameRounds.Common.Enums;
-using System.Threading.Tasks;
 
 namespace Tgs.GameRounds.Core.UnitTest.ApplicationServices;
 

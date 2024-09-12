@@ -17,14 +17,12 @@ namespace Tgs.GameRounds.Entities.Configurations
 
             entity.ToTable("round_details", "bet");
 
-            entity.Property(e => e.RoundId)
-            .ValueGeneratedNever()
-            .HasColumnName("round_id");
-            entity.Property(e => e.AdditionalData).HasColumnName("additional_data");
+            entity.HasIndex(e => e.RoundId, "pk_round_details_ccnew").IsUnique();
 
-            entity.HasOne(d => d.Round).WithOne(p => p.RoundDetail)
-            .HasForeignKey<RoundDetail>(d => d.RoundId)
-            .HasConstraintName("fk_round_details_rounds_round_id");
+            entity.Property(e => e.RoundId)
+                .ValueGeneratedNever()
+                .HasColumnName("round_id");
+            entity.Property(e => e.AdditionalData).HasColumnName("additional_data");
 
             OnConfigurePartial(entity);
         }
