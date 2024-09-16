@@ -6,17 +6,17 @@ public interface IRoundRepository
 
 	ValueTask AddAsync(Models.RoundAdd source, CancellationToken cancellationToken = default);
 
-	ValueTask ClosedAsync(Guid id, Models.RoundClosed source, CancellationToken cancellationToken = default);
+	ValueTask ClosedAsync(DateTimeOffset externalCreatedOn, Guid id, Models.RoundClosed source, CancellationToken cancellationToken = default);
 
-	ValueTask<Models.RoundInfo?> GetAsync(Guid id, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default);
+	ValueTask<Models.RoundInfo?> GetAsync(DateTimeOffset externalCreatedOn, Guid id, CancellationToken cancellationToken = default);
 
-	ValueTask<Models.RoundInfo?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default);
+	ValueTask<Models.RoundInfo?> GetAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default);
 
-	ValueTask<Guid?> GetIdAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default);
+	ValueTask<Guid?> GetIdAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default);
 
 	ValueTask MergeDetailAsync(Guid id, string additionalData, CancellationToken cancellationToken = default);
 
-	ValueTask OpenAsync(Guid id, Models.RoundOpen source, CancellationToken cancellationToken = default);
+	ValueTask OpenAsync(DateTimeOffset externalCreatedOn, Guid id, Models.RoundOpen source, CancellationToken cancellationToken = default);
 
-	ValueTask ReopenAsync(Guid id, Models.RoundReopen source, CancellationToken cancellationToken = default);
+	ValueTask ReopenAsync(DateTimeOffset externalCreatedOn, Guid id, Models.RoundReopen source, CancellationToken cancellationToken = default);
 }

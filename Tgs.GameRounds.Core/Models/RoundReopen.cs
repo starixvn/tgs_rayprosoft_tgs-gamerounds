@@ -6,5 +6,4 @@ public record RoundReopen(
 	decimal ValidBet,
 	decimal Settle,
 	decimal Commission,
-	decimal Turnover,
 	decimal PlayerWinLoss);

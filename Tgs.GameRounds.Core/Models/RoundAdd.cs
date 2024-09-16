@@ -17,5 +17,5 @@ public record RoundAdd(
 	decimal ValidBet,
 	decimal Settle,
 	decimal Commission,
-	decimal Turnover,
-	decimal PlayerWinLoss);
+	decimal PlayerWinLoss,
+	DateTimeOffset CreatedOn);

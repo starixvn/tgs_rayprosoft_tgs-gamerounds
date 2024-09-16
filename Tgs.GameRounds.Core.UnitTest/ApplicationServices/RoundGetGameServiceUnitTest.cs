@@ -10,7 +10,7 @@ using Tgs.GameRounds.Core.Models;
 
 namespace Tgs.GameRounds.Core.UnitTest.ApplicationServices;
 
-public class RoundByGameGetServiceUnitTest
+public class RoundGetGameServiceUnitTest
 {
 	[Fact]
 	public async Task ExternalCreatedOn_Is_Not_Null()
@@ -33,7 +33,7 @@ public class RoundByGameGetServiceUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var query = new RoundByGameQuery(
+		var request = new RoundGetGameRequest(
 			GameProviderId: gameProviderId,
 			GameId: gameId,
 			WalletId: walletId,
@@ -58,17 +58,16 @@ public class RoundByGameGetServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
 			UpdatedOn: updatedOn);
 		_ = fakeRoundRepository.GetAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
 			externalCreatedOn: Arg.Is(externalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(roundInfo);
 
@@ -86,20 +85,22 @@ public class RoundByGameGetServiceUnitTest
 			RoundId: roundInfo.Id,
 			AdditionalData: new JsonObject
 			{
-				["platformTxId"] = query.ExternalRoundId
+				["platformTxId"] = request.ExternalRoundId
 			}.ToJsonString());
 		_ = fakeRoundRepository.GetRoundDetailAsync(
 			id: roundInfo.Id,
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameRoundDetailInfo);
 
-		var sut = new RoundByGameGetService(
+		var sut = new RoundGetGameService(
 			fakeTimeProvider,
 			fakeGameRepository,
 			fakeGameProviderRepository,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.NotNull(actual);
 		Assert.Equal(roundId, actual.RoundId);
@@ -121,7 +122,6 @@ public class RoundByGameGetServiceUnitTest
 		Assert.Equal(roundInfo.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.Settle, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
 		Assert.Equal(roundInfo.ClosedOn, actual.ClosedOn);
@@ -150,7 +150,7 @@ public class RoundByGameGetServiceUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var query = new RoundByGameQuery(
+		var request = new RoundGetGameRequest(
 			GameProviderId: gameProviderId,
 			GameId: gameId,
 			WalletId: walletId,
@@ -179,17 +179,16 @@ public class RoundByGameGetServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
 			UpdatedOn: updatedOn);
 		_ = fakeRoundRepository.GetAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
 			externalCreatedOn: Arg.Is(currentTime.AddMonths(-3)),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(roundInfo);
 
@@ -207,20 +206,22 @@ public class RoundByGameGetServiceUnitTest
 			RoundId: roundInfo.Id,
 			AdditionalData: new JsonObject
 			{
-				["platformTxId"] = query.ExternalRoundId
+				["platformTxId"] = request.ExternalRoundId
 			}.ToJsonString());
 		_ = fakeRoundRepository.GetRoundDetailAsync(
 			id: roundInfo.Id,
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameRoundDetailInfo);
 
-		var sut = new RoundByGameGetService(
+		var sut = new RoundGetGameService(
 			fakeTimeProvider,
 			fakeGameRepository,
 			fakeGameProviderRepository,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.NotNull(actual);
 		Assert.Equal(roundId, actual.RoundId);
@@ -242,7 +243,6 @@ public class RoundByGameGetServiceUnitTest
 		Assert.Equal(roundInfo.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.Settle, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
 		Assert.Equal(roundInfo.ClosedOn, actual.ClosedOn);
@@ -264,7 +264,7 @@ public class RoundByGameGetServiceUnitTest
 		var externalRoundId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 		var externalCreatedOn = new DateTimeOffset(2024, 04, 24, 15, 30, 45, TimeSpan.FromHours(+8));
 
-		var query = new RoundByGameQuery(
+		var request = new RoundGetGameRequest(
 			GameProviderId: gameProviderId,
 			GameId: gameId,
 			WalletId: walletId,
@@ -272,21 +272,23 @@ public class RoundByGameGetServiceUnitTest
 			ExternalCreatedOn: externalCreatedOn);
 
 		_ = fakeRoundRepository.GetAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
 			externalCreatedOn: Arg.Is(externalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns((RoundInfo?)null);
 
-		var sut = new RoundByGameGetService(
+		var sut = new RoundGetGameService(
 			fakeTimeProvider,
 			fakeGameRepository,
 			fakeGameProviderRepository,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.Null(actual);
 	}

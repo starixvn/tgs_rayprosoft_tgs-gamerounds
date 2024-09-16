@@ -38,8 +38,8 @@ public class RoundCacheLockedRepositoryUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
-			PlayerWinLoss: 10.0m);
+			PlayerWinLoss: 10.0m,
+			CreatedOn: DateTimeOffset.UtcNow);
 
 		var key = string.Concat(typeof(RoundCacheLockedRepository).Namespace!.Replace('.', '-').ToLower(), "round", ":", "locked", ":", source.GameProviderId, ":", source.GameId, ":", source.WalletId, ":", source.ExternalRoundId);
 
@@ -91,8 +91,8 @@ public class RoundCacheLockedRepositoryUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
-			PlayerWinLoss: 10.0m);
+			PlayerWinLoss: 10.0m,
+			CreatedOn: DateTimeOffset.UtcNow);
 
 		var key = string.Concat(typeof(RoundCacheLockedRepository).Namespace!.Replace('.', '-').ToLower(), "round", ":", "locked", ":", source.GameProviderId, ":", source.GameId, ":", source.WalletId, ":", source.ExternalRoundId);
 
@@ -144,8 +144,8 @@ public class RoundCacheLockedRepositoryUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
-			PlayerWinLoss: 10.0m);
+			PlayerWinLoss: 10.0m,
+			CreatedOn: DateTimeOffset.UtcNow);
 
 		var key = string.Concat(typeof(RoundCacheLockedRepository).Namespace!.Replace('.', '-').ToLower(), "round", ":", "locked", ":", source.GameProviderId, ":", source.GameId, ":", source.WalletId, ":", source.ExternalRoundId);
 
@@ -186,6 +186,7 @@ public class RoundCacheLockedRepositoryUnitTest
 		var fakeLogger = NullLogger<RoundCacheLockedRepository>.Instance;
 
 		var id = Guid.NewGuid();
+		var externalCreatedOn = DateTimeOffset.UtcNow;
 		var source = new RoundClosed(
 			ClientStatus: Common.Enums.RoundClientStatus.Win,
 			ExternalClosedOn: DateTimeOffset.Now,
@@ -193,7 +194,6 @@ public class RoundCacheLockedRepositoryUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m);
 
 		var sut = new RoundCacheLockedRepository(
@@ -202,11 +202,12 @@ public class RoundCacheLockedRepositoryUnitTest
 			fakeTimeSpan,
 			fakeLogger);
 
-		await sut.ClosedAsync(id, source);
+		await sut.ClosedAsync(externalCreatedOn, id, source);
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.ClosedAsync(
+			externalCreatedOn: Arg.Is(externalCreatedOn),
 			id: Arg.Is(id),
 			source: Arg.Is(source),
 			cancellationToken: Arg.Any<CancellationToken>());
@@ -229,13 +230,13 @@ public class RoundCacheLockedRepositoryUnitTest
 			fakeTimeSpan,
 			fakeLogger);
 
-		_ = await sut.GetAsync(id, externalCreatedOn);
+		_ = await sut.GetAsync(externalCreatedOn, id);
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.GetAsync(
-			id: Arg.Is(id),
 			externalCreatedOn: Arg.Is(externalCreatedOn),
+			id: Arg.Is(id),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
@@ -259,16 +260,16 @@ public class RoundCacheLockedRepositoryUnitTest
 			fakeTimeSpan,
 			fakeLogger);
 
-		_ = await sut.GetAsync(gameProviderId, gameId, walletId, externalRoundId, externalCreatedOn);
+		_ = await sut.GetAsync(externalCreatedOn, gameProviderId, gameId, walletId, externalRoundId);
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.GetAsync(
+			externalCreatedOn: Arg.Is(externalCreatedOn),
 			gameProviderId: Arg.Is(gameProviderId),
 			gameId: Arg.Is(gameId),
 			walletId: Arg.Is(walletId),
 			externalRoundId: Arg.Is(externalRoundId),
-			externalCreatedOn: Arg.Is(externalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
@@ -292,16 +293,16 @@ public class RoundCacheLockedRepositoryUnitTest
 			fakeTimeSpan,
 			fakeLogger);
 
-		_ = await sut.GetIdAsync(gameProviderId, gameId, walletId, externalRoundId, externalCreatedOn);
+		_ = await sut.GetIdAsync(externalCreatedOn, gameProviderId, gameId, walletId, externalRoundId);
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.GetIdAsync(
+			externalCreatedOn: Arg.Is(externalCreatedOn),
 			gameProviderId: Arg.Is(gameProviderId),
 			gameId: Arg.Is(gameId),
 			walletId: Arg.Is(walletId),
 			externalRoundId: Arg.Is(externalRoundId),
-			externalCreatedOn: Arg.Is(externalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
@@ -369,6 +370,7 @@ public class RoundCacheLockedRepositoryUnitTest
 		var fakeLogger = NullLogger<RoundCacheLockedRepository>.Instance;
 
 		var id = Guid.NewGuid();
+		var externalCreatedOn = DateTimeOffset.UtcNow;
 		var source = new RoundOpen(
 			Bet: 10.0m,
 			ValidBet: 10.0m);
@@ -379,11 +381,12 @@ public class RoundCacheLockedRepositoryUnitTest
 			fakeTimeSpan,
 			fakeLogger);
 
-		await sut.OpenAsync(id, source);
+		await sut.OpenAsync(externalCreatedOn, id, source);
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.OpenAsync(
+			externalCreatedOn: Arg.Is(externalCreatedOn),
 			id: Arg.Is(id),
 			source: Arg.Is(source),
 			cancellationToken: Arg.Any<CancellationToken>());
@@ -398,6 +401,7 @@ public class RoundCacheLockedRepositoryUnitTest
 		var fakeLogger = NullLogger<RoundCacheLockedRepository>.Instance;
 
 		var id = Guid.NewGuid();
+		var externalCreatedOn = DateTimeOffset.UtcNow;
 		var source = new RoundReopen(
 			ClientStatus: Common.Enums.RoundClientStatus.Win,
 			ExternalClosedOn: DateTimeOffset.Now,
@@ -405,7 +409,6 @@ public class RoundCacheLockedRepositoryUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m);
 
 		var sut = new RoundCacheLockedRepository(
@@ -414,11 +417,12 @@ public class RoundCacheLockedRepositoryUnitTest
 			fakeTimeSpan,
 			fakeLogger);
 
-		await sut.ReopenAsync(id, source);
+		await sut.ReopenAsync(externalCreatedOn, id, source);
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.ReopenAsync(
+			externalCreatedOn: Arg.Is(externalCreatedOn),
 			id: Arg.Is(id),
 			source: Arg.Is(source),
 			cancellationToken: Arg.Any<CancellationToken>());

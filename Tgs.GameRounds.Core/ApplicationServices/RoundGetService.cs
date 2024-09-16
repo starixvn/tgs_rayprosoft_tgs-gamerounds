@@ -1,5 +1,4 @@
-﻿using System;
-using Tgs.ServiceUtility;
+﻿using MediatR;
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
 
@@ -7,15 +6,15 @@ internal class RoundGetService(
 	TimeProvider timeProvider,
 	IGameRepository gameRepository,
 	IGameProviderRepository gameProviderRepository,
-	IRoundRepository gameRoundRepository) : IGetService<RoundQuery, RoundResult?>
+	IRoundRepository gameRoundRepository) : IRequestHandler<RoundGetRequest, RoundInfoResponse?>
 {
-	public async ValueTask<RoundResult?> GetAsync(RoundQuery query, CancellationToken cancellationToken = default)
+	public async Task<RoundInfoResponse?> Handle(RoundGetRequest request, CancellationToken cancellationToken)
 	{
-		var externalCreatedOn = query.ExternalCreatedOn ?? timeProvider.GetUtcNow().AddMonths(-3);
+		var externalCreatedOn = request.ExternalCreatedOn ?? timeProvider.GetUtcNow().AddMonths(-3);
 
 		var roundInfo = await gameRoundRepository.GetAsync(
-			query.RoundId,
 			externalCreatedOn,
+			request.RoundId,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
@@ -26,18 +25,20 @@ internal class RoundGetService(
 
 		var gameProviderCode = await gameProviderRepository.GetCodeAsync(
 			id: roundInfo.GameProviderId,
-			cancellationToken: cancellationToken).ConfigureAwait(false);
+			cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
 
 		var externalGameId = await gameRepository.GetExternalIdAsync(
 			id: roundInfo.GameId,
-			cancellationToken: cancellationToken).ConfigureAwait(false);
-
-		var detailInfo = await gameRoundRepository.GetRoundDetailAsync(
-			roundInfo.Id,
-			cancellationToken)
+			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
-		return new RoundResult(
+		var detailInfo = await gameRoundRepository.GetRoundDetailAsync(
+			id: roundInfo.Id,
+			cancellationToken: cancellationToken)
+			.ConfigureAwait(false);
+
+		return new RoundInfoResponse(
 			RoundId: roundInfo.Id,
 			GameProviderId: roundInfo.GameProviderId,
 			GameProviderCode: gameProviderCode,
@@ -57,7 +58,6 @@ internal class RoundGetService(
 			ValidBetAmount: roundInfo.ValidBet,
 			SettleAmount: roundInfo.Settle,
 			Commission: roundInfo.Commission,
-			Turnover: roundInfo.Turnover,
 			PlayerWinLoss: roundInfo.PlayerWinLoss,
 			CreatedOn: roundInfo.CreatedOn,
 			ClosedOn: roundInfo.ClosedOn,

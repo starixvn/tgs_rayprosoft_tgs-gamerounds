@@ -1,7 +1,9 @@
 ﻿using System.Text.Json.Nodes;
+using MediatR;
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
-public record RoundCommand(
+public record RoundCommandRequest(
+	Guid Id,
 	Guid GameProviderId,
 	string ExternalRoundId,
 	int GameId,
@@ -18,6 +20,6 @@ public record RoundCommand(
 	decimal ValidBet,
 	decimal Settle,
 	decimal Commission,
-	decimal Turnover,
 	decimal PlayerWinLoss,
-	JsonNode AdditionalData);
+	JsonNode AdditionalData,
+	DateTimeOffset CreatedOn) : IRequest<Guid>;
