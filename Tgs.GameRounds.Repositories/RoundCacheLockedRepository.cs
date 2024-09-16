@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using Tgs.GameRounds.Core;
@@ -43,17 +45,25 @@ internal class RoundCacheLockedRepository(
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "LogOn:{logOn} Message:An exception has occurred when adding bets to this game..{info}",
-				DateTime.Now.ToString("o"),
-				new
+			logger.LogError(ex, "{logError}",
+				JsonSerializer.Serialize(new
 				{
+					LogOn = DateTime.Now.ToString("u"),
+					source.Id,
 					source.GameProviderId,
 					source.GameId,
 					source.PlayerCode,
 					source.WalletId,
 					source.ExternalRoundId,
-					source.ExternalCreatedOn,
-				});
+					ExternalCreatedOn = source.ExternalCreatedOn.ToString("u"),
+					Status = source.Status.ToString(),
+					source.Bet,
+					source.ValidBet,
+					source.Settle,
+					source.Commission,
+					source.PlayerWinLoss,
+					Message = "An exception occurred while adding a new round to this game."
+				}));
 
 			await database.KeyDeleteAsync(
 				key: key,

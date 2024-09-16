@@ -68,28 +68,30 @@ internal class RoundCommandService(
 		}
 		else
 		{
-			logger.LogWarning("{logWarning}",
-				JsonSerializer.Serialize(new
-				{
-					LogOn = DateTime.Now.ToString("u"),
-					request.Id,
-					request.GameProviderId,
-					request.GameId,
-					request.PlayerCode,
-					request.WalletId,
-					request.ExternalRoundId,
-					ExternalCreatedOn = request.ExternalCreatedOn.ToString("u"),
-					RequestStatus = request.Status.ToString(),
-					RequestClientStatus = request.ClientStatus.ToString(),
-					Message = "This game round information."
-				}));
-
 			var roundInfo = await repository.GetAsync(
 				id: id.Value,
 				externalCreatedOn: request.ExternalCreatedOn,
 				cancellationToken: cancellationToken)
 				.ConfigureAwait(false)
 				?? throw new ArgumentNullException(id.ToString());
+
+			logger.LogInformation("{logInformation}",
+				JsonSerializer.Serialize(new
+				{
+					LogOn = DateTime.Now.ToString("u"),
+					roundInfo.Id,
+					roundInfo.GameProviderId,
+					roundInfo.GameId,
+					roundInfo.PlayerCode,
+					roundInfo.WalletId,
+					roundInfo.ExternalRoundId,
+					ExternalCreatedOn = roundInfo.ExternalCreatedOn!.Value.ToString("u"),
+					CurrentStatus = roundInfo.Status.ToString(),
+					CurrentClientStatus = roundInfo.Status.ToString(),
+					RequestStatus = request.Status.ToString(),
+					RequestClientStatus = request.ClientStatus.ToString(),
+					Message = "This game round information."
+				}));
 
 			if ((roundInfo.Status == Common.Enums.RoundStatus.New || roundInfo.Status == Common.Enums.RoundStatus.Open) &&
 				(request.Status == Common.Enums.RoundStatus.New || request.Status == Common.Enums.RoundStatus.Open))
@@ -139,6 +141,34 @@ internal class RoundCommandService(
 						roundInfo.PlayerWinLoss != playerWinLoss ||
 						roundInfo.ClientStatus != request.ClientStatus)
 						{
+							logger.LogWarning("{logWarning}",
+								JsonSerializer.Serialize(new
+								{
+									LogOn = DateTime.Now.ToString("u"),
+									roundInfo.Id,
+									roundInfo.GameProviderId,
+									roundInfo.GameId,
+									roundInfo.PlayerCode,
+									roundInfo.WalletId,
+									roundInfo.ExternalRoundId,
+									ExternalCreatedOn = roundInfo.ExternalCreatedOn!.Value.ToString("u"),
+									CurrentStatus = roundInfo.Status.ToString(),
+									CurrentClientStatus = roundInfo.Status.ToString(),
+									CurrentBet = roundInfo.Bet,
+									CurrentValidBet = roundInfo.ValidBet,
+									CurrentSettle = roundInfo.Settle,
+									CurrentCommission = roundInfo.Commission,
+									CurrentPlayerWinLoss = roundInfo.PlayerWinLoss,
+									RequestStatus = request.Status.ToString(),
+									RequestClientStatus = request.ClientStatus.ToString(),
+									RequestBet = bet,
+									RequestValidBet = validBet,
+									RequestSettle = settle,
+									RequestCommission = commission,
+									RequestPlayerWinLoss = playerWinLoss,
+									Message = "This game round data has changed."
+								}));
+
 							await repository.ReopenAsync(
 								externalCreatedOn: request.ExternalCreatedOn,
 								id!.Value,
