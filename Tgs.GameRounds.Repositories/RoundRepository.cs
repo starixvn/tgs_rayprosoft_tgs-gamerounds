@@ -49,7 +49,7 @@ internal class RoundRepository(
 	public async ValueTask ClosedAsync(DateTimeOffset externalCreatedOn, Guid id, RoundClosed source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).DateTime &&
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-7).DateTime &&
 				x.Id == id &&
 				x.Status == (short)RoundStatus.Open,
 			cancellationToken: cancellationToken)
@@ -190,7 +190,7 @@ internal class RoundRepository(
 	public async ValueTask OpenAsync(DateTimeOffset externalCreatedOn, Guid id, RoundOpen source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).DateTime &&
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-7).DateTime &&
 				x.Id == id &&
 				x.Status == (short)RoundStatus.Open,
 			cancellationToken: cancellationToken)
@@ -216,7 +216,7 @@ internal class RoundRepository(
 	public async ValueTask ReopenAsync(DateTimeOffset externalCreatedOn, Guid id, RoundReopen source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).DateTime &&
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-7).DateTime &&
 				x.Id == id &&
 				x.Status == (short)RoundStatus.Closed,
 			cancellationToken: cancellationToken)
