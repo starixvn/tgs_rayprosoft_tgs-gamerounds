@@ -23,7 +23,6 @@ public record RoundViewModel
 	public decimal ValidBetAmount { get; init; }
 	public decimal SettleAmount { get; init; }
 	public decimal Commission { get; init; }
-	public decimal Turnover { get; init; }
 	public decimal PlayerWinLoss { get; init; }
 	public decimal CompanyWinLoss { get; init; }
 	public DateTimeOffset CreatedOn { get; init; }

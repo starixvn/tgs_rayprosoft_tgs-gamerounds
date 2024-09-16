@@ -1,40 +1,40 @@
-﻿using Tgs.ServiceUtility;
+﻿using MediatR;
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
 
-internal class RoundByExternalGameGetService(
+internal class RoundGetExternalGameService(
 	TimeProvider timeProvider,
 	IGameRepository gameRepository,
 	IGameProviderRepository gameProviderRepository,
-	IRoundRepository gameRoundRepository) : IGetService<RoundByExternalGameQuery, RoundResult?>
+	IRoundRepository gameRoundRepository) : IRequestHandler<RoundGetExternalGameRequest, RoundInfoResponse?>
 {
-	public async ValueTask<RoundResult?> GetAsync(RoundByExternalGameQuery query, CancellationToken cancellationToken = default)
+	public async Task<RoundInfoResponse?> Handle(RoundGetExternalGameRequest request, CancellationToken cancellationToken)
 	{
-		var externalCreatedOn = query.ExternalCreatedOn ?? timeProvider.GetUtcNow().AddMonths(-3);
+		var externalCreatedOn = request.ExternalCreatedOn ?? timeProvider.GetUtcNow().AddMonths(-3);
 
 		var gameProviderCode = await gameProviderRepository.GetCodeAsync(
-			id: query.GameProviderId,
+			id: request.GameProviderId,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
 		var gameId = await gameRepository.GetIdAsync(
-			gameProviderId: query.GameProviderId,
-			externalId: query.ExternalGameId,
+			gameProviderId: request.GameProviderId,
+			externalId: request.ExternalGameId,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
 		var roundInfo = await gameRoundRepository.GetAsync(
-			gameProviderId: query.GameProviderId,
-			gameId: gameId,
-			walletId: query.WalletId,
-			externalRoundId: query.ExternalRoundId,
 			externalCreatedOn: externalCreatedOn,
+			gameProviderId: request.GameProviderId,
+			gameId: gameId,
+			walletId: request.WalletId,
+			externalRoundId: request.ExternalRoundId,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
 		if (roundInfo is null)
 		{
-			return null;
+			return default;
 		}
 
 		var detailInfo = await gameRoundRepository.GetRoundDetailAsync(
@@ -42,7 +42,7 @@ internal class RoundByExternalGameGetService(
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
-		return new RoundResult(
+		return new RoundInfoResponse(
 			RoundId: roundInfo.Id,
 			GameProviderId: roundInfo.GameProviderId,
 			GameProviderCode: gameProviderCode,
@@ -55,14 +55,13 @@ internal class RoundByExternalGameGetService(
 			Status: roundInfo.Status,
 			ClientStatus: roundInfo.ClientStatus,
 			ExternalRoundId: roundInfo.ExternalRoundId,
-			ExternalGameId: query.ExternalGameId,
+			ExternalGameId: request.ExternalGameId,
 			ExternalCreatedOn: roundInfo.ExternalCreatedOn,
 			ExternalClosedOn: roundInfo.ExternalClosedOn,
 			BetAmount: roundInfo.Bet,
 			ValidBetAmount: roundInfo.ValidBet,
 			SettleAmount: roundInfo.Settle,
 			Commission: roundInfo.Commission,
-			Turnover: roundInfo.Turnover,
 			PlayerWinLoss: roundInfo.PlayerWinLoss,
 			CreatedOn: roundInfo.CreatedOn,
 			ClosedOn: roundInfo.ClosedOn,

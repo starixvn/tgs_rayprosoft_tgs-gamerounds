@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -57,6 +56,7 @@ builder.Services
 	.Services
 	.AddSingleton<RedisConnectionManager>()
 	.AddSingleton(TimeProvider.System)
+	.AddSerialNumberGenerator()
 	.AddGameRoundsCore()
 	.AddGameRoundsRepositories(
 	(sp, dbBuilder) =>

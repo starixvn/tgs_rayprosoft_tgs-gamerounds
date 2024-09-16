@@ -2,7 +2,7 @@
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
 
-public record RoundResult(
+public record RoundInfoResponse(
 	Guid RoundId,
 	Guid GameProviderId,
 	string GameProviderCode,
@@ -22,7 +22,6 @@ public record RoundResult(
 	decimal ValidBetAmount,
 	decimal SettleAmount,
 	decimal Commission,
-	decimal Turnover,
 	decimal PlayerWinLoss,
 	DateTimeOffset CreatedOn,
 	DateTimeOffset? ClosedOn,

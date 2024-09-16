@@ -11,6 +11,8 @@ using Tgs.GameRounds.Core.Models;
 using Tgs.ServiceUtility;
 using System.Text.Json.Nodes;
 using Tgs.GameRounds.Common.ViewModels;
+using MediatR;
+using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.IntegrationTest;
 
@@ -33,7 +35,7 @@ public partial class GameRoundsClientUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var roundInfo = new RoundResult(
+		var roundInfo = new RoundInfoResponse(
 			RoundId: roundId,
 			GameProviderId: gameProviderId,
 			GameProviderCode: gameProviderCode,
@@ -53,7 +55,6 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -62,17 +63,16 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(new RoundQuery(
+			_ = fakeMediator.Send(
+				request: Arg.Is(new RoundGetRequest(
 					RoundId: roundId,
 					ExternalCreatedOn: null)),
 				cancellationToken: Arg.Any<CancellationToken>())
 				.Returns(roundInfo);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -101,7 +101,6 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -127,7 +126,7 @@ public partial class GameRoundsClientUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var roundInfo = new RoundResult(
+		var roundInfo = new RoundInfoResponse(
 			RoundId: roundId,
 			GameProviderId: gameProviderId,
 			GameProviderCode: gameProviderCode,
@@ -147,7 +146,6 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -156,17 +154,16 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(new RoundQuery(
+			_ = fakeMediator.Send(
+				request: Arg.Is(new RoundGetRequest(
 					RoundId: roundId,
 					ExternalCreatedOn: externalCreatedOn)),
 				cancellationToken: Arg.Any<CancellationToken>())
 				.Returns(roundInfo);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -195,7 +192,6 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -220,17 +216,16 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(new RoundQuery(
+			_ = fakeMediator.Send(
+				request: Arg.Is(new RoundGetRequest(
 					RoundId: roundId,
 					ExternalCreatedOn: externalCreatedOn)),
 				cancellationToken: Arg.Any<CancellationToken>())
-				.Returns((RoundResult?)null);
+				.Returns((RoundInfoResponse?)null);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -259,7 +254,7 @@ public partial class GameRoundsClientUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var roundInfo = new RoundResult(
+		var roundInfo = new RoundInfoResponse(
 			RoundId: roundId,
 			GameProviderId: gameProviderId,
 			GameProviderCode: gameProviderCode,
@@ -279,7 +274,6 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -288,21 +282,20 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundByExternalGameQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			var query = new RoundByExternalGameQuery(
+			var request = new RoundGetExternalGameRequest(
 				GameProviderId: gameProviderId,
 				WalletId: walletId,
 				ExternalRoundId: externalRoundId,
 				ExternalGameId: externalGameId,
 				ExternalCreatedOn: null);
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(query),
+			_ = fakeMediator.Send(
+				request: Arg.Is(request),
 				cancellationToken: Arg.Any<CancellationToken>())
 				.Returns(roundInfo);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -331,7 +324,6 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -357,7 +349,7 @@ public partial class GameRoundsClientUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var roundInfo = new RoundResult(
+		var roundInfo = new RoundInfoResponse(
 			RoundId: roundId,
 			GameProviderId: gameProviderId,
 			GameProviderCode: gameProviderCode,
@@ -377,7 +369,6 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -386,21 +377,20 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundByExternalGameQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			var query = new RoundByExternalGameQuery(
+			var request = new RoundGetExternalGameRequest(
 				GameProviderId: gameProviderId,
 				WalletId: walletId,
 				ExternalRoundId: externalRoundId,
 				ExternalGameId: externalGameId,
 				ExternalCreatedOn: externalCreatedOn);
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(query),
+			_ = fakeMediator.Send(
+				request: Arg.Is(request),
 				cancellationToken: Arg.Any<CancellationToken>())
 				.Returns(roundInfo);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -429,7 +419,6 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -448,21 +437,20 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundByExternalGameQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			var query = new RoundByExternalGameQuery(
+			var request = new RoundGetExternalGameRequest(
 				GameProviderId: gameProviderId,
 				WalletId: walletId,
 				ExternalRoundId: externalRoundId,
 				ExternalGameId: externalGameId,
 				ExternalCreatedOn: null);
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(query),
+			_ = fakeMediator.Send(
+				request: Arg.Is(request),
 				cancellationToken: Arg.Any<CancellationToken>())
-				.Returns((RoundResult?)null);
+				.Returns((RoundInfoResponse?)null);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -491,7 +479,7 @@ public partial class GameRoundsClientUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var roundInfo = new RoundResult(
+		var roundInfo = new RoundInfoResponse(
 			RoundId: roundId,
 			GameProviderId: gameProviderId,
 			GameProviderCode: gameProviderCode,
@@ -511,7 +499,6 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -520,21 +507,20 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundByGameQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			var query = new RoundByGameQuery(
+			var request = new RoundGetGameRequest(
 				GameProviderId: gameProviderId,
 				GameId: gameId,
 				WalletId: walletId,
 				ExternalRoundId: externalRoundId,
 				ExternalCreatedOn: null);
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(query),
+			_ = fakeMediator.Send(
+				request: Arg.Is(request),
 				cancellationToken: Arg.Any<CancellationToken>())
 				.Returns(roundInfo);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -563,7 +549,6 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -589,7 +574,7 @@ public partial class GameRoundsClientUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var roundInfo = new RoundResult(
+		var roundInfo = new RoundInfoResponse(
 			RoundId: roundId,
 			GameProviderId: gameProviderId,
 			GameProviderCode: gameProviderCode,
@@ -609,7 +594,6 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -618,21 +602,20 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundByGameQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			var query = new RoundByGameQuery(
+			var request = new RoundGetGameRequest(
 				GameProviderId: gameProviderId,
 				GameId: gameId,
 				WalletId: walletId,
 				ExternalRoundId: externalRoundId,
 				ExternalCreatedOn: externalCreatedOn);
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(query),
+			_ = fakeMediator.Send(
+				request: Arg.Is(request),
 				cancellationToken: Arg.Any<CancellationToken>())
 				.Returns(roundInfo);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -661,7 +644,6 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -680,21 +662,20 @@ public partial class GameRoundsClientUnitTest
 
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundByGameQuery, RoundResult?>>();
+			var fakeMediator = Substitute.For<IMediator>();
 
-			var query = new RoundByGameQuery(
+			var request = new RoundGetGameRequest(
 				GameProviderId: gameProviderId,
 				ExternalRoundId: externalRoundId,
 				GameId: gameId,
 				WalletId: walletId,
 				ExternalCreatedOn: null);
-			_ = fakeService
-				.GetAsync(
-				query: Arg.Is(query),
+			_ = fakeMediator.Send(
+				request: Arg.Is(request),
 				cancellationToken: Arg.Any<CancellationToken>())
-				.Returns((RoundResult?)null);
+				.Returns((RoundInfoResponse?)null);
 
-			_ = services.AddSingleton(fakeService);
+			_ = services.AddSingleton(fakeMediator);
 		}));
 
 		var httpClient = web.CreateClient();
@@ -741,7 +722,7 @@ public partial class GameRoundsClientUnitTest
 	}
 
 	[Fact]
-	public async Task Round_Command()
+	public async Task Round_Command_Id_Is_Null()
 	{
 		var externalRoundId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 		var source = new RoundCommandViewModel
@@ -762,7 +743,6 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount = 10.0m,
 			SettleAmount = 20.0m,
 			Commission = 0.0m,
-			Turnover = 10.0m,
 			PlayerWinLoss = 10.0m,
 			AdditionalData = new JsonObject
 			{
@@ -773,14 +753,45 @@ public partial class GameRoundsClientUnitTest
 		var roundId = Guid.NewGuid();
 		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
 		{
-			var fakeService = Substitute.For<IGetService<RoundCommand, Guid>>();
+			var fakeMediator = Substitute.For<IMediator>();
+			var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+			var fakeTimeProvider = Substitute.For<TimeProvider>();
 
-			_ = fakeService.GetAsync(
-				query: Arg.Any<RoundCommand>(),
+			_ = fakeSerialNumberGenerator.GenerateAsync(
 				cancellationToken: Arg.Any<CancellationToken>())
-				.Returns(roundId);
+			.Returns(roundId);
 
-			_ = services.AddTransient(_ => fakeService);
+			var createdOn = new DateTimeOffset(2024, 09, 16, 11, 36, 57, TimeSpan.FromHours(+08));
+			_ = fakeTimeProvider.GetUtcNow()
+			.Returns(createdOn);
+
+			_ = fakeMediator.Send(
+				request: Arg.Is<RoundCommandRequest>(compare => compare.Id == roundId &&
+					compare.CreatedOn == createdOn &&
+					compare.GameProviderId == source.GameProviderId &&
+					compare.GameProviderConfigurationId == source.GameProviderConfigurationId &&
+					compare.GameId == source.GameId &&
+					compare.BrandId == source.BrandId &&
+					compare.PlayerCode == source.PlayerCode &&
+					compare.WalletId == source.WalletId &&
+					compare.CurrencyCode == source.CurrencyCode &&
+					compare.Status == source.Status &&
+					compare.ClientStatus == source.ClientStatus &&
+					compare.ExternalRoundId == source.ExternalRoundId &&
+					compare.ExternalCreatedOn == source.ExternalCreatedOn &&
+					compare.ExternalClosedOn == source.ExternalClosedOn &&
+					compare.Bet == source.BetAmount &&
+					compare.ValidBet == source.ValidBetAmount &&
+					compare.Settle == source.SettleAmount &&
+					compare.Commission == source.Commission &&
+					compare.PlayerWinLoss == source.PlayerWinLoss),
+				cancellationToken:
+				Arg.Any<CancellationToken>())
+			.Returns(roundId);
+
+			_ = services.AddTransient(_ => fakeMediator);
+			_ = services.AddTransient(_ => fakeSerialNumberGenerator);
+			_ = services.AddTransient(_ => fakeTimeProvider);
 		}));
 
 		var httpClient = web.CreateDefaultClient();
@@ -789,5 +800,79 @@ public partial class GameRoundsClientUnitTest
 		var actual = await client.RoundCommandAsync(source);
 
 		Assert.Equal(roundId, actual);
+	}
+
+	[Fact]
+	public async Task Round_Command_Id_Is_Not_Null()
+	{
+		var externalRoundId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+		var source = new RoundCommandViewModel
+		{
+			Id = Guid.NewGuid(),
+			GameProviderId = Guid.NewGuid(),
+			GameProviderConfigurationId = Guid.NewGuid(),
+			GameId = 1,
+			BrandId = Guid.NewGuid(),
+			PlayerCode = "test",
+			WalletId = Guid.NewGuid(),
+			CurrencyCode = "CNY",
+			Status = Common.Enums.RoundStatus.Closed,
+			ClientStatus = Common.Enums.RoundClientStatus.Win,
+			ExternalRoundId = externalRoundId,
+			ExternalCreatedOn = DateTimeOffset.UtcNow.AddSeconds(-5),
+			ExternalClosedOn = DateTimeOffset.UtcNow,
+			BetAmount = 10.0m,
+			ValidBetAmount = 10.0m,
+			SettleAmount = 20.0m,
+			Commission = 0.0m,
+			PlayerWinLoss = 10.0m,
+			AdditionalData = new JsonObject
+			{
+				["ExternalRoundId"] = externalRoundId
+			},
+			CreatedOn = new DateTimeOffset(2024, 09, 16, 11, 36, 57, TimeSpan.FromHours(+08))
+		};
+
+		var web = new GameRoundsApplicationUnitTest(builder => _ = builder.ConfigureServices(services =>
+		{
+			var fakeMediator = Substitute.For<IMediator>();
+			var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+			var fakeTimeProvider = Substitute.For<TimeProvider>();
+
+			_ = fakeMediator.Send(
+				request: Arg.Is<RoundCommandRequest>(compare => compare.Id == source.Id &&
+					compare.CreatedOn == source.CreatedOn &&
+					compare.GameProviderId == source.GameProviderId &&
+					compare.GameProviderConfigurationId == source.GameProviderConfigurationId &&
+					compare.GameId == source.GameId &&
+					compare.BrandId == source.BrandId &&
+					compare.PlayerCode == source.PlayerCode &&
+					compare.WalletId == source.WalletId &&
+					compare.CurrencyCode == source.CurrencyCode &&
+					compare.Status == source.Status &&
+					compare.ClientStatus == source.ClientStatus &&
+					compare.ExternalRoundId == source.ExternalRoundId &&
+					compare.ExternalCreatedOn == source.ExternalCreatedOn &&
+					compare.ExternalClosedOn == source.ExternalClosedOn &&
+					compare.Bet == source.BetAmount &&
+					compare.ValidBet == source.ValidBetAmount &&
+					compare.Settle == source.SettleAmount &&
+					compare.Commission == source.Commission &&
+					compare.PlayerWinLoss == source.PlayerWinLoss),
+				cancellationToken:
+				Arg.Any<CancellationToken>())
+			.Returns(Task.FromResult<Guid>(source.Id.Value));
+
+			_ = services.AddTransient(_ => fakeMediator);
+			_ = services.AddTransient(_ => fakeSerialNumberGenerator);
+			_ = services.AddTransient(_ => fakeTimeProvider);
+		}));
+
+		var httpClient = web.CreateDefaultClient();
+		var client = new GameRoundsClient(httpClient);
+
+		var actual = await client.RoundCommandAsync(source);
+
+		Assert.Equal(source.Id, actual);
 	}
 }

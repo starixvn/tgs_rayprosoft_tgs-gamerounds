@@ -5,17 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Tgs.GameRounds.Core.ApplicationServices;
-using Tgs.SerialNumberGenerator;
 
 namespace Tgs.GameRounds.Core.UnitTest.ApplicationServices;
 
-public class RoundCommandGetServiceUnitTest
+public class RoundCommandServiceUnitTest
 {
 	[Fact]
 	public async Task Add_Round_Status_Is_Open()
 	{
-		var fakeLogger = NullLogger<RoundCommandGetService>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeLogger = NullLogger<RoundCommandService>.Instance;
 		var fakeRoundRepository = Substitute.For<IRoundRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString("N");
@@ -27,7 +25,9 @@ public class RoundCommandGetServiceUnitTest
 		var status = Common.Enums.RoundStatus.Open;
 		var clientStatus = Common.Enums.RoundClientStatus.Open;
 
-		var query = new RoundCommand(
+		var request = new RoundCommandRequest(
+			Id: Guid.NewGuid(),
+			CreatedOn: DateTimeOffset.UtcNow,
 			GameProviderId: gameProviderId,
 			GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
 			GameId: gameId,
@@ -40,11 +40,10 @@ public class RoundCommandGetServiceUnitTest
 			ExternalClosedOn: DateTimeOffset.UnixEpoch,
 			Status: status,
 			ClientStatus: clientStatus,
-			Bet: 10.0m,
-			ValidBet: 10.0m,
+			Bet: 20.0m,
+			ValidBet: 20.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: 0.0m,
 			AdditionalData: new JsonObject
 			{
@@ -52,87 +51,85 @@ public class RoundCommandGetServiceUnitTest
 			});
 
 		_ = fakeRoundRepository.GetIdAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(ValueTask.FromResult<Guid?>(null));
 
-		var roundId = Guid.NewGuid();
-		_ = fakeSerialNumberGenerator.GenerateAsync(
-			cancellationToken: Arg.Any<CancellationToken>())
-			.Returns(roundId);
-
-		var sut = new RoundCommandGetService(
+		var sut = new RoundCommandService(
 			fakeLogger,
-			fakeSerialNumberGenerator,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
-		Assert.Equal(roundId, actual);
+		Assert.Equal(request.Id, actual);
 
 		await fakeRoundRepository
 			.Received(1)
 			.AddAsync(
 			source: Arg.Is(new Models.RoundAdd(
-				Id: roundId,
-				GameProviderId: query.GameProviderId,
-				GameProviderConfigurationId: query.GameProviderConfigurationId,
-				GameId: query.GameId,
-				BrandId: query.BrandId,
-				PlayerCode: query.PlayerCode,
-				WalletId: query.WalletId,
-				CurrencyCode: query.CurrencyCode,
+				Id: request.Id,
+				GameProviderId: request.GameProviderId,
+				GameProviderConfigurationId: request.GameProviderConfigurationId,
+				GameId: request.GameId,
+				BrandId: request.BrandId,
+				PlayerCode: request.PlayerCode,
+				WalletId: request.WalletId,
+				CurrencyCode: request.CurrencyCode,
 				Status: Common.Enums.RoundStatus.Open,
 				ClientStatus: Common.Enums.RoundClientStatus.Open,
-				ExternalRoundId: query.ExternalRoundId,
+				ExternalRoundId: request.ExternalRoundId,
 				ExternalCreatedOn: externalCreatedOn,
 				ExternalClosedOn: null,
-				Bet: query.Bet,
-				ValidBet: query.ValidBet,
+				Bet: 20.0m,
+				ValidBet: 20.0m,
 				Settle: 0.0m,
 				Commission: 0.0m,
-				Turnover: 0.0m,
-				PlayerWinLoss: 0.0m)),
+				PlayerWinLoss: 0.0m,
+				CreatedOn: request.CreatedOn)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.OpenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundOpen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ClosedAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundClosed>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ReopenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.MergeDetailAsync(
-			id: Arg.Is(roundId),
-			additionalData: Arg.Is(query.AdditionalData.ToJsonString()!),
+			id: Arg.Is(request.Id),
+			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Add_Round_Status_Is_Closed()
 	{
-		var fakeLogger = NullLogger<RoundCommandGetService>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeLogger = NullLogger<RoundCommandService>.Instance;
 		var fakeRoundRepository = Substitute.For<IRoundRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString("N");
@@ -145,7 +142,9 @@ public class RoundCommandGetServiceUnitTest
 		var status = Common.Enums.RoundStatus.Closed;
 		var clientStatus = Common.Enums.RoundClientStatus.Win;
 
-		var query = new RoundCommand(
+		var request = new RoundCommandRequest(
+			Id: Guid.NewGuid(),
+			CreatedOn: DateTimeOffset.UtcNow,
 			GameProviderId: gameProviderId,
 			GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
 			GameId: gameId,
@@ -158,99 +157,96 @@ public class RoundCommandGetServiceUnitTest
 			ExternalClosedOn: externalClosedOn,
 			Status: status,
 			ClientStatus: clientStatus,
-			Bet: 10.0m,
-			ValidBet: 10.0m,
-			Settle: 20.0m,
+			Bet: 20.0m,
+			ValidBet: 0.5m,
+			Settle: 19.5m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
-			PlayerWinLoss: 10.0m,
+			PlayerWinLoss: -0.5m,
 			AdditionalData: new JsonObject
 			{
 				["ExternalRoundId"] = externalRoundId
 			});
 
 		_ = fakeRoundRepository.GetIdAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(ValueTask.FromResult<Guid?>(null));
 
-		var roundId = Guid.NewGuid();
-		_ = fakeSerialNumberGenerator.GenerateAsync(
-			cancellationToken: Arg.Any<CancellationToken>())
-			.Returns(roundId);
-
-		var sut = new RoundCommandGetService(
+		var sut = new RoundCommandService(
 			fakeLogger,
-			fakeSerialNumberGenerator,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
-		Assert.Equal(roundId, actual);
+		Assert.Equal(request.Id, actual);
 
 		await fakeRoundRepository
 			.Received(1)
 			.AddAsync(
 			source: Arg.Is(new Models.RoundAdd(
-				Id: roundId,
-				GameProviderId: query.GameProviderId,
-				GameProviderConfigurationId: query.GameProviderConfigurationId,
-				GameId: query.GameId,
-				BrandId: query.BrandId,
-				PlayerCode: query.PlayerCode,
-				WalletId: query.WalletId,
-				CurrencyCode: query.CurrencyCode,
+				Id: request.Id,
+				GameProviderId: request.GameProviderId,
+				GameProviderConfigurationId: request.GameProviderConfigurationId,
+				GameId: request.GameId,
+				BrandId: request.BrandId,
+				PlayerCode: request.PlayerCode,
+				WalletId: request.WalletId,
+				CurrencyCode: request.CurrencyCode,
 				Status: Common.Enums.RoundStatus.Closed,
 				ClientStatus: Common.Enums.RoundClientStatus.Win,
-				ExternalRoundId: query.ExternalRoundId,
+				ExternalRoundId: request.ExternalRoundId,
 				ExternalCreatedOn: externalCreatedOn,
 				ExternalClosedOn: externalClosedOn,
-				Bet: 10.0m,
-				ValidBet: 10.0m,
-				Settle: 20.0m,
+				Bet: 20.0m,
+				ValidBet: 0.5m,
+				Settle: 19.5m,
 				Commission: 0.0m,
-				Turnover: 10.0m,
-				PlayerWinLoss: 10.0m)),
+				PlayerWinLoss: -0.5m,
+				CreatedOn: request.CreatedOn)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.OpenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundOpen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ClosedAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundClosed>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ReopenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.MergeDetailAsync(
-			id: Arg.Is(roundId),
-			additionalData: Arg.Is(query.AdditionalData.ToJsonString()!),
+			id: Arg.Is(request.Id),
+			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Update_Round_Closed()
 	{
-		var fakeLogger = NullLogger<RoundCommandGetService>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeLogger = NullLogger<RoundCommandService>.Instance;
 		var fakeRoundRepository = Substitute.For<IRoundRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString("N");
@@ -263,7 +259,9 @@ public class RoundCommandGetServiceUnitTest
 		var status = Common.Enums.RoundStatus.Closed;
 		var clientStatus = Common.Enums.RoundClientStatus.Win;
 
-		var query = new RoundCommand(
+		var request = new RoundCommandRequest(
+			Id: Guid.NewGuid(),
+			CreatedOn: DateTimeOffset.UtcNow,
 			GameProviderId: gameProviderId,
 			GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
 			GameId: gameId,
@@ -280,7 +278,6 @@ public class RoundCommandGetServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			AdditionalData: new JsonObject
 			{
@@ -288,52 +285,50 @@ public class RoundCommandGetServiceUnitTest
 			});
 
 		var roundId = Guid.NewGuid();
-		_ = fakeRoundRepository
-			.GetIdAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
+		_ = fakeRoundRepository.GetIdAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(ValueTask.FromResult<Guid?>(roundId));
 
 		var gameRound = new Models.RoundInfo(
 			Id: roundId,
-			GameProviderId: query.GameProviderId,
+			GameProviderId: request.GameProviderId,
 			GameProviderConfigurationId: Guid.NewGuid(),
-			GameId: query.GameId,
+			GameId: request.GameId,
 			BrandId: Guid.NewGuid(),
-			PlayerCode: query.PlayerCode,
-			WalletId: query.WalletId,
+			PlayerCode: request.PlayerCode,
+			WalletId: request.WalletId,
 			CurrencyCode: "CNY",
 			Status: Common.Enums.RoundStatus.Open,
 			ClientStatus: Common.Enums.RoundClientStatus.Open,
-			ExternalRoundId: query.ExternalRoundId,
+			ExternalRoundId: request.ExternalRoundId,
 			ExternalCreatedOn: DateTimeOffset.Now,
 			ExternalClosedOn: DateTimeOffset.UnixEpoch,
 			Bet: 10.0m,
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 0.0m,
 			PlayerWinLoss: 0.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.UnixEpoch,
 			UpdatedOn: DateTimeOffset.Now);
-		_ = fakeRoundRepository
-			.GetAsync(
+		_ = fakeRoundRepository.GetAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
 			id: Arg.Is(roundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameRound);
 
-		var sut = new RoundCommandGetService(
+		var sut = new RoundCommandService(
 			fakeLogger,
-			fakeSerialNumberGenerator,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.Equal(roundId, actual);
 
@@ -346,29 +341,31 @@ public class RoundCommandGetServiceUnitTest
 		_ = fakeRoundRepository
 			.Received(0)
 			.OpenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundOpen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.ClosedAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
 			id: Arg.Is(roundId),
 			source: Arg.Is(new Models.RoundClosed(
 				ClientStatus: Common.Enums.RoundClientStatus.Win,
 				ExternalClosedOn: externalClosedOn,
-				Bet: query.Bet,
-				ValidBet: query.ValidBet,
-				Settle: query.Settle,
-				Commission: query.Commission,
-				Turnover: query.Turnover,
-				PlayerWinLoss: query.PlayerWinLoss)),
+				Bet: request.Bet,
+				ValidBet: request.ValidBet,
+				Settle: request.Settle,
+				Commission: request.Commission,
+				PlayerWinLoss: request.PlayerWinLoss)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ReopenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
@@ -376,15 +373,14 @@ public class RoundCommandGetServiceUnitTest
 			.Received(1)
 			.MergeDetailAsync(
 			id: Arg.Is(roundId),
-			additionalData: Arg.Is(query.AdditionalData.ToJsonString()!),
+			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Update_Round_Closed_Get_DataBase_RoundStatus_Is_Closed()
 	{
-		var fakeLogger = NullLogger<RoundCommandGetService>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeLogger = NullLogger<RoundCommandService>.Instance;
 		var fakeRoundRepository = Substitute.For<IRoundRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString("N");
@@ -397,7 +393,9 @@ public class RoundCommandGetServiceUnitTest
 		var status = Common.Enums.RoundStatus.Closed;
 		var clientStatus = Common.Enums.RoundClientStatus.Win;
 
-		var query = new RoundCommand(
+		var request = new RoundCommandRequest(
+			Id: Guid.NewGuid(),
+			CreatedOn: DateTimeOffset.UtcNow,
 			GameProviderId: gameProviderId,
 			GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
 			GameId: gameId,
@@ -414,7 +412,6 @@ public class RoundCommandGetServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			AdditionalData: new JsonObject
 			{
@@ -422,52 +419,50 @@ public class RoundCommandGetServiceUnitTest
 			});
 
 		var roundId = Guid.NewGuid();
-		_ = fakeRoundRepository
-			.GetIdAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
+		_ = fakeRoundRepository.GetIdAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(ValueTask.FromResult<Guid?>(roundId));
 
 		var gameRound = new Models.RoundInfo(
 			Id: roundId,
-			GameProviderId: query.GameProviderId,
+			GameProviderId: request.GameProviderId,
 			GameProviderConfigurationId: Guid.NewGuid(),
-			GameId: query.GameId,
+			GameId: request.GameId,
 			BrandId: Guid.NewGuid(),
-			PlayerCode: query.PlayerCode,
-			WalletId: query.WalletId,
+			PlayerCode: request.PlayerCode,
+			WalletId: request.WalletId,
 			CurrencyCode: "CNY",
 			Status: Common.Enums.RoundStatus.Closed,
 			ClientStatus: Common.Enums.RoundClientStatus.Win,
-			ExternalRoundId: query.ExternalRoundId,
+			ExternalRoundId: request.ExternalRoundId,
 			ExternalCreatedOn: DateTimeOffset.Now,
 			ExternalClosedOn: DateTimeOffset.Now,
 			Bet: 10.0m,
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.Now,
 			UpdatedOn: DateTimeOffset.Now);
-		_ = fakeRoundRepository
-			.GetAsync(
+		_ = fakeRoundRepository.GetAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
 			id: Arg.Is(roundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameRound);
 
-		var sut = new RoundCommandGetService(
+		var sut = new RoundCommandService(
 			fakeLogger,
-			fakeSerialNumberGenerator,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.Equal(roundId, actual);
 
@@ -480,37 +475,39 @@ public class RoundCommandGetServiceUnitTest
 		_ = fakeRoundRepository
 			.Received(0)
 			.OpenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundOpen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ClosedAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundClosed>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ReopenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.MergeDetailAsync(
-			id: Arg.Is(roundId),
-			additionalData: Arg.Is(query.AdditionalData.ToJsonString()!),
+			id: Arg.Any<Guid>(),
+			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Update_Round_Open()
 	{
-		var fakeLogger = NullLogger<RoundCommandGetService>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeLogger = NullLogger<RoundCommandService>.Instance;
 		var fakeRoundRepository = Substitute.For<IRoundRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString("N");
@@ -523,7 +520,9 @@ public class RoundCommandGetServiceUnitTest
 		var status = Common.Enums.RoundStatus.Open;
 		var clientStatus = Common.Enums.RoundClientStatus.Open;
 
-		var query = new RoundCommand(
+		var request = new RoundCommandRequest(
+			Id: Guid.NewGuid(),
+			CreatedOn: DateTimeOffset.UtcNow,
 			GameProviderId: gameProviderId,
 			GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
 			GameId: gameId,
@@ -540,7 +539,6 @@ public class RoundCommandGetServiceUnitTest
 			ValidBet: 20.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 0.0m,
 			PlayerWinLoss: 10.0m,
 			AdditionalData: new JsonObject
 			{
@@ -548,52 +546,50 @@ public class RoundCommandGetServiceUnitTest
 			});
 
 		var roundId = Guid.NewGuid();
-		_ = fakeRoundRepository
-			.GetIdAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
+		_ = fakeRoundRepository.GetIdAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(ValueTask.FromResult<Guid?>(roundId));
 
 		var gameRound = new Models.RoundInfo(
 			Id: roundId,
-			GameProviderId: query.GameProviderId,
+			GameProviderId: request.GameProviderId,
 			GameProviderConfigurationId: Guid.NewGuid(),
-			GameId: query.GameId,
+			GameId: request.GameId,
 			BrandId: Guid.NewGuid(),
-			PlayerCode: query.PlayerCode,
-			WalletId: query.WalletId,
+			PlayerCode: request.PlayerCode,
+			WalletId: request.WalletId,
 			CurrencyCode: "CNY",
 			Status: Common.Enums.RoundStatus.Open,
 			ClientStatus: Common.Enums.RoundClientStatus.Open,
-			ExternalRoundId: query.ExternalRoundId,
+			ExternalRoundId: request.ExternalRoundId,
 			ExternalCreatedOn: DateTimeOffset.Now,
 			ExternalClosedOn: DateTimeOffset.UnixEpoch,
 			Bet: 10.0m,
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 0.0m,
 			PlayerWinLoss: 0.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.UnixEpoch,
 			UpdatedOn: DateTimeOffset.Now);
-		_ = fakeRoundRepository
-			.GetAsync(
+		_ = fakeRoundRepository.GetAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
 			id: Arg.Is(roundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameRound);
 
-		var sut = new RoundCommandGetService(
+		var sut = new RoundCommandService(
 			fakeLogger,
-			fakeSerialNumberGenerator,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.Equal(roundId, actual);
 
@@ -606,23 +602,26 @@ public class RoundCommandGetServiceUnitTest
 		_ = fakeRoundRepository
 			.Received(1)
 			.OpenAsync(
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
 			id: Arg.Is(roundId),
 			source: Arg.Is(new Models.RoundOpen(
-				Bet: query.Bet,
-				ValidBet: query.ValidBet)),
+				Bet: request.Bet,
+				ValidBet: request.ValidBet)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ClosedAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundClosed>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ReopenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
@@ -630,15 +629,14 @@ public class RoundCommandGetServiceUnitTest
 			.Received(1)
 			.MergeDetailAsync(
 			id: Arg.Is(roundId),
-			additionalData: Arg.Is(query.AdditionalData.ToJsonString()!),
+			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Update_Round_Reopen()
 	{
-		var fakeLogger = NullLogger<RoundCommandGetService>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeLogger = NullLogger<RoundCommandService>.Instance;
 		var fakeRoundRepository = Substitute.For<IRoundRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString("N");
@@ -651,7 +649,9 @@ public class RoundCommandGetServiceUnitTest
 		var status = Common.Enums.RoundStatus.Closed;
 		var clientStatus = Common.Enums.RoundClientStatus.Win;
 
-		var query = new RoundCommand(
+		var request = new RoundCommandRequest(
+			Id: Guid.NewGuid(),
+			CreatedOn: DateTimeOffset.UtcNow,
 			GameProviderId: gameProviderId,
 			GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
 			GameId: gameId,
@@ -668,7 +668,6 @@ public class RoundCommandGetServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			AdditionalData: new JsonObject
 			{
@@ -676,52 +675,50 @@ public class RoundCommandGetServiceUnitTest
 			});
 
 		var roundId = Guid.NewGuid();
-		_ = fakeRoundRepository
-			.GetIdAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
+		_ = fakeRoundRepository.GetIdAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(ValueTask.FromResult<Guid?>(roundId));
 
 		var gameRound = new Models.RoundInfo(
 			Id: roundId,
-			GameProviderId: query.GameProviderId,
+			GameProviderId: request.GameProviderId,
 			GameProviderConfigurationId: Guid.NewGuid(),
-			GameId: query.GameId,
+			GameId: request.GameId,
 			BrandId: Guid.NewGuid(),
-			PlayerCode: query.PlayerCode,
-			WalletId: query.WalletId,
+			PlayerCode: request.PlayerCode,
+			WalletId: request.WalletId,
 			CurrencyCode: "CNY",
 			Status: Common.Enums.RoundStatus.Closed,
 			ClientStatus: Common.Enums.RoundClientStatus.Loss,
-			ExternalRoundId: query.ExternalRoundId,
+			ExternalRoundId: request.ExternalRoundId,
 			ExternalCreatedOn: DateTimeOffset.Now,
 			ExternalClosedOn: DateTimeOffset.Now,
 			Bet: 10.0m,
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.Now,
 			UpdatedOn: DateTimeOffset.Now);
-		_ = fakeRoundRepository
-			.GetAsync(
+		_ = fakeRoundRepository.GetAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
 			id: Arg.Is(roundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameRound);
 
-		var sut = new RoundCommandGetService(
+		var sut = new RoundCommandService(
 			fakeLogger,
-			fakeSerialNumberGenerator,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.Equal(roundId, actual);
 
@@ -734,45 +731,46 @@ public class RoundCommandGetServiceUnitTest
 		_ = fakeRoundRepository
 			.Received(0)
 			.OpenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundOpen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ClosedAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundClosed>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.ReopenAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
 			id: Arg.Is(roundId),
 			source: Arg.Is(new Models.RoundReopen(
 				ClientStatus: Common.Enums.RoundClientStatus.Win,
 				ExternalClosedOn: externalClosedOn,
-				Bet: query.Bet,
-				ValidBet: query.ValidBet,
-				Settle: query.Settle,
-				Commission: query.Commission,
-				Turnover: query.Turnover,
-				PlayerWinLoss: query.PlayerWinLoss)),
+				Bet: request.Bet,
+				ValidBet: request.ValidBet,
+				Settle: request.Settle,
+				Commission: request.Commission,
+				PlayerWinLoss: request.PlayerWinLoss)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(1)
 			.MergeDetailAsync(
 			id: Arg.Is(roundId),
-			additionalData: Arg.Is(query.AdditionalData.ToJsonString()!),
+			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
 	public async Task Update_Round_Reopen_Is_RoundStatus_Open()
 	{
-		var fakeLogger = NullLogger<RoundCommandGetService>.Instance;
-		var fakeSerialNumberGenerator = Substitute.For<ISerialNumberGenerator>();
+		var fakeLogger = NullLogger<RoundCommandService>.Instance;
 		var fakeRoundRepository = Substitute.For<IRoundRepository>();
 
 		var externalRoundId = Guid.NewGuid().ToString("N");
@@ -785,7 +783,9 @@ public class RoundCommandGetServiceUnitTest
 		var status = Common.Enums.RoundStatus.Open;
 		var clientStatus = Common.Enums.RoundClientStatus.Open;
 
-		var query = new RoundCommand(
+		var request = new RoundCommandRequest(
+			Id: Guid.NewGuid(),
+			CreatedOn: DateTimeOffset.UtcNow,
 			GameProviderId: gameProviderId,
 			GameProviderConfigurationId: new Guid("be8b70a3-a8fa-ecef-bfad-7a3455b9ef0f"),
 			GameId: gameId,
@@ -802,7 +802,6 @@ public class RoundCommandGetServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 0.0m,
 			PlayerWinLoss: 0.0m,
 			AdditionalData: new JsonObject
 			{
@@ -810,52 +809,50 @@ public class RoundCommandGetServiceUnitTest
 			});
 
 		var roundId = Guid.NewGuid();
-		_ = fakeRoundRepository
-			.GetIdAsync(
-			gameProviderId: Arg.Is(query.GameProviderId),
-			gameId: Arg.Is(query.GameId),
-			walletId: Arg.Is(query.WalletId),
-			externalRoundId: Arg.Is(query.ExternalRoundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
+		_ = fakeRoundRepository.GetIdAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
+			gameProviderId: Arg.Is(request.GameProviderId),
+			gameId: Arg.Is(request.GameId),
+			walletId: Arg.Is(request.WalletId),
+			externalRoundId: Arg.Is(request.ExternalRoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(ValueTask.FromResult<Guid?>(roundId));
 
 		var gameRound = new Models.RoundInfo(
 			Id: roundId,
-			GameProviderId: query.GameProviderId,
+			GameProviderId: request.GameProviderId,
 			GameProviderConfigurationId: Guid.NewGuid(),
-			GameId: query.GameId,
+			GameId: request.GameId,
 			BrandId: Guid.NewGuid(),
-			PlayerCode: query.PlayerCode,
-			WalletId: query.WalletId,
+			PlayerCode: request.PlayerCode,
+			WalletId: request.WalletId,
 			CurrencyCode: "CNY",
 			Status: Common.Enums.RoundStatus.Closed,
 			ClientStatus: Common.Enums.RoundClientStatus.Win,
-			ExternalRoundId: query.ExternalRoundId,
+			ExternalRoundId: request.ExternalRoundId,
 			ExternalCreatedOn: DateTimeOffset.Now,
 			ExternalClosedOn: DateTimeOffset.Now,
 			Bet: 10.0m,
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.Now,
 			UpdatedOn: DateTimeOffset.Now);
-		_ = fakeRoundRepository
-			.GetAsync(
+		_ = fakeRoundRepository.GetAsync(
+			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
 			id: Arg.Is(roundId),
-			externalCreatedOn: Arg.Is(query.ExternalCreatedOn),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(gameRound);
 
-		var sut = new RoundCommandGetService(
+		var sut = new RoundCommandService(
 			fakeLogger,
-			fakeSerialNumberGenerator,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.Equal(roundId, actual);
 
@@ -868,29 +865,32 @@ public class RoundCommandGetServiceUnitTest
 		_ = fakeRoundRepository
 			.Received(0)
 			.OpenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundOpen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ClosedAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundClosed>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.ReopenAsync(
-			id: Arg.Is(roundId),
+			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
 			.Received(0)
 			.MergeDetailAsync(
-			id: Arg.Is(roundId),
-			additionalData: Arg.Is(query.AdditionalData.ToJsonString()!),
+			id: Arg.Any<Guid>(),
+			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 }

@@ -12,34 +12,32 @@ internal class RoundRepository(
 {
 	public async ValueTask AddAsync(RoundAdd source, CancellationToken cancellationToken = default)
 	{
-		var round = new Round()
-		{
-			Id = source.Id,
-			ExternalRoundId = source.ExternalRoundId,
-			GameProviderId = source.GameProviderId,
-			PlayerCode = source.PlayerCode,
-			GameId = source.GameId,
-			CurrencyCode = source.CurrencyCode,
-			Status = (short)source.Status,
-			GameProviderConfigurationId = source.GameProviderConfigurationId,
-			WalletId = source.WalletId,
-			CreatedOn = DateTime.UtcNow,
-			ClosedOn = source.ExternalClosedOn.HasValue ? DateTime.UtcNow : null,
-			UpdatedOn = DateTime.UtcNow,
-			BrandId = source.BrandId,
-			ExternalCreatedOn = DateTime.SpecifyKind(source.ExternalCreatedOn.UtcDateTime, DateTimeKind.Utc),
-			ExternalClosedOn = source.ExternalClosedOn.HasValue ? DateTime.SpecifyKind(source.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null,
-			BetAmount = source.Bet,
-			ValidBetAmount = source.ValidBet,
-			SettleAmount = source.Settle,
-			Commission = source.ExternalClosedOn.HasValue ? source.Commission : 0,
-			Turnover = source.ExternalClosedOn.HasValue ? source.Turnover : 0,
-			WinLoss = source.ExternalClosedOn.HasValue ? -source.PlayerWinLoss : 0,
-			ClientStatus = (short)source.ClientStatus
-		};
-
 		_ = await context.Rounds.AddAsync(
-			entity: round,
+			entity: new Round()
+			{
+				Id = source.Id,
+				ExternalRoundId = source.ExternalRoundId,
+				GameProviderId = source.GameProviderId,
+				PlayerCode = source.PlayerCode,
+				GameId = source.GameId,
+				CurrencyCode = source.CurrencyCode,
+				Status = (short)source.Status,
+				GameProviderConfigurationId = source.GameProviderConfigurationId,
+				WalletId = source.WalletId,
+				CreatedOn = source.CreatedOn.UtcDateTime,
+				ClosedOn = source.ExternalClosedOn.HasValue ? DateTime.UtcNow : null,
+				UpdatedOn = DateTime.UtcNow,
+				BrandId = source.BrandId,
+				ExternalCreatedOn = DateTime.SpecifyKind(source.ExternalCreatedOn.UtcDateTime, DateTimeKind.Utc),
+				ExternalClosedOn = source.ExternalClosedOn.HasValue ? DateTime.SpecifyKind(source.ExternalClosedOn.Value.UtcDateTime, DateTimeKind.Utc) : null,
+				BetAmount = source.Bet,
+				ValidBetAmount = source.ValidBet,
+				SettleAmount = source.Settle,
+				Commission = source.ExternalClosedOn.HasValue ? source.Commission : 0,
+				Turnover = source.ValidBet,
+				WinLoss = source.ExternalClosedOn.HasValue ? -source.PlayerWinLoss : 0,
+				ClientStatus = (short)source.ClientStatus,
+			},
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
@@ -48,10 +46,12 @@ internal class RoundRepository(
 			.ConfigureAwait(false);
 	}
 
-	public async ValueTask ClosedAsync(Guid id, RoundClosed source, CancellationToken cancellationToken = default)
+	public async ValueTask ClosedAsync(DateTimeOffset externalCreatedOn, Guid id, RoundClosed source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.Id == id,
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).DateTime &&
+				x.Id == id &&
+				x.Status == (short)RoundStatus.Open,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
@@ -64,9 +64,8 @@ internal class RoundRepository(
 		round.ValidBetAmount = source.ValidBet;
 		round.SettleAmount = source.Settle;
 		round.Commission = source.Commission;
-		round.Turnover = source.Turnover;
+		round.Turnover = source.ValidBet;
 		round.WinLoss = -source.PlayerWinLoss;
-		round.TieBetAdjustment = 0;
 
 		_ = context.Rounds.Update(round);
 
@@ -75,7 +74,7 @@ internal class RoundRepository(
 			.ConfigureAwait(false);
 	}
 
-	public async ValueTask<RoundInfo?> GetAsync(Guid id, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
+	public async ValueTask<RoundInfo?> GetAsync(DateTimeOffset externalCreatedOn, Guid id, CancellationToken cancellationToken = default)
 		=> await context.Rounds
 		.Where(r => r.CreatedOn >= externalCreatedOn.AddDays(-7) && r.Id == id)
 		.Select(round => new RoundInfo(
@@ -96,7 +95,6 @@ internal class RoundRepository(
 			round.ValidBetAmount.GetValueOrDefault(0),
 			round.SettleAmount.GetValueOrDefault(0),
 			round.Commission.GetValueOrDefault(0),
-			round.Turnover.GetValueOrDefault(0),
 			-round.WinLoss.GetValueOrDefault(0),
 			round.CreatedOn,
 			round.ClosedOn,
@@ -104,7 +102,7 @@ internal class RoundRepository(
 		.FirstOrDefaultAsync(cancellationToken)
 		.ConfigureAwait(false);
 
-	public async ValueTask<RoundInfo?> GetAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
+	public async ValueTask<RoundInfo?> GetAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default)
 		=> await context.Rounds
 		.Where(r => r.CreatedOn >= externalCreatedOn.AddDays(-7) &&
 			r.GameProviderId == gameProviderId &&
@@ -129,7 +127,6 @@ internal class RoundRepository(
 			round.ValidBetAmount.GetValueOrDefault(0),
 			round.SettleAmount.GetValueOrDefault(0),
 			round.Commission.GetValueOrDefault(0),
-			round.Turnover.GetValueOrDefault(0),
 			-round.WinLoss.GetValueOrDefault(0),
 			round.CreatedOn,
 			round.ClosedOn,
@@ -137,7 +134,7 @@ internal class RoundRepository(
 		.FirstOrDefaultAsync(cancellationToken)
 		.ConfigureAwait(false);
 
-	public async ValueTask<Guid?> GetIdAsync(Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, DateTimeOffset externalCreatedOn, CancellationToken cancellationToken = default)
+	public async ValueTask<Guid?> GetIdAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default)
 		=> await context.Rounds.AsQueryable()
 		.Where(x =>
 		x.CreatedOn >= externalCreatedOn.AddDays(-7).UtcDateTime &&
@@ -190,10 +187,12 @@ internal class RoundRepository(
 			.ConfigureAwait(false);
 	}
 
-	public async ValueTask OpenAsync(Guid id, RoundOpen source, CancellationToken cancellationToken = default)
+	public async ValueTask OpenAsync(DateTimeOffset externalCreatedOn, Guid id, RoundOpen source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.Id == id,
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).DateTime &&
+				x.Id == id &&
+				x.Status == (short)RoundStatus.Open,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
@@ -202,6 +201,10 @@ internal class RoundRepository(
 		round.UpdatedOn = DateTime.UtcNow;
 		round.BetAmount = source.Bet;
 		round.ValidBetAmount = source.ValidBet;
+		round.SettleAmount = 0.0m;
+		round.Commission = 0.0m;
+		round.Turnover = 0.0m;
+		round.WinLoss = 0.0m;
 
 		_ = context.Rounds.Update(round);
 
@@ -210,10 +213,12 @@ internal class RoundRepository(
 			.ConfigureAwait(false);
 	}
 
-	public async ValueTask ReopenAsync(Guid id, RoundReopen source, CancellationToken cancellationToken = default)
+	public async ValueTask ReopenAsync(DateTimeOffset externalCreatedOn, Guid id, RoundReopen source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.Id == id,
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).DateTime &&
+				x.Id == id &&
+				x.Status == (short)RoundStatus.Closed,
 			cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 
@@ -225,9 +230,8 @@ internal class RoundRepository(
 		round.ValidBetAmount = source.ValidBet;
 		round.SettleAmount = source.Settle;
 		round.Commission = source.Commission;
-		round.Turnover = source.Turnover;
+		round.Turnover = source.ValidBet;
 		round.WinLoss = -source.PlayerWinLoss;
-		round.TieBetAdjustment = 0;
 		round.ReopenTurnoverAdjustment = round.Turnover ?? 0;
 		round.ReopenedOn = DateTime.UtcNow;
 

@@ -33,7 +33,7 @@ public class RoundGetServiceUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var query = new RoundQuery(
+		var request = new RoundGetRequest(
 			RoundId: roundId,
 			ExternalCreatedOn: externalCreatedOn);
 
@@ -55,14 +55,13 @@ public class RoundGetServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
 			UpdatedOn: updatedOn);
 		_ = fakeRoundRepository.GetAsync(
-			id: Arg.Is(query.RoundId),
 			externalCreatedOn: Arg.Is(externalCreatedOn),
+			id: Arg.Is(request.RoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(roundInfo);
 
@@ -93,7 +92,9 @@ public class RoundGetServiceUnitTest
 			fakeGameProviderRepository,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.NotNull(actual);
 		Assert.Equal(roundId, actual.RoundId);
@@ -115,7 +116,6 @@ public class RoundGetServiceUnitTest
 		Assert.Equal(roundInfo.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.Settle, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
 		Assert.Equal(roundInfo.ClosedOn, actual.ClosedOn);
@@ -144,7 +144,7 @@ public class RoundGetServiceUnitTest
 		var closedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 		var updatedOn = new DateTimeOffset(2024, 04, 24, 15, 31, 15, TimeSpan.FromHours(+8));
 
-		var query = new RoundQuery(
+		var request = new RoundGetRequest(
 			RoundId: roundId,
 			ExternalCreatedOn: null);
 
@@ -170,14 +170,13 @@ public class RoundGetServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
 			UpdatedOn: updatedOn);
 		_ = fakeRoundRepository.GetAsync(
-			id: Arg.Is(query.RoundId),
 			externalCreatedOn: Arg.Is(currentTime.AddMonths(-3)),
+			id: Arg.Is(request.RoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns(roundInfo);
 
@@ -208,7 +207,9 @@ public class RoundGetServiceUnitTest
 			fakeGameProviderRepository,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.NotNull(actual);
 		Assert.Equal(roundId, actual.RoundId);
@@ -230,7 +231,6 @@ public class RoundGetServiceUnitTest
 		Assert.Equal(roundInfo.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.Settle, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
-		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
 		Assert.Equal(roundInfo.ClosedOn, actual.ClosedOn);
@@ -249,13 +249,13 @@ public class RoundGetServiceUnitTest
 		var roundId = Guid.NewGuid();
 		var externalCreatedOn = new DateTimeOffset(2024, 04, 24, 15, 30, 45, TimeSpan.FromHours(+8));
 
-		var query = new RoundQuery(
+		var request = new RoundGetRequest(
 			RoundId: roundId,
 			ExternalCreatedOn: externalCreatedOn);
 
 		_ = fakeRoundRepository.GetAsync(
-			id: Arg.Is(query.RoundId),
-			externalCreatedOn: Arg.Any<DateTimeOffset>(),
+			externalCreatedOn: Arg.Is(externalCreatedOn),
+			id: Arg.Is(request.RoundId),
 			cancellationToken: Arg.Any<CancellationToken>())
 			.Returns((RoundInfo?)null);
 
@@ -265,7 +265,9 @@ public class RoundGetServiceUnitTest
 			fakeGameProviderRepository,
 			fakeRoundRepository);
 
-		var actual = await sut.GetAsync(query);
+		var cancellationTokenSource = new CancellationTokenSource();
+		var token = cancellationTokenSource.Token;
+		var actual = await sut.Handle(request, token);
 
 		Assert.Null(actual);
 	}
