@@ -34,7 +34,7 @@ internal class RoundRepository(
 				ValidBetAmount = source.ValidBet,
 				SettleAmount = source.Settle,
 				Commission = source.ExternalClosedOn.HasValue ? source.Commission : 0,
-				Turnover = source.ValidBet,
+				Turnover = source.Turnover,
 				WinLoss = source.ExternalClosedOn.HasValue ? -source.PlayerWinLoss : 0,
 				ClientStatus = (short)source.ClientStatus,
 			},
@@ -64,7 +64,7 @@ internal class RoundRepository(
 		round.ValidBetAmount = source.ValidBet;
 		round.SettleAmount = source.Settle;
 		round.Commission = source.Commission;
-		round.Turnover = source.ValidBet;
+		round.Turnover = source.Turnover;
 		round.WinLoss = -source.PlayerWinLoss;
 
 		_ = context.Rounds.Update(round);
@@ -95,6 +95,7 @@ internal class RoundRepository(
 			round.ValidBetAmount.GetValueOrDefault(0),
 			round.SettleAmount.GetValueOrDefault(0),
 			round.Commission.GetValueOrDefault(0),
+			round.Turnover.GetValueOrDefault(0),
 			-round.WinLoss.GetValueOrDefault(0),
 			round.CreatedOn,
 			round.ClosedOn,
@@ -127,6 +128,7 @@ internal class RoundRepository(
 			round.ValidBetAmount.GetValueOrDefault(0),
 			round.SettleAmount.GetValueOrDefault(0),
 			round.Commission.GetValueOrDefault(0),
+			round.Turnover.GetValueOrDefault(0),
 			-round.WinLoss.GetValueOrDefault(0),
 			round.CreatedOn,
 			round.ClosedOn,
@@ -203,7 +205,7 @@ internal class RoundRepository(
 		round.ValidBetAmount = source.ValidBet;
 		round.SettleAmount = 0.0m;
 		round.Commission = 0.0m;
-		round.Turnover = 0.0m;
+		round.Turnover = source.Turnover;
 		round.WinLoss = 0.0m;
 
 		_ = context.Rounds.Update(round);
@@ -230,7 +232,7 @@ internal class RoundRepository(
 		round.ValidBetAmount = source.ValidBet;
 		round.SettleAmount = source.Settle;
 		round.Commission = source.Commission;
-		round.Turnover = source.ValidBet;
+		round.Turnover = source.Turnover;
 		round.WinLoss = -source.PlayerWinLoss;
 		round.ReopenTurnoverAdjustment = round.Turnover ?? 0;
 		round.ReopenedOn = DateTime.UtcNow;

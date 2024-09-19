@@ -69,6 +69,7 @@ public class RoundGetExternalGameServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -123,6 +124,7 @@ public class RoundGetExternalGameServiceUnitTest
 		Assert.Equal(roundInfo.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.Settle, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
+		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
 		Assert.Equal(roundInfo.ClosedOn, actual.ClosedOn);
@@ -191,6 +193,7 @@ public class RoundGetExternalGameServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -245,6 +248,7 @@ public class RoundGetExternalGameServiceUnitTest
 		Assert.Equal(roundInfo.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.Settle, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
+		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
 		Assert.Equal(roundInfo.ClosedOn, actual.ClosedOn);

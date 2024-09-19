@@ -262,6 +262,7 @@ public class RoundRepositoryUnitTest
 			ValidBet: 10m,
 			Settle: 20m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10m,
 			CreatedOn: DateTime.UtcNow
 		);
@@ -295,7 +296,7 @@ public class RoundRepositoryUnitTest
 		Assert.Equal(source.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(source.Settle, actual.SettleAmount);
 		Assert.Equal(source.Commission, actual.Commission);
-		Assert.Equal(source.ValidBet, actual.Turnover);
+		Assert.Equal(source.Turnover, actual.Turnover);
 		Assert.Equal(-source.PlayerWinLoss, actual.WinLoss);
 		Assert.Equal((int)source.ClientStatus, (int)actual.ClientStatus);
 	}
@@ -328,6 +329,7 @@ public class RoundRepositoryUnitTest
 			ValidBet: 10m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 0.0m,
 			CreatedOn: DateTime.UtcNow
 		);
@@ -361,7 +363,7 @@ public class RoundRepositoryUnitTest
 		Assert.Equal(source.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(source.Settle, actual.SettleAmount);
 		Assert.Equal(source.Commission, actual.Commission);
-		Assert.Equal(source.ValidBet, actual.Turnover);
+		Assert.Equal(source.Turnover, actual.Turnover);
 		Assert.Equal(-source.PlayerWinLoss, actual.WinLoss);
 		Assert.Equal((int)source.ClientStatus, (int)actual.ClientStatus);
 	}
@@ -417,6 +419,7 @@ public class RoundRepositoryUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m
 		);
 
@@ -448,7 +451,7 @@ public class RoundRepositoryUnitTest
 		Assert.Equal(source.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(source.Settle, actual.SettleAmount);
 		Assert.Equal(source.Commission, actual.Commission);
-		Assert.Equal(source.ValidBet, actual.Turnover);
+		Assert.Equal(source.Turnover, actual.Turnover);
 		Assert.Equal(-source.PlayerWinLoss, actual.WinLoss);
 		Assert.Equal((int)source.ClientStatus, (int)actual.ClientStatus);
 	}
@@ -486,7 +489,7 @@ public class RoundRepositoryUnitTest
 			ValidBetAmount = 10m,
 			SettleAmount = 0.0m,
 			Commission = 0.0m,
-			Turnover = 0.0m,
+			Turnover = 10m,
 			WinLoss = 0.0m,
 			ClientStatus = (short)RoundClientStatus.Open
 		};
@@ -500,7 +503,8 @@ public class RoundRepositoryUnitTest
 
 		var source = new RoundOpen(
 			Bet: 10m,
-			ValidBet: 10m);
+			ValidBet: 10m,
+			Turnover: 10.0m);
 
 		var fakeRoundRepository = new RoundRepository(context);
 
@@ -530,7 +534,7 @@ public class RoundRepositoryUnitTest
 		Assert.Equal(source.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(0.0m, actual.SettleAmount);
 		Assert.Equal(0.0m, actual.Commission);
-		Assert.Equal(0.0m, actual.Turnover);
+		Assert.Equal(source.Turnover, actual.Turnover);
 		Assert.Equal(0.0m, actual.WinLoss);
 		Assert.Equal((int)RoundClientStatus.Open, (int)actual.ClientStatus);
 	}
@@ -587,6 +591,7 @@ public class RoundRepositoryUnitTest
 			ValidBet: 10m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10m
 		);
 
@@ -618,7 +623,7 @@ public class RoundRepositoryUnitTest
 		Assert.Equal(source.ValidBet, actual.ValidBetAmount);
 		Assert.Equal(source.Settle, actual.SettleAmount);
 		Assert.Equal(source.Commission, actual.Commission);
-		Assert.Equal(source.ValidBet, actual.Turnover);
+		Assert.Equal(source.Turnover, actual.Turnover);
 		Assert.Equal(-source.PlayerWinLoss, actual.WinLoss);
 		Assert.Equal((int)source.ClientStatus, (int)actual.ClientStatus);
 		Assert.Equal(round.Turnover, actual.ReopenTurnoverAdjustment!.Value);

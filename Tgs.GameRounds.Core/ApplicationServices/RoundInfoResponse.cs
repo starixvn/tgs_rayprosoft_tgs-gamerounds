@@ -22,6 +22,7 @@ public record RoundInfoResponse(
 	decimal ValidBetAmount,
 	decimal SettleAmount,
 	decimal Commission,
+	decimal Turnover,
 	decimal PlayerWinLoss,
 	DateTimeOffset CreatedOn,
 	DateTimeOffset? ClosedOn,
