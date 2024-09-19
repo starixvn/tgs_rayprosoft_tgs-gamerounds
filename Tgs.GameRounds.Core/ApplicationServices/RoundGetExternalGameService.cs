@@ -62,6 +62,7 @@ internal class RoundGetExternalGameService(
 			ValidBetAmount: roundInfo.ValidBet,
 			SettleAmount: roundInfo.Settle,
 			Commission: roundInfo.Commission,
+			Turnover: roundInfo.Turnover,
 			PlayerWinLoss: roundInfo.PlayerWinLoss,
 			CreatedOn: roundInfo.CreatedOn,
 			ClosedOn: roundInfo.ClosedOn,

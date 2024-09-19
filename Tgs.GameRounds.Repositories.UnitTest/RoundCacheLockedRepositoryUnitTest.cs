@@ -38,6 +38,7 @@ public class RoundCacheLockedRepositoryUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			CreatedOn: DateTimeOffset.UtcNow);
 
@@ -90,6 +91,7 @@ public class RoundCacheLockedRepositoryUnitTest
 			Bet: 10.0m,
 			ValidBet: 10.0m,
 			Settle: 20.0m,
+			Turnover: 10.0m,
 			Commission: 0.0m,
 			PlayerWinLoss: 10.0m,
 			CreatedOn: DateTimeOffset.UtcNow);
@@ -144,6 +146,7 @@ public class RoundCacheLockedRepositoryUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			CreatedOn: DateTimeOffset.UtcNow);
 
@@ -193,6 +196,7 @@ public class RoundCacheLockedRepositoryUnitTest
 			Bet: 10.0m,
 			ValidBet: 10.0m,
 			Settle: 20.0m,
+			Turnover: 10.0m,
 			Commission: 0.0m,
 			PlayerWinLoss: 10.0m);
 
@@ -373,7 +377,8 @@ public class RoundCacheLockedRepositoryUnitTest
 		var externalCreatedOn = DateTimeOffset.UtcNow;
 		var source = new RoundOpen(
 			Bet: 10.0m,
-			ValidBet: 10.0m);
+			ValidBet: 10.0m,
+			Turnover: 10.0m);
 
 		var sut = new RoundCacheLockedRepository(
 			fakeRoundRepository,
@@ -408,6 +413,7 @@ public class RoundCacheLockedRepositoryUnitTest
 			Bet: 10.0m,
 			ValidBet: 10.0m,
 			Settle: 20.0m,
+			Turnover: 10.0m,
 			Commission: 0.0m,
 			PlayerWinLoss: 10.0m);
 

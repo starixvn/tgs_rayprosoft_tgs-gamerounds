@@ -55,6 +55,7 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -101,6 +102,7 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
+		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -146,6 +148,7 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -192,6 +195,7 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
+		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -274,6 +278,7 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -324,6 +329,7 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
+		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -369,6 +375,7 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -419,6 +426,7 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
+		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -499,6 +507,7 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -549,6 +558,7 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
+		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);
@@ -594,6 +604,7 @@ public partial class GameRoundsClientUnitTest
 			ValidBetAmount: 10.0m,
 			SettleAmount: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: createdOn,
 			ClosedOn: closedOn,
@@ -644,6 +655,7 @@ public partial class GameRoundsClientUnitTest
 		Assert.Equal(roundInfo.ValidBetAmount, actual.ValidBetAmount);
 		Assert.Equal(roundInfo.SettleAmount, actual.SettleAmount);
 		Assert.Equal(roundInfo.Commission, actual.Commission);
+		Assert.Equal(roundInfo.Turnover, actual.Turnover);
 		Assert.Equal(roundInfo.PlayerWinLoss, actual.PlayerWinLoss);
 		Assert.Equal(-roundInfo.PlayerWinLoss, actual.CompanyWinLoss);
 		Assert.Equal(roundInfo.CreatedOn, actual.CreatedOn);

@@ -14,7 +14,8 @@ internal class RoundCommandService(
 
 		var externalClosedOn = (DateTimeOffset?)null;
 		var bet = request.Bet;
-		var validBet = request.ValidBet;
+		var validBet = request.Bet;
+		var turnover = request.Bet;
 		var settle = 0.0m;
 		var commission = 0.0m;
 		var playerWinLoss = 0.0m;
@@ -25,6 +26,7 @@ internal class RoundCommandService(
 			settle = request.Settle;
 			commission = request.Commission;
 			validBet = request.ValidBet;
+			turnover = request.Turnover;
 			playerWinLoss = request.PlayerWinLoss;
 		}
 
@@ -59,6 +61,7 @@ internal class RoundCommandService(
 					ValidBet: validBet,
 					Settle: settle,
 					Commission: commission,
+					Turnover: turnover,
 					PlayerWinLoss: playerWinLoss,
 					CreatedOn: request.CreatedOn),
 				cancellationToken: cancellationToken)
@@ -104,7 +107,8 @@ internal class RoundCommandService(
 						id: id!.Value,
 						source: new Models.RoundOpen(
 							Bet: bet,
-							ValidBet: validBet),
+							ValidBet: validBet,
+							Turnover: turnover),
 						cancellationToken: cancellationToken)
 						.ConfigureAwait(false);
 					isOperate = true;
@@ -125,6 +129,7 @@ internal class RoundCommandService(
 							ValidBet: validBet,
 							Settle: settle,
 							Commission: commission,
+							Turnover: turnover,
 							PlayerWinLoss: playerWinLoss),
 						cancellationToken: cancellationToken)
 						.ConfigureAwait(false);
@@ -138,6 +143,7 @@ internal class RoundCommandService(
 						roundInfo.ValidBet != validBet ||
 						roundInfo.Settle != settle ||
 						roundInfo.Commission != commission ||
+						roundInfo.Turnover != turnover ||
 						roundInfo.PlayerWinLoss != playerWinLoss ||
 						roundInfo.ClientStatus != request.ClientStatus)
 						{
@@ -158,6 +164,7 @@ internal class RoundCommandService(
 									CurrentValidBet = roundInfo.ValidBet,
 									CurrentSettle = roundInfo.Settle,
 									CurrentCommission = roundInfo.Commission,
+									CurrentTurnover = roundInfo.Turnover,
 									CurrentPlayerWinLoss = roundInfo.PlayerWinLoss,
 									RequestStatus = request.Status.ToString(),
 									RequestClientStatus = request.ClientStatus.ToString(),
@@ -165,6 +172,7 @@ internal class RoundCommandService(
 									RequestValidBet = validBet,
 									RequestSettle = settle,
 									RequestCommission = commission,
+									RequestTurnover = turnover,
 									RequestPlayerWinLoss = playerWinLoss,
 									Message = "This game round data has changed."
 								}));
@@ -179,6 +187,7 @@ internal class RoundCommandService(
 									ValidBet: validBet,
 									Settle: settle,
 									Commission: commission,
+									Turnover: turnover,
 									PlayerWinLoss: playerWinLoss),
 								cancellationToken: cancellationToken)
 								.ConfigureAwait(false);

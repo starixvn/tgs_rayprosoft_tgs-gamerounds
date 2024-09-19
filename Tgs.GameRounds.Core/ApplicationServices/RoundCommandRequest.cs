@@ -20,6 +20,7 @@ public record RoundCommandRequest(
 	decimal ValidBet,
 	decimal Settle,
 	decimal Commission,
+	decimal Turnover,
 	decimal PlayerWinLoss,
 	JsonNode AdditionalData,
 	DateTimeOffset CreatedOn) : IRequest<Guid>;

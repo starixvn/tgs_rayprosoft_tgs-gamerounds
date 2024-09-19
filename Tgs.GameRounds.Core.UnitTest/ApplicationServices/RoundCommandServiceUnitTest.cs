@@ -43,6 +43,7 @@ public class RoundCommandServiceUnitTest
 			Bet: 20.0m,
 			ValidBet: 20.0m,
 			Settle: 0.0m,
+			Turnover: 20.0m,
 			Commission: 0.0m,
 			PlayerWinLoss: 0.0m,
 			AdditionalData: new JsonObject
@@ -90,6 +91,7 @@ public class RoundCommandServiceUnitTest
 				ValidBet: 20.0m,
 				Settle: 0.0m,
 				Commission: 0.0m,
+				Turnover: 20.0m,
 				PlayerWinLoss: 0.0m,
 				CreatedOn: request.CreatedOn)),
 			cancellationToken: Arg.Any<CancellationToken>());
@@ -161,6 +163,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 0.5m,
 			Settle: 19.5m,
 			Commission: 0.0m,
+			Turnover: 0.5m,
 			PlayerWinLoss: -0.5m,
 			AdditionalData: new JsonObject
 			{
@@ -207,6 +210,7 @@ public class RoundCommandServiceUnitTest
 				ValidBet: 0.5m,
 				Settle: 19.5m,
 				Commission: 0.0m,
+				Turnover: 0.5m,
 				PlayerWinLoss: -0.5m,
 				CreatedOn: request.CreatedOn)),
 			cancellationToken: Arg.Any<CancellationToken>());
@@ -278,6 +282,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			AdditionalData: new JsonObject
 			{
@@ -312,6 +317,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 0.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.UnixEpoch,
@@ -358,6 +364,7 @@ public class RoundCommandServiceUnitTest
 				ValidBet: request.ValidBet,
 				Settle: request.Settle,
 				Commission: request.Commission,
+				Turnover: request.Turnover,
 				PlayerWinLoss: request.PlayerWinLoss)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
@@ -412,6 +419,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			AdditionalData: new JsonObject
 			{
@@ -446,6 +454,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.Now,
@@ -539,6 +548,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 20.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 20.0m,
 			PlayerWinLoss: 10.0m,
 			AdditionalData: new JsonObject
 			{
@@ -573,6 +583,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 0.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.UnixEpoch,
@@ -606,7 +617,8 @@ public class RoundCommandServiceUnitTest
 			id: Arg.Is(roundId),
 			source: Arg.Is(new Models.RoundOpen(
 				Bet: request.Bet,
-				ValidBet: request.ValidBet)),
+				ValidBet: request.ValidBet,
+				Turnover: request.Turnover)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
 		_ = fakeRoundRepository
@@ -668,6 +680,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			AdditionalData: new JsonObject
 			{
@@ -702,6 +715,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: -10.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.Now,
@@ -756,6 +770,7 @@ public class RoundCommandServiceUnitTest
 				ValidBet: request.ValidBet,
 				Settle: request.Settle,
 				Commission: request.Commission,
+				Turnover: request.Turnover,
 				PlayerWinLoss: request.PlayerWinLoss)),
 			cancellationToken: Arg.Any<CancellationToken>());
 
@@ -802,6 +817,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 0.0m,
 			AdditionalData: new JsonObject
 			{
@@ -836,6 +852,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 10.0m,
 			Settle: 20.0m,
 			Commission: 0.0m,
+			Turnover: 10.0m,
 			PlayerWinLoss: 10.0m,
 			CreatedOn: DateTimeOffset.Now,
 			ClosedOn: DateTimeOffset.Now,
