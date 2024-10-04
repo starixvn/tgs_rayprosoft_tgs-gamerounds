@@ -14,15 +14,7 @@ public partial class TgsContext : DbContext
     {
     }
 
-    public virtual DbSet<Game> Games { get; set; }
-
-    public virtual DbSet<GameProvider> GameProviders { get; set; }
-
     public virtual DbSet<Round> Rounds { get; set; }
-
-    public virtual DbSet<RoundDetail> RoundDetails { get; set; }
-
-    public virtual DbSet<SubGameProvider> SubGameProviders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,11 +22,7 @@ public partial class TgsContext : DbContext
             .HasPostgresExtension("ltree")
             .HasPostgresExtension("pg_trgm");
 
-        modelBuilder.ApplyConfiguration(new Configurations.GameConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.GameProviderConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.RoundConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.RoundDetailConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.SubGameProviderConfiguration());
         OnModelCreatingPartial(modelBuilder);
     }
 

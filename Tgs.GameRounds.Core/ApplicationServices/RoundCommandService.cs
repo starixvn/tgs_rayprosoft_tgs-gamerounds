@@ -10,8 +10,6 @@ internal class RoundCommandService(
 {
 	public async Task<Guid> Handle(RoundCommandRequest request, CancellationToken cancellationToken)
 	{
-		bool isOperate = false;
-
 		var externalClosedOn = (DateTimeOffset?)null;
 		var bet = request.Bet;
 		var validBet = request.Bet;
@@ -66,8 +64,6 @@ internal class RoundCommandService(
 					CreatedOn: request.CreatedOn),
 				cancellationToken: cancellationToken)
 				.ConfigureAwait(false);
-
-			isOperate = true;
 		}
 		else
 		{
@@ -111,7 +107,6 @@ internal class RoundCommandService(
 							Turnover: turnover),
 						cancellationToken: cancellationToken)
 						.ConfigureAwait(false);
-					isOperate = true;
 				}
 			}
 			else
@@ -133,7 +128,6 @@ internal class RoundCommandService(
 							PlayerWinLoss: playerWinLoss),
 						cancellationToken: cancellationToken)
 						.ConfigureAwait(false);
-					isOperate = true;
 				}
 				else
 				{
@@ -191,20 +185,10 @@ internal class RoundCommandService(
 									PlayerWinLoss: playerWinLoss),
 								cancellationToken: cancellationToken)
 								.ConfigureAwait(false);
-							isOperate = true;
 						}
 					}
 				}
 			}
-		}
-
-		if (isOperate)
-		{
-			await repository.MergeDetailAsync(
-				id: id.Value,
-				additionalData: request.AdditionalData.ToJsonString()!,
-				cancellationToken: cancellationToken)
-				.ConfigureAwait(false);
 		}
 
 		return id!.Value;

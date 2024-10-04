@@ -80,17 +80,8 @@ internal class RoundCacheLockedRepository(
 	public ValueTask<RoundInfo?> GetAsync(DateTimeOffset externalCreatedOn, Guid id, CancellationToken cancellationToken = default)
 		=> repository.GetAsync(externalCreatedOn, id, cancellationToken);
 
-	public ValueTask<RoundInfo?> GetAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default)
-		=> repository.GetAsync(externalCreatedOn, gameProviderId, gameId, walletId, externalRoundId, cancellationToken);
-
 	public ValueTask<Guid?> GetIdAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default)
 		=> repository.GetIdAsync(externalCreatedOn, gameProviderId, gameId, walletId, externalRoundId, cancellationToken);
-
-	public ValueTask<RoundDetailInfo?> GetRoundDetailAsync(Guid id, CancellationToken cancellationToken = default)
-		=> repository.GetRoundDetailAsync(id, cancellationToken);
-
-	public ValueTask MergeDetailAsync(Guid id, string additionalData, CancellationToken cancellationToken = default)
-		=> repository.MergeDetailAsync(id, additionalData, cancellationToken);
 
 	public ValueTask OpenAsync(DateTimeOffset externalCreatedOn, Guid id, RoundOpen source, CancellationToken cancellationToken = default)
 		=> repository.OpenAsync(externalCreatedOn, id, source, cancellationToken);
