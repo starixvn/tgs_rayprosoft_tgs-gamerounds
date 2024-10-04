@@ -22,23 +22,7 @@
   "T4TemplatePath": null,
   "Tables": [
     {
-      "Name": "bet.round_details",
-      "ObjectType": 0
-    },
-    {
       "Name": "bet.rounds",
-      "ObjectType": 0
-    },
-    {
-      "Name": "dbo.game_providers",
-      "ObjectType": 0
-    },
-    {
-      "Name": "dbo.games",
-      "ObjectType": 0
-    },
-    {
-      "Name": "dbo.sub_game_providers",
       "ObjectType": 0
     }
   ],

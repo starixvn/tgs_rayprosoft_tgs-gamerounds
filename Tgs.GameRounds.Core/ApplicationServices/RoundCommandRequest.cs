@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Nodes;
-using MediatR;
+﻿using MediatR;
 
 namespace Tgs.GameRounds.Core.ApplicationServices;
 public record RoundCommandRequest(
@@ -22,5 +21,4 @@ public record RoundCommandRequest(
 	decimal Commission,
 	decimal Turnover,
 	decimal PlayerWinLoss,
-	JsonNode AdditionalData,
 	DateTimeOffset CreatedOn) : IRequest<Guid>;

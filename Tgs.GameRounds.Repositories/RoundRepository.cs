@@ -103,39 +103,6 @@ internal class RoundRepository(
 		.FirstOrDefaultAsync(cancellationToken)
 		.ConfigureAwait(false);
 
-	public async ValueTask<RoundInfo?> GetAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default)
-		=> await context.Rounds
-		.Where(r => r.CreatedOn >= externalCreatedOn.AddDays(-7).UtcDateTime &&
-			r.GameProviderId == gameProviderId &&
-			r.ExternalRoundId == externalRoundId &&
-			r.GameId == gameId &&
-			r.WalletId == walletId)
-		.Select(round => new RoundInfo(
-			round.Id,
-			round.GameProviderId,
-			round.GameProviderConfigurationId,
-			round.GameId,
-			round.BrandId,
-			round.PlayerCode,
-			round.WalletId,
-			round.CurrencyCode,
-			(RoundStatus)round.Status,
-			(RoundClientStatus)round.ClientStatus,
-			round.ExternalRoundId,
-			round.ExternalCreatedOn,
-			round.ExternalClosedOn,
-			round.BetAmount.GetValueOrDefault(0),
-			round.ValidBetAmount.GetValueOrDefault(0),
-			round.SettleAmount.GetValueOrDefault(0),
-			round.Commission.GetValueOrDefault(0),
-			round.Turnover.GetValueOrDefault(0),
-			-round.WinLoss.GetValueOrDefault(0),
-			round.CreatedOn,
-			round.ClosedOn,
-			round.UpdatedOn))
-		.FirstOrDefaultAsync(cancellationToken)
-		.ConfigureAwait(false);
-
 	public async ValueTask<Guid?> GetIdAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default)
 		=> await context.Rounds.AsQueryable()
 		.Where(x =>
@@ -148,46 +115,6 @@ internal class RoundRepository(
 		.Select(x => (Guid?)x.Id)
 		.FirstOrDefaultAsync(cancellationToken)
 		.ConfigureAwait(false);
-
-	public async ValueTask<RoundDetailInfo?> GetRoundDetailAsync(Guid roundId, CancellationToken cancellationToken = default)
-		=> await context.RoundDetails
-		.Where(x => x.RoundId == roundId)
-		.Select(x => new RoundDetailInfo(x.RoundId, x.AdditionalData))
-		.FirstOrDefaultAsync(cancellationToken)
-		.ConfigureAwait(false);
-
-	public async ValueTask MergeDetailAsync(Guid id, string additionalData, CancellationToken cancellationToken = default)
-	{
-		var roundDetail = await context.RoundDetails
-			.FirstOrDefaultAsync(
-			predicate: x => x.RoundId == id,
-			cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
-
-		if (roundDetail is null)
-		{
-			roundDetail = new RoundDetail()
-			{
-				RoundId = id,
-				AdditionalData = additionalData,
-			};
-
-			_ = await context.RoundDetails.AddAsync(
-				entity: roundDetail,
-				cancellationToken: cancellationToken)
-				.ConfigureAwait(false);
-		}
-		else
-		{
-			roundDetail.AdditionalData = additionalData;
-
-			_ = context.RoundDetails.Update(roundDetail);
-		}
-
-		_ = await context.SaveChangesAsync(
-			cancellationToken: cancellationToken)
-			.ConfigureAwait(false);
-	}
 
 	public async ValueTask OpenAsync(DateTimeOffset externalCreatedOn, Guid id, RoundOpen source, CancellationToken cancellationToken = default)
 	{

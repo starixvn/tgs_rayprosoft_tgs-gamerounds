@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -245,39 +244,6 @@ public class RoundCacheLockedRepositoryUnitTest
 	}
 
 	[Fact]
-	public async Task Get_Game()
-	{
-		var fakeRoundRepository = Substitute.For<IRoundRepository>();
-		var fakeDatabase = Substitute.For<IDatabase>();
-		var fakeTimeSpan = TimeSpan.FromMinutes(1);
-		var fakeLogger = NullLogger<RoundCacheLockedRepository>.Instance;
-
-		var gameProviderId = Guid.NewGuid();
-		var gameId = 1;
-		var walletId = Guid.NewGuid();
-		var externalRoundId = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-		var externalCreatedOn = DateTimeOffset.Now;
-
-		var sut = new RoundCacheLockedRepository(
-			fakeRoundRepository,
-			fakeDatabase,
-			fakeTimeSpan,
-			fakeLogger);
-
-		_ = await sut.GetAsync(externalCreatedOn, gameProviderId, gameId, walletId, externalRoundId);
-
-		_ = fakeRoundRepository
-			.Received(1)
-			.GetAsync(
-			externalCreatedOn: Arg.Is(externalCreatedOn),
-			gameProviderId: Arg.Is(gameProviderId),
-			gameId: Arg.Is(gameId),
-			walletId: Arg.Is(walletId),
-			externalRoundId: Arg.Is(externalRoundId),
-			cancellationToken: Arg.Any<CancellationToken>());
-	}
-
-	[Fact]
 	public async Task Get_Id()
 	{
 		var fakeRoundRepository = Substitute.For<IRoundRepository>();
@@ -307,61 +273,6 @@ public class RoundCacheLockedRepositoryUnitTest
 			gameId: Arg.Is(gameId),
 			walletId: Arg.Is(walletId),
 			externalRoundId: Arg.Is(externalRoundId),
-			cancellationToken: Arg.Any<CancellationToken>());
-	}
-
-	[Fact]
-	public async Task Get_RoundDetail()
-	{
-		var fakeRoundRepository = Substitute.For<IRoundRepository>();
-		var fakeDatabase = Substitute.For<IDatabase>();
-		var fakeTimeSpan = TimeSpan.FromMinutes(1);
-		var fakeLogger = NullLogger<RoundCacheLockedRepository>.Instance;
-
-		var id = Guid.NewGuid();
-
-		var sut = new RoundCacheLockedRepository(
-			fakeRoundRepository,
-			fakeDatabase,
-			fakeTimeSpan,
-			fakeLogger);
-
-		_ = await sut.GetRoundDetailAsync(id);
-
-		_ = fakeRoundRepository
-			.Received(1)
-			.GetRoundDetailAsync(
-			id: Arg.Is(id),
-			cancellationToken: Arg.Any<CancellationToken>());
-	}
-
-	[Fact]
-	public async Task MergeDetail()
-	{
-		var fakeRoundRepository = Substitute.For<IRoundRepository>();
-		var fakeDatabase = Substitute.For<IDatabase>();
-		var fakeTimeSpan = TimeSpan.FromMinutes(1);
-		var fakeLogger = NullLogger<RoundCacheLockedRepository>.Instance;
-
-		var id = Guid.NewGuid();
-		var additionalData = new JsonObject
-		{
-			["ExternalRoundId"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString()
-		}.ToJsonString();
-
-		var sut = new RoundCacheLockedRepository(
-			fakeRoundRepository,
-			fakeDatabase,
-			fakeTimeSpan,
-			fakeLogger);
-
-		await sut.MergeDetailAsync(id, additionalData);
-
-		_ = fakeRoundRepository
-			.Received(1)
-			.MergeDetailAsync(
-			id: Arg.Is(id),
-			additionalData: Arg.Is(additionalData),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 

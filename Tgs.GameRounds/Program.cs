@@ -74,6 +74,7 @@ builder.Services
 		.AddSource("Tgs.*")
 		.AddSource("TGS.*")
 		.AddSource("Valhalla.*")
+		.AddSource("MediatR")
 		.AddAspNetCoreInstrumentation()
 		.AddHttpClientInstrumentation()
 		.AddGrpcClientInstrumentation()
@@ -94,9 +95,7 @@ builder.Services
 			&& !httpContext.Request.Path.StartsWithSegments("/profiler/")
 			&& !httpContext.Request.Path.StartsWithSegments("/hangfire")
 			&& !httpContext.Request.Path.StartsWithSegments("/metrics")
-			&& !filterInstrumentations.Any(ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
-	.AddInterceptionService()
-	.AddServiceUtiltiyInterceptors();
+			&& !filterInstrumentations.Any(ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
 
 builder.Services.AddHealthChecks();
 

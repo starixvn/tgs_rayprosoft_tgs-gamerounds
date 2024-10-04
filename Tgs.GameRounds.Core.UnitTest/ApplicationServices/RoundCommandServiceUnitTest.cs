@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -45,11 +44,7 @@ public class RoundCommandServiceUnitTest
 			Settle: 0.0m,
 			Turnover: 20.0m,
 			Commission: 0.0m,
-			PlayerWinLoss: 0.0m,
-			AdditionalData: new JsonObject
-			{
-				["ExternalRoundId"] = externalRoundId
-			});
+			PlayerWinLoss: 0.0m);
 
 		_ = fakeRoundRepository.GetIdAsync(
 			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
@@ -119,13 +114,6 @@ public class RoundCommandServiceUnitTest
 			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
-
-		_ = fakeRoundRepository
-			.Received(1)
-			.MergeDetailAsync(
-			id: Arg.Is(request.Id),
-			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
-			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -164,11 +152,7 @@ public class RoundCommandServiceUnitTest
 			Settle: 19.5m,
 			Commission: 0.0m,
 			Turnover: 0.5m,
-			PlayerWinLoss: -0.5m,
-			AdditionalData: new JsonObject
-			{
-				["ExternalRoundId"] = externalRoundId
-			});
+			PlayerWinLoss: -0.5m);
 
 		_ = fakeRoundRepository.GetIdAsync(
 			externalCreatedOn: Arg.Is(request.ExternalCreatedOn),
@@ -238,13 +222,6 @@ public class RoundCommandServiceUnitTest
 			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
-
-		_ = fakeRoundRepository
-			.Received(1)
-			.MergeDetailAsync(
-			id: Arg.Is(request.Id),
-			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
-			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -283,11 +260,7 @@ public class RoundCommandServiceUnitTest
 			Settle: 20.0m,
 			Commission: 0.0m,
 			Turnover: 10.0m,
-			PlayerWinLoss: 10.0m,
-			AdditionalData: new JsonObject
-			{
-				["ExternalRoundId"] = externalRoundId
-			});
+			PlayerWinLoss: 10.0m);
 
 		var roundId = Guid.NewGuid();
 		_ = fakeRoundRepository.GetIdAsync(
@@ -375,13 +348,6 @@ public class RoundCommandServiceUnitTest
 			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
-
-		_ = fakeRoundRepository
-			.Received(1)
-			.MergeDetailAsync(
-			id: Arg.Is(roundId),
-			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
-			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -420,11 +386,7 @@ public class RoundCommandServiceUnitTest
 			Settle: 20.0m,
 			Commission: 0.0m,
 			Turnover: 10.0m,
-			PlayerWinLoss: 10.0m,
-			AdditionalData: new JsonObject
-			{
-				["ExternalRoundId"] = externalRoundId
-			});
+			PlayerWinLoss: 10.0m);
 
 		var roundId = Guid.NewGuid();
 		_ = fakeRoundRepository.GetIdAsync(
@@ -504,13 +466,6 @@ public class RoundCommandServiceUnitTest
 			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
-
-		_ = fakeRoundRepository
-			.Received(0)
-			.MergeDetailAsync(
-			id: Arg.Any<Guid>(),
-			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
-			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -549,11 +504,7 @@ public class RoundCommandServiceUnitTest
 			Settle: 0.0m,
 			Commission: 0.0m,
 			Turnover: 20.0m,
-			PlayerWinLoss: 10.0m,
-			AdditionalData: new JsonObject
-			{
-				["ExternalRoundId"] = externalRoundId
-			});
+			PlayerWinLoss: 10.0m);
 
 		var roundId = Guid.NewGuid();
 		_ = fakeRoundRepository.GetIdAsync(
@@ -636,13 +587,6 @@ public class RoundCommandServiceUnitTest
 			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
 			cancellationToken: Arg.Any<CancellationToken>());
-
-		_ = fakeRoundRepository
-			.Received(1)
-			.MergeDetailAsync(
-			id: Arg.Is(roundId),
-			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
-			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -681,11 +625,7 @@ public class RoundCommandServiceUnitTest
 			Settle: 20.0m,
 			Commission: 0.0m,
 			Turnover: 10.0m,
-			PlayerWinLoss: 10.0m,
-			AdditionalData: new JsonObject
-			{
-				["ExternalRoundId"] = externalRoundId
-			});
+			PlayerWinLoss: 10.0m);
 
 		var roundId = Guid.NewGuid();
 		_ = fakeRoundRepository.GetIdAsync(
@@ -773,13 +713,6 @@ public class RoundCommandServiceUnitTest
 				Turnover: request.Turnover,
 				PlayerWinLoss: request.PlayerWinLoss)),
 			cancellationToken: Arg.Any<CancellationToken>());
-
-		_ = fakeRoundRepository
-			.Received(1)
-			.MergeDetailAsync(
-			id: Arg.Is(roundId),
-			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
-			cancellationToken: Arg.Any<CancellationToken>());
 	}
 
 	[Fact]
@@ -818,11 +751,7 @@ public class RoundCommandServiceUnitTest
 			Settle: 0.0m,
 			Commission: 0.0m,
 			Turnover: 10.0m,
-			PlayerWinLoss: 0.0m,
-			AdditionalData: new JsonObject
-			{
-				["ExternalRoundId"] = externalRoundId
-			});
+			PlayerWinLoss: 0.0m);
 
 		var roundId = Guid.NewGuid();
 		_ = fakeRoundRepository.GetIdAsync(
@@ -901,13 +830,6 @@ public class RoundCommandServiceUnitTest
 			externalCreatedOn: Arg.Any<DateTimeOffset>(),
 			id: Arg.Any<Guid>(),
 			source: Arg.Any<Models.RoundReopen>(),
-			cancellationToken: Arg.Any<CancellationToken>());
-
-		_ = fakeRoundRepository
-			.Received(0)
-			.MergeDetailAsync(
-			id: Arg.Any<Guid>(),
-			additionalData: Arg.Is(request.AdditionalData.ToJsonString()!),
 			cancellationToken: Arg.Any<CancellationToken>());
 	}
 }
