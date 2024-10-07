@@ -12,8 +12,8 @@ internal class RoundCommandService(
 	{
 		var externalClosedOn = (DateTimeOffset?)null;
 		var bet = request.Bet;
-		var validBet = request.Bet;
-		var turnover = request.Bet;
+		var validBet = request.ValidBet;
+		var turnover = 0.0m;
 		var settle = 0.0m;
 		var commission = 0.0m;
 		var playerWinLoss = 0.0m;
