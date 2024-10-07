@@ -49,7 +49,7 @@ internal class RoundRepository(
 	public async ValueTask ClosedAsync(DateTimeOffset externalCreatedOn, Guid id, RoundClosed source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-7).UtcDateTime &&
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).UtcDateTime &&
 				x.Id == id &&
 				x.Status == (short)RoundStatus.Open,
 			cancellationToken: cancellationToken)
@@ -76,7 +76,7 @@ internal class RoundRepository(
 
 	public async ValueTask<RoundInfo?> GetAsync(DateTimeOffset externalCreatedOn, Guid id, CancellationToken cancellationToken = default)
 		=> await context.Rounds
-		.Where(r => r.CreatedOn >= externalCreatedOn.AddDays(-7).UtcDateTime && r.Id == id)
+		.Where(r => r.CreatedOn >= externalCreatedOn.AddDays(-3).UtcDateTime && r.Id == id)
 		.Select(round => new RoundInfo(
 			round.Id,
 			round.GameProviderId,
@@ -106,7 +106,7 @@ internal class RoundRepository(
 	public async ValueTask<Guid?> GetIdAsync(DateTimeOffset externalCreatedOn, Guid gameProviderId, int gameId, Guid walletId, string externalRoundId, CancellationToken cancellationToken = default)
 		=> await context.Rounds.AsQueryable()
 		.Where(x =>
-		x.CreatedOn >= externalCreatedOn.AddDays(-7).UtcDateTime &&
+		x.CreatedOn >= externalCreatedOn.AddDays(-3).UtcDateTime &&
 		x.CreatedOn <= DateTimeOffset.UtcNow &&
 		x.ExternalRoundId == externalRoundId &&
 		x.GameProviderId == gameProviderId &&
@@ -119,7 +119,7 @@ internal class RoundRepository(
 	public async ValueTask OpenAsync(DateTimeOffset externalCreatedOn, Guid id, RoundOpen source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-7).UtcDateTime &&
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).UtcDateTime &&
 				x.Id == id &&
 				x.Status == (short)RoundStatus.Open,
 			cancellationToken: cancellationToken)
@@ -145,7 +145,7 @@ internal class RoundRepository(
 	public async ValueTask ReopenAsync(DateTimeOffset externalCreatedOn, Guid id, RoundReopen source, CancellationToken cancellationToken = default)
 	{
 		var round = await context.Rounds.SingleAsync(
-			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-7).UtcDateTime &&
+			predicate: x => x.CreatedOn >= externalCreatedOn.AddDays(-3).UtcDateTime &&
 				x.Id == id &&
 				x.Status == (short)RoundStatus.Closed,
 			cancellationToken: cancellationToken)

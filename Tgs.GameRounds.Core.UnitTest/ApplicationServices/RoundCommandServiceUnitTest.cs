@@ -42,7 +42,7 @@ public class RoundCommandServiceUnitTest
 			Bet: 20.0m,
 			ValidBet: 20.0m,
 			Settle: 0.0m,
-			Turnover: 20.0m,
+			Turnover: 0.0m,
 			Commission: 0.0m,
 			PlayerWinLoss: 0.0m);
 
@@ -86,7 +86,7 @@ public class RoundCommandServiceUnitTest
 				ValidBet: 20.0m,
 				Settle: 0.0m,
 				Commission: 0.0m,
-				Turnover: 20.0m,
+				Turnover: 0.0m,
 				PlayerWinLoss: 0.0m,
 				CreatedOn: request.CreatedOn)),
 			cancellationToken: Arg.Any<CancellationToken>());
@@ -503,7 +503,7 @@ public class RoundCommandServiceUnitTest
 			ValidBet: 20.0m,
 			Settle: 0.0m,
 			Commission: 0.0m,
-			Turnover: 20.0m,
+			Turnover: 0.0m,
 			PlayerWinLoss: 10.0m);
 
 		var roundId = Guid.NewGuid();
