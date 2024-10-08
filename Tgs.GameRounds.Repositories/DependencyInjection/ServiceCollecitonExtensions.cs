@@ -15,6 +15,5 @@ public static class ServiceCollecitonExtensions
 		=> services
 		.AddDbContext<TgsContext>(dbContextOptions)
 		.AddTransient<IRoundRepository, RoundRepository>()
-		.Decorate<IRoundRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<RoundCacheLockedRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(3)))
-		.Decorate<IRoundRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<RoundCacheGetRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(4.5)));
+		.Decorate<IRoundRepository>((innerRepository, sp) => ActivatorUtilities.CreateInstance<RoundCacheLockedRepository>(sp, innerRepository, redisDatabaseResolver(sp), TimeSpan.FromMinutes(3)));
 }
